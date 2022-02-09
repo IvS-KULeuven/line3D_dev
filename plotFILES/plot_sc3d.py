@@ -1,3 +1,7 @@
+import sys
+sys.path.append('./levpy/')
+sys.path.append('./levpy/version_sc3d')
+
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
 import numpy as np

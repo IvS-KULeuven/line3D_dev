@@ -1,0 +1,38 @@
+HOME = '/lhome/levin'
+
+!PATH = '.:' + $
+        HOME+'/gdlproc/cmsvlib' + ':' + $        
+        HOME+'/gdlproc/proLEV' + ':' + $
+        HOME+'/gdlproc/proLEV/misc' + ':' + $
+        HOME+'/gdlproc/proLEV/models' + ':' + $                
+        HOME+'/gdlproc/proLEV/lte' + ':' + $
+        HOME+'/gdlproc/proLEV/grids' + ':' + $
+        HOME+'/gdlproc/proLEV/getall/3d' + ':' + $        
+        HOME+'/gdlproc/proLEV/getall/version_sc3d' + ':' + $
+        HOME+'/gdlproc/proLEV/getall/sc_cont2d' + ':' + $        
+        HOME+'/gdlproc/proLEV/getall/sc_cont3d' + ':' + $
+        HOME+'/gdlproc/proLEV/getall/forsol' + ':' + $
+        HOME+'/gdlproc/proLEV/fluxem' + ':' + $                
+        HOME+'/gdlproc/proLEV/contour_plots' + ':' + $
+        HOME+'/gdlproc/proLEV/math' + ':' + $
+        HOME+'/gdlproc/proLEV/hdf5_conversion' + ':' + $        
+        HOME+'/gdlproc/proLEV/math/interpolation' + ':' + $
+        HOME+'/gdlproc/proLEV/math/integration' + ':' + $        
+        HOME+'/gdlproc/proLEV/math/statistics' + ':' + $
+        HOME+'/gdlproc/proLEV/math/sparse' + ':' + $        
+        HOME+'/gdlproc/proLEV/colors' + ':' + $
+        HOME+'/gdlproc/proLEV/downsize' + ':' + $
+        HOME+'/gdlproc/proLEV/plots_small' + ':' + $                
+        HOME+'/gdlproc/proJO' + ':' + $
+        HOME+'/gdlproc/proGENERAL' + ':' + $
+        HOME+'/gdlproc/testsuite' + ':' + $
+        HOME+'/gdlproc/proLEV/textoidl' + ':' + $
+        !PATH
+
+;now define those programs that shall be compiled at startup
+;load constants in cgs units
+  const_cgs, /HELP
+;load globally stored line transitions
+  line_transitions, /HELP
+
+

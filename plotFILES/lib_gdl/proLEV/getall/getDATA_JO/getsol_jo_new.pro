@@ -1,0 +1,41 @@
+PRO getSOL_JO_NEW, dir, FILE_EXIST, NDJO, RADIUS, SLINENUM, SLINESOBO, SLINESOBOC, SCONT, VEL1D_JO
+;
+;-----------------------DEFINE FILE-NAMES-------------------------------
+;
+fname=dir+'/DATA_JO.dat'
+;
+;-----------------------CHECK IF FILES EXIST----------------------------
+;
+FILE_EXIST=FILE_TEST(fname)
+IF(FILE_EXIST EQ 0) THEN BEGIN
+   PRINT, 'FILE DOES NOT EXIST: ', fname
+   RETURN
+ENDIF
+;
+;------------------------READ IN DATA FROM FILES------------------------
+;
+HEADER=''
+;
+RADIUS=FLTARR(NDJO)*1.D0
+SLINENUM=FLTARR(NDJO)*1.D0
+SLINESOBOC=FLTARR(NDJO)*1.D0
+SLINESOBO=FLTARR(NDJO)*1.D0
+SCONT=FLTARR(NDJO)*1.D0
+VEL1D_JO=FLTARR(NDJO)*1.D0
+;
+OPENR, 1, fname
+   READF, 1, HEADER
+   FOR I=0, NDJO-1 DO BEGIN
+      READF, 1, VAR0, VAR1, VAR2, VAR3, VAR4, VAR5, VAR6
+      RADIUS(I)=VAR0
+      SLINENUM(I)=VAR2
+      SLINESOBOC(I)=VAR3
+      SLINESOBO(I)=VAR4
+      SCONT(I)=VAR5
+      VEL1D_JO(I)=VAR6
+   ENDFOR
+CLOSE, 1
+;
+RETURN
+;
+END

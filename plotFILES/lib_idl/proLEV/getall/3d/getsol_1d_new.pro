@@ -1,0 +1,45 @@
+PRO getSOL_1D_NEW, dir, FILE_EXIST, NDZ, MINT1D, SCONT1D, MINTBAR1D, SLINE1D, SSOBO1D, SSOBOC1D
+;
+;-----------------------CHECK IF FILES EXIST----------------------------
+;
+fname=dir+'/solution1D.dat'
+;
+;-----------------------CHECK IF FILES EXIST----------------------------
+;
+FILE_EXIST=FILE_TEST(fname)
+IF(FILE_EXIST EQ 0) THEN BEGIN
+   FILE_EXIST=0
+   PRINT, 'FILE DOES NOT EXIST: ', fname
+   RETURN
+ENDIF
+;
+;------------------------READ IN DATA FROM FILES------------------------
+;
+HEADER=''
+;
+N1D=NDZ
+;
+MINT1D=FLTARR(N1D)*1.D0
+SCONT1D=FLTARR(N1D)*1.D0
+MINTBAR1D=FLTARR(N1D)*1.D0
+SLINE1D=FLTARR(N1D)*1.D0
+SSOBO1D=FLTARR(N1D)*1.D0
+SSOBOC1D=FLTARR(N1D)*1.D0
+;
+OPENR, 1, fname
+   READF, 1, HEADER
+;
+   FOR I=0, N1D-1 DO BEGIN
+      READF, 1, VAR0, VAR1, VAR2, VAR3, VAR4, VAR5, VAR6
+      MINT1D(I)=VAR1
+      SCONT1D(I)=VAR2
+      MINTBAR1D(I)=VAR3
+      SLINE1D(I)=VAR4
+      SSOBO1D(I)=VAR5
+      SSOBOC1D(I)=VAR6
+   ENDFOR
+CLOSE, 1
+;
+RETURN
+;
+END

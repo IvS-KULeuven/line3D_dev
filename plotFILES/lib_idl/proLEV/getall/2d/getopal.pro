@@ -1,0 +1,35 @@
+PRO getOPAL, dir, FILE_EXIST, N1D, OPALBAR1D, OPALBAR2D, NDZMAX, NDXMAX, NCZ
+;
+; NAME:
+;       getOPAL
+; PURPOSE:
+;       READ IN 2D-LINE OPACITY AND CALCULATE 1D-LINE OPACITY
+;
+;-----------------------DEFINE FILE-NAMES-------------------------------
+;
+fname=dir+'/OPAL2D_IDL.dat'
+;
+;-----------------------CHECK IF FILES EXIST----------------------------
+;
+FILE_EXIST=FILE_TEST(fname)
+IF(FILE_EXIST EQ 0) THEN BEGIN
+   PRINT, 'FILE DOES NOT EXIST: ', fname
+   RETURN
+ENDIF
+;
+;------------------------READ IN DATA FROM FILES------------------------
+;
+HEADER=''
+;
+OPALBAR2D=FLTARR(NDZMAX,NDXMAX)*1.D0
+;
+OPENR, 1, fname, /F77_UNFORMATTED
+   READU, 1, OPALBAR2D
+CLOSE, 1
+;
+OPALBAR1D=FLTARR(N1D)*1.D0
+OPALBAR1D=OPALBAR2D(NDZMAX/2+NCZ : NDZMAX-1, NDXMAX/2)
+;
+RETURN
+;
+END
