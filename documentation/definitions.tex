@@ -1,0 +1,444 @@
+\newcommand{\ih}{\ensuremath{I_{\rm H}}}
+\newcommand{\nh}{\ensuremath{n_{\rm H}}}
+\newcommand{\mh}{\ensuremath{m_{\rm p}}}
+\newcommand{\yh}{\ensuremath{Y_{\rm H}}}
+\newcommand{\ihe}{\ensuremath{I_{\rm He}}}
+\newcommand{\nhe}{\ensuremath{n_{\rm He}}}
+\newcommand{\yhe}{\ensuremath{Y_{\rm He}}}
+\newcommand{\mhe}{\ensuremath{m_{\rm He}}}
+\newcommand{\iii}{\ensuremath{I_{\rm i}}}
+\newcommand{\nii}{\ensuremath{n_{\rm i}}}
+\newcommand{\mii}{\ensuremath{m_{\rm i}}}
+\newcommand{\aii}{\ensuremath{A_{\rm i}}}
+\newcommand{\zii}{\ensuremath{Z_{\rm i}}}
+\newcommand{\yii}{\ensuremath{Y_{\rm i}}}
+\newcommand{\nkk}{\ensuremath{n_{\rm k}}}
+\newcommand{\mkk}{\ensuremath{m_{\rm k}}}
+\newcommand{\ykk}{\ensuremath{Y_{\rm k}}}
+
+% This is for txfonts: it sets the ring lower, touching the A.
+\newcommand{\msun}{\ensuremath{M_{\odot}}}
+\newcommand{\lsun}{\ensuremath{L_{\odot}}}
+\newcommand{\rsun}{\ensuremath{R_{\odot}}}
+\newcommand{\Zsun}{\ensuremath{Z_{\odot}}}
+\newcommand{\Teff}{\ensuremath{T_{\rm eff}}}
+\newcommand{\vinf}{\ensuremath{v_{\infty}}}
+\newcommand{\mdot}{\ensuremath{\dot{M}}}
+\newcommand{\Ndot}{\ensuremath{N_{\odot}}}
+
+\newcommand{\ratio}{\ensuremath{v_{\infty}/v_{\rm esc}}}
+
+\newcommand{\msunyr}{\ensuremath{M_{\odot} {\rm yr}^{-1}}}
+\newcommand{\Mdu}{\ensuremath{\cdot 10^{-6}\,M_{\odot} {\rm yr}^{-1}}}
+\newcommand{\mdu}{\ensuremath{10^{-6}\,M_{\odot} {\rm yr}^{-1}}}
+
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\beqa}{\begin{eqnarray}}
+\newcommand{\eeqa}{\end{eqnarray}}
+
+\newcommand{\nbeq}{\begin{equation*}}
+\newcommand{\neeq}{\end{equation*}}
+
+\newcommand{\eu}{\ensuremath{{\rm e}}}
+
+\newcommand{\kms}{\ensuremath{{\rm km}\,{\rm s}^{-1}}}
+\newcommand{\gcmc}{\ensuremath{{\rm g}\,{\rm cm}^{-3}}}
+\newcommand{\seconds}{\ensuremath{{\rm s}}}
+\newcommand{\magn}{\ensuremath{^{\rm m}}}
+\newcommand{\half}{\ensuremath{\frac{1}{2}}}
+
+\newcommand{\rarrow}{\rightarrow}
+\newcommand{\dd}{{\rm d}}
+
+\newcommand{\HI}  {H\,{\sc i}}
+\newcommand{\HII} {H\,{\sc ii}}
+\newcommand{\HeI} {He\,{\sc i}}
+\newcommand{\HeII}{He\,{\sc ii}}
+\newcommand{\HeIII}{He\,{\sc iii}}
+
+\newcommand{\CII}{C\,{\sc ii}}
+\newcommand{\CIII}{C\,{\sc iii}}
+\newcommand{\CIV}{C\,{\sc iv}}
+\newcommand{\CV}{C\,{\sc v}}
+
+\newcommand\NII{N\,{\sc ii}}
+\newcommand\NIII{N\,{\sc iii}}
+\newcommand\NIV{N\,{\sc iv}}
+\newcommand\NV{N\,{\sc v}}
+\newcommand\NVI{N\,{\sc vi}}
+\newcommand\NVII{N\,{\sc vii}}
+
+\newcommand\OI{O\,{\sc i}}
+\newcommand\OII{O\,{\sc ii}}
+\newcommand\OIII{O\,{\sc iii}}
+\newcommand\OIV{O\,{\sc iv}}
+\newcommand\OV{O\,{\sc v}}
+\newcommand\OVI{O\,{\sc vi}}
+\newcommand\OVII{O\,{\sc vii}}
+
+\newcommand\NeII{Ne\,{\sc ii}}
+
+\newcommand\SiII{Si\,{\sc ii}}
+\newcommand\SiIII{Si\,{\sc iii}}
+\newcommand\SiIV{Si\,{\sc iv}}
+\newcommand\SiV{Si\,{\sc v}}
+\newcommand\SiVI{Si\,{\sc vi}}
+
+%\newcomand{\SVI}{S\,{\sc vi}}
+
+\newcommand{\PIV}{P\,{\sc iv}}
+\newcommand{\PV}{P\,{\sc v}}
+\newcommand{\PVI}{P\,{\sc vi}}
+\newcommand{\PVII}{P\,{\sc vii}}
+
+\newcommand{\FeII}{Fe\,{\sc ii}}
+\newcommand{\FeIII}{Fe\,{\sc iii}}
+\newcommand{\FeIV}{Fe\,{\sc iv}}
+
+\newcommand{\Hep}{H$_{\epsilon}$}
+\newcommand{\Hd} {H$_{\rm \delta}$}
+\newcommand{\Hg} {H$_{\rm \gamma}$}
+\newcommand{\Hb} {H$_{\rm \beta}$}
+\newcommand{\Ha} {H$_{\rm \alpha}$}
+\newcommand{\Lya}{L$_{\rm \alpha}$}
+\newcommand{\Bra}{Br$_{\rm \alpha}$}
+\newcommand{\Brg}{Br$_{\rm \gamma}$}
+\newcommand{\Pfg}{Pf$_{\rm \gamma}$}
+\newcommand{\Pfb}{Pf$_{\rm \beta}$}
+
+\newcommand{\Lum}{\ensuremath{\log L}}
+\newcommand{\LL}{\ensuremath{(L/L_{\odot})}}
+\newcommand{\logLL}{\ensuremath{\log (L/L_{\odot})}}
+\newcommand{\MV}{\ensuremath{M_V}}
+
+\newcommand{\Rstar}{\ensuremath{R_{\ast}}}
+\newcommand{\Rmax}{\ensuremath{R_{\rm max}}}
+\newcommand{\Rmin}{\ensuremath{R_{\rm min}}}
+\newcommand{\Mstar}{\ensuremath{M_{\ast}}}
+\newcommand{\Lstar}{\ensuremath{L_{\ast}}}
+
+\newcommand{\Mwm}{\ensuremath{\log (modWMR)}}
+\newcommand{\Dmom}{\ensuremath{D_{\rm mom}}}
+
+\newcommand{\logg}{\ensuremath{\log g}}
+\newcommand{\YHe}{\ensuremath{Y_{\rm He}}}
+\newcommand{\gc}{\ensuremath{g_{\rm cent}}}
+
+\newcommand{\Te}{\ensuremath{T_{\rm e}}}
+\newcommand{\Trad}{\ensuremath{T_{\rm rad}}}
+\newcommand{\Tgas}{\ensuremath{T_{\rm gas}}}
+\newcommand{\Tshock}{\ensuremath{T_{\rm s}}}
+\newcommand{\Tshockmax}{\ensuremath{T_{\rm s}^{\infty}}}
+
+\newcommand{\vesc}{\ensuremath{v_{\rm esc}}}
+\newcommand{\vth}{\ensuremath{v_{\rm th}}}
+\newcommand{\vrad}{\ensuremath{v_{\rm rad}}}
+\newcommand{\vrot}{\ensuremath{v_{\rm rot}}}
+\newcommand{\vcrit}{\ensuremath{v_{\rm crit}}}
+\newcommand{\vsini}{\ensuremath{v{\thinspace}\sin{\thinspace}i}}
+\newcommand{\vturb}{\ensuremath{v_{\rm turb}}}
+\newcommand{\vmic}{\ensuremath{v_{\rm mic}}}
+\newcommand{\vmac}{\ensuremath{v_{\rm mac}}}
+\newcommand{\vsound}{\ensuremath{v_{\rm s}}}
+
+\newcommand{\mx}{\ensuremath{m_{\rm x}}}
+
+\newcommand{\adiabsound}{\ensuremath{a_{\rm s}}}
+
+\newcommand{\dvdr}{\ensuremath{\dd v/\dd r}}
+\newcommand{\fcl}{\ensuremath{f_{\rm cl}}}
+\newcommand{\fv}{\ensuremath{f_{\rm X}}}
+\newcommand{\xne}{\ensuremath{n_{\rm e}}}
+\newcommand{\taur}{\ensuremath{\tau_{\rm Ross}}}
+
+\newcommand{\elecden}{\ensuremath{n_{\rm e}}}
+\newcommand{\protden}{\ensuremath{n_{\rm p}}}
+
+\newcommand{\nl}{\ensuremath{n_{\rm l}}}
+\newcommand{\nup}{\ensuremath{n_{\rm u}}}
+\newcommand{\nuul}{\ensuremath{\nu_{\rm ul}}}
+\newcommand{\taus}{\ensuremath{\tau_{\rm Sob}}}
+
+\newcommand{\lxray}{\ensuremath{L_{\rm x}}}
+\newcommand{\lbol}{\ensuremath{L_{\rm bol}}}
+
+\newcommand{\grad}{\ensuremath{g_{\rm rad}}}
+
+\newcommand{\trip}{\ensuremath{\lambda\lambda4634-4640-4642}}
+\newcommand{\qua}{\ensuremath{\lambda\lambda4510-4514-4518}}
+
+\newcommand{\nivem}{\ensuremath{\lambda4058}}
+\newcommand{\nivab}{\ensuremath{\lambda6380}}
+\newcommand{\niiir}{\ensuremath{\lambda4640}}
+
+\newcommand{\Jbar}{\ensuremath{\bar J}}
+\newcommand{\Ibar}{\ensuremath{\bar I}}
+
+\newcommand\ie{\hbox{i.e.,}}
+\newcommand\eg{\hbox{e.g.,}}
+
+
+%from levin:
+%%\newcommand{\vecown}[1]{\ensuremath{\underline{#1}}}
+%%\newcommand{\matown}[1]{\ensuremath{\underline{\underline{#1}}}}
+%\newcommand{\vecown}[1]{\ensuremath{\vec{#1}}}
+%\newcommand{\matown}[1]{\ensuremath{\vec{#1}}}
+\newcommand{\vecown}[1]{\ensuremath{\boldsymbol{#1}}}
+\newcommand{\matown}[1]{\ensuremath{\boldsymbol{#1}}}
+
+\newcommand{\iincv}{\ensuremath{\vecown{I}_{\rm inc}}}
+\newcommand{\scontv}{\ensuremath{\vecown{S}^{\rm (C)}}}
+\newcommand{\slinev}{\ensuremath{\vecown{S}^{\rm (L)}}}
+
+%\newcommand{\alo}{\ensuremath{\Lambda^\ast}}
+\newcommand{\alo}{\ensuremath{\Lambda^{\rm (A)}}}
+\newcommand{\alom}{\ensuremath{\matown{\Lambda}^\ast}}
+\newcommand{\unitym}{\ensuremath{\matown{1}}}
+
+
+\newcommand{\icore}{\ensuremath{I_{\rm c}}}
+\newcommand{\epsc}{\ensuremath{\epsilon_{\rm C}}}
+\newcommand{\epsl}{\ensuremath{\epsilon_{\rm L}}}
+\newcommand{\scont}{\ensuremath{S_{\rm C}}}
+\newcommand{\sline}{\ensuremath{S_{\rm L}}}
+\newcommand{\kcont}{\ensuremath{k_{\rm C}}}
+\newcommand{\kline}{\ensuremath{k_{\rm L}}}
+\newcommand{\kapline}{\ensuremath{\kappa_{\rm 0}}}
+\newcommand{\kappae}{\ensuremath{\kappa_{\rm e}}}
+\newcommand{\kappal}{\ensuremath{\kappa_{\rm L}}}
+\newcommand{\chibar}{\ensuremath{\bar{\chi}}}
+\newcommand{\chibarl}{\ensuremath{\bar{\chi}_{\rm L}}}
+\newcommand{\chic}{\ensuremath{\chi_{\rm C}}}
+\newcommand{\chil}{\ensuremath{\chi_{\rm L}}}
+\newcommand{\chith}{\ensuremath{\chi_{\rm Th}}}
+\newcommand{\chiinf}{\ensuremath{\chi_{\rm \infty}}}
+\newcommand{\const}{\ensuremath{{\rm const.}}}
+\newcommand{\vvinf}{\ensuremath{V_{\infty}}}
+\newcommand{\pihalf}{\ensuremath{\frac{\pi}{2}}}
+\newcommand{\tpihalf}{\ensuremath{\frac{3\pi}{2}}}
+\newcommand{\profile}{\ensuremath{\Phi_x}}
+\newcommand{\profilenu}{\ensuremath{\Phi_\nu}}
+\newcommand{\nx}{\ensuremath{N_{\rm x}}}
+\newcommand{\ny}{\ensuremath{N_{\rm y}}}
+\newcommand{\nz}{\ensuremath{N_{\rm z}}}
+\newcommand{\nnz}{\ensuremath{N_{\rm NZ}}}
+\newcommand{\nnu}{\ensuremath{N_{\rm F}}}
+\newcommand{\nnue}{\ensuremath{N_{\rm \nu}}}
+\newcommand{\ntheta}{\ensuremath{N_{\rm \theta}}}
+\newcommand{\nphi}{\ensuremath{N_{\rm \phi}}}
+\newcommand{\nomega}{\ensuremath{N_{\rm \Omega}}}
+\newcommand{\ncpu}{\ensuremath{N_{\rm CPU}}}
+\newcommand{\vmin}{\ensuremath{v_{\rm min}}}
+\newcommand{\hei}{\ensuremath{I_{\rm He}}}
+\newcommand{\mhyd}{\ensuremath{m_{\rm H}}}
+\newcommand{\xobs}{\ensuremath{x_{\rm obs}}}
+\newcommand{\xcmf}{\ensuremath{x_{\rm cmf}}}
+
+\newcommand{\indx}[1]{\ensuremath{{#1}}}
+\newcommand{\indxijk}{\ensuremath{\indx{ijk}}}
+\newcommand{\scontijk}{\ensuremath{S_{\indx{ijk}}^{\rm (C)}}}
+\newcommand{\slineijk}{\ensuremath{S_{\indx{ijk}}^{\rm (L)}}}
+\newcommand{\chicijk}{\ensuremath{\chi_{\indx{ijk}}^{(\rm C)}}}
+\newcommand{\chibarijk}{\ensuremath{\bar{\chi}_{\indx{ijk}}^{\rm (L)}}}
+\newcommand{\indxu}{\ensuremath{{\rm u}}}
+\newcommand{\indxp}{\ensuremath{{\rm p}}}
+\newcommand{\indxd}{\ensuremath{{\rm d}}}
+\newcommand{\indxc}{\ensuremath{{\rm c}}}
+
+\newcommand{\xii}{\ensuremath{x_{\rm i}}}
+\newcommand{\ximo}{\ensuremath{x_{\rm i-1}}}
+\newcommand{\xipo}{\ensuremath{x_{\rm i+1}}}
+\newcommand{\fii}{\ensuremath{f_{\rm i}}}
+\newcommand{\fimo}{\ensuremath{f_{\rm i-1}}}
+\newcommand{\fipo}{\ensuremath{f_{\rm i+1}}}
+\newcommand{\dxi}{\ensuremath{\Delta x_{\rm i}}}
+\newcommand{\dxipo}{\ensuremath{\Delta x_{\rm i+1}}}
+
+
+\newcommand{\chinu}{\ensuremath{\chi_{\nu}}}
+\newcommand{\etanu}{\ensuremath{\eta_{\nu}}}
+\newcommand{\Inu}{\ensuremath{I_{\nu}}}
+\newcommand{\Snu}{\ensuremath{S_{\nu}}}
+\newcommand{\Hnu}{\ensuremath{H_{\nu}}}
+\newcommand{\Jnu}{\ensuremath{J_{\rm \nu}}}
+\newcommand{\Bnu}{\ensuremath{B_{\rm \nu}}}
+
+\newcommand{\eqrt}{\hbox{EQRT}}
+
+\newcommand{\malf}{\ensuremath{M_{\rm A}}}
+\newcommand{\valf}{\ensuremath{v_{\rm A}}}
+\newcommand{\ralf}{\ensuremath{R_{\rm A}}}
+\newcommand{\rapex}{\ensuremath{r_{\rm m}}}
+\newcommand{\rkep}{\ensuremath{R_{\rm K}}}
+\newcommand{\Bpole}{\ensuremath{B_{\rm p}}}
+\newcommand{\etastar}{\ensuremath{\eta_{\rm \ast}}}
+\newcommand{\mdotz}{\ensuremath{\dot{M}_{\rm B=0}}}
+\newcommand{\mdotb}{\ensuremath{\dot{M}_{\rm B}}}
+\newcommand{\vthfid}{\ensuremath{v_{\rm th}^{\rm \ast}}}
+\newcommand{\ddopfid}{\ensuremath{\Delta \nu_{\rm D}^{\rm \ast}}}
+\newcommand{\ddop}{\ensuremath{\Delta \nu_{\rm D}}}
+
+\newcommand{\wrt}{w.r.t.}
+\newcommand{\sigmae}{\ensuremath{\sigma_{\rm e}}}
+\newcommand{\sigmab}{\ensuremath{\sigma_{\rm B}}}
+\newcommand{\kboltz}{\ensuremath{k_{\rm B}}}
+\newcommand{\nel}{\ensuremath{n_{\rm e}}}
+
+
+\newcommand{\mbh}{\ensuremath{M_{\rm BH}}}
+
+\newcommand{\Rpole}{\ensuremath{R_{\rm p}}}
+\newcommand{\Req}{\ensuremath{R_{\rm eq}}}
+\newcommand{\Teffeq}{\ensuremath{T_{\rm eff, eq}}}
+\newcommand{\Teffpole}{\ensuremath{T_{\rm eff, p}}}
+
+%\newcommand{\clatitude}{\ensuremath{\tilde{\theta}}}
+\newcommand{\clatitude}{\ensuremath{\Theta}}
+\newcommand{\azimuth}{\ensuremath{\Phi}}
+%
+%radiation coordinates
+\newcommand{\thetarad}{\ensuremath{\theta}}
+\newcommand{\phirad}{\ensuremath{\phi}}
+
+%how to write stellar names from HD catalogue
+\newcommand{\hdname}{\textit{}}
+\newcommand{\omp}{\textsc{OpenMP}}
+
+%transition rates
+\newcommand{\Cul}{\ensuremath{C_{\rm ul}}}
+\newcommand{\Aul}{\ensuremath{A_{\rm ul}}}
+
+%corrections
+\newcommand{\corr}[1]{\textcolor{red}{#1}}
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
+
+%monotonicity parameter
+\newcommand{\paramon}{\ensuremath{\omega}}
+
+%mean relative error
+\newcommand{\mrerr}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+%\newcommand{\mrerr}[1]{\ensuremath{<#1>}}
+
+%number of iterations until convergence
+\newcommand{\nconv}{\ensuremath{N_{\rm iter}}}
+
+%units
+\newcommand{\kK}{\ensuremath{{\rm kK}}}
+\newcommand{\kelvin}{\ensuremath{{\rm K}}}
+\newcommand{\yr}{\ensuremath{{\rm yr}}}
+\newcommand{\Gauss}{\ensuremath{{\rm G}}}
+\newcommand{\kGauss}{\ensuremath{{\rm kG}}}
+
+%electronmass
+\newcommand{\mel}{\ensuremath{m_e}}
+
+%square degree
+\newcommand{\degsqr}{\ensuremath{{\rm deg}^2}}
+
+%convolution
+\newcommand{\convolve}{\ensuremath{\circledast}}
+
+
+\def\aj{AJ}%
+          % Astronomical Journal
+\def\araa{ARA\&A}%
+          % Annual Review of Astron and Astrophys
+\def\apj{ApJ}%
+          % Astrophysical Journal
+\def\apjl{ApJ}%
+          % Astrophysical Journal, Letters
+\def\apjs{ApJS}%
+          % Astrophysical Journal, Supplement
+\def\ao{Appl.~Opt.}%
+          % Applied Optics
+\def\apss{Ap\&SS}%
+          % Astrophysics and Space Science
+\def\aap{A\&A}%
+          % Astronomy and Astrophysics
+\def\aapacc{A\&A}%
+          % Astronomy and Astrophysics (accepted / in publication)
+\def\aa{A\&A}%
+          % Astronomy and Astrophysics
+\def\aapr{A\&A~Rev.}%
+          % Astronomy and Astrophysics Reviews
+\def\aaps{A\&AS}%
+          % Astronomy and Astrophysics, Supplement
+\def\azh{AZh}%
+          % Astronomicheskii Zhurnal
+\def\baas{BAAS}%
+          % Bulletin of the AAS
+\def\jrasc{JRASC}%
+          % Journal of the RAS of Canada
+\def\memras{MmRAS}%
+          % Memoirs of the RAS
+\def\mnras{MNRAS}%
+          % Monthly Notices of the RAS
+\def\pra{Phys.~Rev.~A}%
+          % Physical Review A: General Physics
+\def\prb{Phys.~Rev.~B}%
+          % Physical Review B: Solid State
+\def\prc{Phys.~Rev.~C}%
+          % Physical Review C
+\def\prd{Phys.~Rev.~D}%
+          % Physical Review D
+\def\pre{Phys.~Rev.~E}%
+          % Physical Review E
+\def\prl{Phys.~Rev.~Lett.}%
+          % Physical Review Letters
+\def\pasp{PASP}%
+          % Publications of the ASP
+\def\pasj{PASJ}%
+          % Publications of the ASJ
+\def\qjras{QJRAS}%
+          % Quarterly Journal of the RAS
+\def\skytel{S\&T}%
+          % Sky and Telescope
+\def\solphys{Sol.~Phys.}%
+          % Solar Physics
+\def\sovast{Soviet~Ast.}%
+          % Soviet Astronomy
+\def\ssr{Space~Sci.~Rev.}%
+          % Space Science Reviews
+\def\zap{ZAp}%
+         % Zeitschrift fuer Astrophysik
+\def\na{New~Astron.}%
+          % New Astronomy
+\def\nat{Nature}%
+          % Nature
+\def\iaucirc{IAU~Circ.}%
+          % IAU Cirulars
+\def\aplett{Astrophys.~Lett.}%
+          % Astrophysics Letters
+\def\apspr{Astrophys.~Space~Phys.~Res.}%
+          % Astrophysics Space Physics Research
+\def\bain{Bull.~Astron.~Inst.~Netherlands}%
+          % Bulletin Astronomical Institute of the Netherlands
+\def\fcp{Fund.~Cosmic~Phys.}%
+          % Fundamental Cosmic Physics
+\def\gca{Geochim.~Cosmochim.~Acta}%
+          % Geochimica Cosmochimica Acta
+\def\grl{Geophys.~Res.~Lett.}%
+          % Geophysics Research Letters
+\def\jcp{J.~Chem.~Phys.}%
+          % Journal of Chemical Physics
+\def\jgr{J.~Geophys.~Res.}%
+          % Journal of Geophysics Research
+\def\jqsrt{J.~Quant.~Spec.~Radiat.~Transf.}%
+          % Journal of Quantitiative Spectroscopy and Radiative Trasfer
+\def\memsai{Mem.~Soc.~Astron.~Italiana}%
+          % Mem. Societa Astronomica Italiana
+\def\nphysa{Nucl.~Phys.~A}%
+          % Nuclear Physics A
+\def\physrep{Phys.~Rep.}%
+          % Physics Reports
+\def\physscr{Phys.~Scr}%
+          % Physica Scripta
+\def\planss{Planet.~Space~Sci.}%
+          % Planetary Space Science
+\def\procspie{Proc.~SPIE}%
+          % Proceedings of the SPIE
+\let\astap=\aap
+\let\apjlett=\apjl
+\let\apjsupp=\apjs
+\let\applopt=\ao

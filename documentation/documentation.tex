@@ -1,0 +1,812 @@
+\documentclass[10pt,a4paper]{article}
+%
+%-------------------------packages--------------------------------------
+%
+\usepackage[utf8x]{inputenc}
+\usepackage{a4wide}
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage{natbib}
+\usepackage{afterpage}
+\usepackage{lscape}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{times,mathptmx}
+\usepackage{appendix}
+\usepackage{subfigure}
+\usepackage{tabularx}
+\usepackage{ltablex}
+\usepackage{multicol}
+\usepackage{captcont}  % for caption continuation ; appendix
+%\usepackage{fixmath}   % for \mathbold{}  warning: {\rm \theta} or {\rm \phi}
+%is wrong
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{ltcaption}
+\usepackage{epsfig,psfrag,pdflscape}
+\usepackage[varg]{txfonts} %varg to distinguish between v and nu
+\usepackage{calrsfs}
+\usepackage[breaklinks]{hyperref} %for line breaks in list of figures
+\usepackage{thumbpdf}
+\usepackage[bottom,hang,stable]{footmisc}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+%the second language defines main language used for contents and bibliography
+\usepackage[ngerman,english]{babel}
+\usepackage[T1]{fontenc}
+
+
+\usepackage[tableposition=t]{caption}
+%
+%----------------------hypersetup-------------------------------------------------
+%
+\newcommand{\notesTitle}{Documentation}
+\newcommand{\notesAuthor}{Levin Hennicker}
+%
+\hypersetup{
+   pdfpagemode = {UseNone}, % Verhindert die automatische Anzeige der Lesezeichen
+   pdftitle = {\notesTitle},
+   pdfauthor = {\notesAuthor}
+}
+%
+%----------------------page layout-------------------------------------------------
+%
+% Seitenlayout
+\usepackage{geometry}
+\geometry{
+  left=2cm,
+  right=2cm,
+  top=2cm,
+  bottom=2cm,
+  bindingoffset=5mm
+}
+%
+%---------------------------definitions---------------------------------
+%
+\definecolor{blue}{rgb}{0.,0.,0.5}
+\definecolor{gray}{rgb}{0.,0.5,0.}
+\definecolor{rrr}{rgb}{0.5,0.,0.}
+\definecolor{darkblue}{rgb}{0,0,0.5}
+\definecolor{orange}{rgb}{1.,0.5,0.}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+%
+\newcommand{\defeq}{\mathrel{\mathop:}=}
+\newcommand{\einruecken}{\noindent\hspace*{10mm}}
+\newcommand{\einrueckenb}{\noindent\hspace*{17mm}}
+
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+%
+\include{definitions}
+%
+%-----------------------------------------------------------------------
+%
+\title{\notesTitle}
+\author{\notesAuthor}
+%
+%-----------------------------------------------------------------------
+%
+\begin{document}
+\maketitle
+%
+\clearpage
+\tableofcontents
+\clearpage
+%
+\section{Introduction}
+The aim of this code library is to perform radiative transfer
+calculations for a range of applications, focussing however
+on the spectral synthesis of 3D hot-star winds. The main
+features consist of performing detailed radiative transfer
+calculations accounting for highly supersonic velocity fields and
+(almost) arbitrary 3D structures. We have developed several main
+programs to be used for different situations, summarized as follows:
+%
+\begin{description}
+  \item[line3D:] A code module to calculate synthetic line profiles for a single star within a global \textit{star-in-a-box} setup (see Sect.~\ref{subsec:line3d}).
+  \item[BOSS-3D:] A code module to calculate synthetic line profiles for binary systems (see Sect.~\ref{subsec:cont3d}).  
+  \item[cont3Dslab:] A code module to calculate the continuum radiation for a single star within a local \textit{star-in-a-box} setup, that might be used for coupling in radiation-hydrodynamic simulations (see Sect.~\ref{subsec:boss3d}).
+\end{description}
+%
+Each of these packages will be described in the corresponding sections in more detail.
+
+\subsection{Radiation hydrodynamics}
+ToDo
+
+\subsection{Radiative transfer}
+To calculate the radiative transfer, we consider the time-independent equation of radiative transfer,
+%
+\beq
+\label{eq:eqrt}
+\vecown{n}\vecown{\nabla} I_\nu = \eta_\nu - \chi_\nu I_\nu = \chi_\nu \left(S_\nu - I_\nu\right)\,,
+\eeq
+%
+with $I_\nu$ the specific intensity, $\eta_\nu$ the emissivity,
+$\chi_\nu$ the opacity, and $S_\nu=\eta_\nu/\chi_\nu$ the source
+function.  Further, we define the angular moments of the specific
+intensity:
+%
+\beqa
+   J_\nu &=& \dfrac{1}{4 \pi} \int I_\nu \dd \Omega = \dfrac{c}{4\pi} E_\nu \,,\\
+   \vecown{H}_\nu &=&  \dfrac{1}{4\pi} \int I_\nu \vecown{n} \dd \Omega = \dfrac{1}{4\pi} \vecown{F}_\nu  \,, \\
+   \matown{K}_\nu &=&  \dfrac{1}{4\pi} \int \underbrace{\vecown{n} I_\nu \vecown{n}}_{{\rm dyadic~product}} \dd \Omega = \dfrac{c}{4\pi}\matown{P}_\nu \,,
+\eeqa
+%   
+with $J_\nu$ the mean intensity, $\vecown{H}_\nu$ the Eddington flux,
+and $K_\nu$ simply the second moment without a specific name.  The
+mean intensity, Eddington flux, and second moment are trivially
+related to the radiation energy density $E_\nu$, the radiation flux
+$\vecown{F}_\nu$, and the radiation pressure tensor $\matown{P}_\nu$.
+
+For all code modules, we are considering the radiation quantities
+$I_\nu$, $J_\nu$, $\vecown{H}_\nu$, $\matown{K}_\nu$, and not the
+corresponding `physical' quantities. In general there are three
+operating modes for calculating these quantities:
+
+\begin{itemize}
+\item[(i)] Since the source function in the equation of radiative
+  transfer (EQRT) can in principle depend on the radiation field,
+  Eq.~\eqref{eq:eqrt} becomes an integro-differential equation. In
+  this case, an iteration scheme is required (main code
+  \textit{line3D/sc3d.eo} and \textit{cont3Dslab/sc3d.eo} for
+  star-in-a-box and box-in-a-star simulations, respectively) based on
+  a non-local accelerated $\Lambda$ iteration (ALI). 
+\item[(ii)] For known source functions and opacities (\eg~approximated
+  in LTE or pre-calculated in step (i)), we can solve the radiative
+  transfer in a $pz$-type geometry to obtain surface brightnesses or
+  emergent flux profiles (main codes \textit{line3D/modelspec.eo} and
+  \textit{line3D/spec.eo}).
+\item[(iii)] If we are dealing with binary systems, we rely purely on
+  semi-analytical models thus far (\eg~opacities and source functions
+  in LTE), and solve the radiative transfer in a $pz$-type of geometry
+  (main codes \textit{line3D/modelspec\_vbin.eo} and
+  \textit{line3D/spec\_vbin.eo}).
+\end{itemize}
+%
+%
+%
+\subsection{Philosophy}
+All developed sub-programs are meant to be -- at least in
+principle -- a sort of stand-alone packages, that can be used
+completely independent of each other. Indeed, we consider the full
+radiative transfer problem as a three-step process:
+\begin{enumerate}
+\item Firstly, we need to create a discretized model of the physical
+  state of the gas (\ie~density $\rho$, gas temperature $\Tgas$, velocity
+  field $\vecown{v}$). In order that our radiative-transfer routines
+  can communicate with such a model, we have developed a user
+  interface to either transform input data from a given hydrodynamic
+  simulation or to set up a semi-analytical model. This step
+  is performed in the code \textit{model.eo} with corresponding source
+  code to be found in \textit{line3D/src\_model} and
+  \textit{cont3Dslab/src\_model}.
+  \item Secondly, we need to calculate opacities and source functions. We can follow two branches here:
+    \begin{itemize}
+    \item For resonance lines within a two-level-approximation and/or a two-component continuum source consisting of thermal and scattering terms, we can
+      calculate continuum and line source functions consistently with
+      the radiation field. This is performed by the code
+      \textit{sc3d.eo}. Since the iteration scheme is computationally
+      very expensive, the source function will be calculated on a
+      relatively low-resolution grid, and then interpolated back onto the original model within the code \textit{modelspec.eo}.
+      The corresponding source codes can be found in
+      \textit{line3D/src\_sc3d}, \textit{line3D/src\_modelspec}, and
+      \textit{cont3Dslab/src\_sc3d}.
+      \item Alternatively, we can directly use the code
+        \textit{modelspec.eo} to calculate source functions and
+        opacities from semi-analytical calculations (\eg~assuming LTE occupation numbers, see \textit{line3D/src\_modelspec}).
+    \end{itemize}
+  \item Finally, the surface brightness or emergent flux profiles are
+    calculated by solving the radiative transfer in a $pz$-type
+    geometry using the code \textit{spec.eo}, with input given from
+    the previous step 2. The corresponding source code can be found in
+    \textit{line3D/src\_spec} and \textit{cont3Dslab/src\_surfb}.
+\end{enumerate}
+%
+We emphasize that the binary version (extension \textit{\_vbin})
+consists only of steps (2) and (3), since we haven't implemented an
+ALI scheme for binary systems yet.
+
+\section{Installation}
+\subsection{Requirements}
+The code requires the following packages:
+\begin{description}
+\item[\textsc{FORTRAN} compiler:] Either the gfortran (version  8+) or ifort compiler is required. Depending which compiler is used, one needs to adapt the source code since the \textsc{inquire} function works differently for both compilers:
+  \\
+  gfortran: inquire(file=trim(directory)//'/.', exist=my\_boolean)
+  \\
+  ifort: inquire(directory=trim(directory), exist=my\_boolean)
+\item[\textsc{HDF5}:] The HDF5 library is required (version 1.10.5 or higher). This library needs to be compiled with the same compiler as used for the main programs (\ie~gfortran or ifort). See Sect.~\ref{subsec:hdf5} on how to install HDF5 on your system
+\end{description}  
+\subsection{Getting the code}
+You can get the code from github:
+\begin{itemize}
+\item Global star-in-a-box simulations:\\
+  git clone https://github.com/levin-h/line3D
+\item Local box-in-a-star simulations:\\
+  git clone https://github.com/levin-h/cont3D
+\end{itemize}
+%
+%
+%
+\subsection{Quick start}
+
+
+\subsection{Installing HDF5}
+\label{subsec:hdf5}
+I recommend to create a local build for your HDF5 libraries. To this end, please follow the following steps (here for version 1.10.6)
+\paragraph{UNIX systems}
+\begin{enumerate}
+\item Download the package \textbf{hdf5-1.10.6.tar.gz}, unzip it, and change to the corresponding folder: \\
+  tar -zxvf hdf5-1.10.6.tar.gz\\
+  cd hdf5-1.10.6
+\item Export some required environment variables:\\
+    \begin{tabular}{ll}
+      \textbf{gfortran}  & \textbf{ifort} \\
+      export FC=gfortran & export FC=ifort \\
+      export CC=gcc & export CC=icc \\
+      export F9X=gfortran & export F9X=ifort \\
+      export CXX=g++ & export CXX=icpc
+    \end{tabular}
+\item Configure your installation with a local path where you want to install the package (\eg~\$HOME/hdf5\_gfortran\_build):\\
+  ./configure -{}-prefix=\$HOME/hdf5\_gfortran\_build -{}-enable-fortran (and if required -{}-enable-cxx)
+\item Installation \\
+  make (and watch for fatal errors)\\
+  make check   (and verify that all tests return a `pass') \\
+  make install
+\item Include the library path in the Makefile of the main code (\eg~line3D/Makefile)
+\item Update your .bashrc file to add the library path to your LD environment variable:\\
+    HDF5\_PATH=\$HOME/hdf5\_gfortran\_build/hdf5\_lib/lib \\
+    LD\_LIBRARY\_PATH=\$LD\_LIBRARY\_PATH:\$ADD\_LIB\_PATH \\
+    export LD\_LIBRARY\_PATH
+\end{enumerate}
+
+\paragraph{MAC}
+On the MAC, the installation is essentially performed the same way. For the gfortran compiler, you might need
+\begin{enumerate}
+\item Install the CommandLineTools
+\item Install homebrew:\\
+  mkdir homebrew \&\& curl -L https://github.com/Homebrew/brew/tarball/master | tar xz -{}-strip 1 -C homebrew \\
+  eval "\$(homebrew/bin/brew shellenv)" \\
+  brew update -{}-force -{}-quiet \\
+  chmod -R go-w "\$(brew -{}-prefix)/share/zsh"  \\
+  export PATH=\$HOME/homebrew/bin:\$PATH
+\item Install gfortran:\\
+  brew install gcc
+\item Install HDF5 as for UNIX systems. When updating the Makefile of
+  the main code (\eg~line3D/Makefile), replace all *.so libraries with
+  the MAC *.dylib extension.
+\end{enumerate}
+
+
+\section{Main code modules}
+\subsection{line3D}
+\label{subsec:line3d}
+This folder contains code modules for running global (star-in-a-box)
+radiative transfer simulations. There are essentially four different
+code modules further described in the following. Each code module
+requires a specific input file organized by namelists.
+
+\begin{description}
+\item[model.eo] Prepares the data to be used for the actual radiative
+  transfer calculations, by transforming any input data or calculating
+  semi-analytic models. You can simply add new models in
+  src\_model. The corresponding namelist file is described in
+  Table~\ref{tab:namelist_sc3d}. Essentially, we set up the state of
+  the gas in 1d, 2d, or 3d, described by the density $\rho$, the
+  velocity field $\vecown{v}$, the gas and radiation temperatures,
+  $\Tgas$ and $\Trad$, the thermal velocities (becomes obsolete at some
+  point), $\vth$, and the thermalization parameter $\epsc$. Currently hardcoded, the model will be saved in
+  inputFILES/modelXd.h5.
+\item[sc3d.eo] Performs the radiative transfer for the continuum
+  and/or line transition with certain opacity laws using an iterative
+  ALI scheme. The corresponding namelist file is described in
+  Table~\ref{tab:namelist_sc3d}.
+\item[modelspec.eo] Prepares the data to be
+  used for the line-profile calculations of single stars. Here, we can
+  read in the source functions and opacities calculated by the
+  \textit{sc3d.eo} program, or implement other semi-analytic
+  models. The corresponding namelist file is described in
+  Table~\ref{tab:namelist_modelspec}.
+\item[spec.eo] Calculates line profiles for a specific input file. The
+  corresponding namelist files is described in
+  Table~\ref{tab:namelist_spec}.
+\end{description}
+
+\subsubsection{The namelist files}
+The namelist options for the programs \textit{model.eo} and
+\textit{sc3d.eo} are summarized in Table~\ref{tab:namelist_sc3d}, and
+the namelist options for the programs \textit{modelspec.eo},
+\textit{spec.eo} are shown in Tables
+Tables~\ref{tab:namelist_modelspec}, \ref{tab:namelist_spec},
+respectively.
+%
+\begin{footnotesize}
+\begin{longtable}[h]{p{0.24\linewidth}p{0.07\linewidth}p{0.69\linewidth}}
+\caption{\normalsize Input namelist for the programs \textit{model.eo} and
+  \textit{sc3d.eo}. Some of the inputs are meanwhile obsolete. We use one indat file for both programs to avoid inconsistency of the data used within \textit{model.eo} and \textit{sc3d.eo}. If only running the \textit{model.eo} many of the paramneters are not required and should be assigned with an arbitrary value.}
+\label{tab:namelist_sc3d}
+\\\hline\hline
+ Example & Data type & Description \\\hline
+  \&input\_options & & Options for the models \\
+model\_dir = 'inputFILES' & string & Directory of the model that will be read in \\
+output\_file = 'output\_model00.h5' & string & All calculations stored in output\_file (.h5 extension to be included) \\
+input\_mod = 12 & integer & Identifier of the model to be calculated; only required for model.eo (where the hydro model is specified)\\
+input\_mod\_dim = 3 & integer & Dimension of input model; input\_mod\_dim $\in [1,2,3]$ \\
+%
+spatial\_grid1d = 5 & integer & Identifier to calculate a 1D radial grid from a beta-velocity law. Depending ong the option spatial\_grid3d, this input is obsolete.\\
+ & & spatial\_grid1d=0 if equidistant radial grid is used (subroutine grid1d\_r\_equi) \\
+ & & spatial\_grid1d=1 if equidistant velocity grid is used (subroutine grid1d\_vel\_equi) \\
+ & & spatial\_grid1d=2 if equidistant tau\_thomson grid is used (subroutine grid1d\_tau\_equi) \\
+ & & spatial\_grid1d=3 if equidistant log(tau\_thomson) grid is used (subroutine grid1d\_tau\_log) \\
+ & & spatial\_grid1d=4 if combination is used (see subroutine grid1d\_final for details) \\
+ & & spatial\_grid1d=5 if combination is used (see subroutine grid1d\_final\_2 for details) \\
+ & & spatial\_grid1d=6 if grid is calucalted equidistant in log-space (subroutine grid1d\_r\_log) \\
+%
+spatial\_grid3d = 2 & integer & Identifier to calculate the 3D Cartesian grid. \\
+& & spatial\_grid3d=0 if 3d grid is calculated from 1d grid with equidistant core points  \\
+& & spatial\_grid3d=1 if 3d grid is calculated from a mean-value approach (minimizing distance of subsequent coordinates from 1d-grid) \\
+& & spatial\_grid3d=2 if 3d grid is calculated from a mean-value approach  (minimizing distance of subsequent coordinates from original input-grid) \\
+& & spatial\_grid3d=3 if 3d grid is calculated completely equidistant \\
+& & spatial\_grid3d=4 if 3d grid is calculated from a 1d radial grid and setting up angular grid equidistantly \\
+& & spatial\_grid3d=5 if 3d grid is calculated from a 3d spherical grid (optimized) \\
+%
+opt\_opac = 0 & integer & Identifier to decide on the continuum opacity model \\
+ & & opt\_opac=0 if Thomson opacities \\
+ & & opt\_opac=1 if OPAL opacities \\
+%
+opt\_opal = 0 & integer & Identifier to decide on the line opacity model \\
+ & & opt\_opal=0 if line-strength parameter \\
+ & & opt\_opal=1 if \cite{Hamann80} parameterization \\
+%
+opt\_angint\_method = 9 & integer & Identifier to decide on the angular-integration technique to be used \\
+ & & opt\_angint\_method=0 if angular integration is used with trapezoidal rule (nodes equidistant in $\theta$ and $\phi$) \\
+ & & opt\_angint\_method=1 if angular integration is used with trapezoidal rule (nodes from \cite{Lobel08}) \\
+ & &  opt\_angint\_method=2 if angular integration is used with simpsons rule (nodes equidistant in $\theta$ and $\phi$, note: $\mu$-grid and $\phi$-grid will be made equidistant for three subsequent points) \\
+ & & opt\_angint\_method=3 if angular integration is used with simpson rule corrected for the error from a grid with half resolution (also known as boole's rule) \\
+ & & opt\_angint\_method=4 if angular integration is used with cubic splines (catmull-rom-spline, nodes equidistant in $\theta$ and $\phi$) \\
+ & & opt\_angint\_method=5 if angular integration is used with gauss-legendre-integration (for each octant) \\
+ & & opt\_angint\_method=6 if angular integration is used with gauss-chebyshev-integration (for each octant) \\
+ & & opt\_angint\_method=7 if angular integration is used with triangulation (linear integrals) \\
+ & & opt\_angint\_method=8 if angular integration is used with triangulation ('pseudo'-gauss integrals per triangle) \\
+ & & opt\_angint\_method=9 if angular integration is used with lebedev interpolation (optimized nodes on the sphere) \\
+%
+opt\_method = 1 & integer & Identifier to decide on the radiative-transfer solution method \\
+ & & opt\_method=0  if finite volume method shall be used \\
+ & & opt\_method=1  if linear short characteristics method shall be used \\
+ & & opt\_method=2  if quadratic bezier short characteristics method shall be used \\
+%
+opt\_sol2d = f & logical & Logical to decide whether 2D solution scheme shall be applied \\
+%
+opt\_ltec = 0 & integer & Identifier to decide on the continuum wavelength/frequency model \\
+ & & opt\_ltec = 0 if single continuum frequency \\
+ & & opt\_ltec = 1 if grey approximation for continuum (frequency integrated) \\
+%
+opt\_incl\_cont = t & logical & Set to true (false) if continuum shall be included (or not) \\
+opt\_start\_cont = t & logical  & Set to true (false) if continuum iteration shall start from the beginning (or from intermediate steps) \\
+opt\_ng\_cont = t & logical  & Set to true (false) if Ng-extrapolation for continuum iteration shall be included or not \\
+opt\_ait\_cont = f & logical & Set to true (false) if Aitkens-extrapolation for continuum iteration shall be included or not \\
+opt\_incl\_line = f & logical & Set to true (false) if line shall be included (or not) \\
+opt\_start\_line = t & logical & Set to true (false) if line iteration shall start from the beginning (or from intermediate steps) \\
+opt\_ng\_line = t & logical  & Set to true (false) if Ng-extrapolation for line iteration shall be included or not \\
+opt\_ait\_line = f & logical & Set to true (false) if Aitkens-extrapolation for line iteration shall be included or not \\
+opt\_alo\_cont = 3 & integer & Identifier to define the approximate $\Lambda$-operator for continuum iteration \\
+ & & opt\_alo\_cont = 0 if classical $\Lambda$ iteration \\
+ & & opt\_alo\_cont = 1 if diagonal approximate $\Lambda$ operator \\
+ & & opt\_alo\_cont = 2 if direct-neighbour approximate $\Lambda$ operator (7 elements) \\
+ & & opt\_alo\_cont = 3 if nearest-neighbour approximate $\Lambda$ operator (27 elements) \\
+opt\_alo\_line = 3 & integer & Identifier to define the approximate $\Lambda$-operator for line iteration \\
+ & & opt\_alo\_line = 0 if classical $\Lambda$ iteration \\
+ & & opt\_alo\_line = 1 if diagonal approximate $\Lambda$ operator \\
+ & & opt\_alo\_line = 2 if direct-neighbour approximate $\Lambda$ operator (7 elements) \\
+ & & opt\_alo\_line = 3 if nearest-neighbour approximate $\Lambda$ operator (27 elements) \\
+opt\_incl\_gdark = f & logical & Set to true (false) if gravity darkening by \cite{Zeipel24} shall be included (or not) \\
+opt\_incl\_sdist = f & logical & Set to true (false) if surface distortion due to rotation shall be included (or not) \\\hline
+%
+\&input\_mod\_1d & & Input parameters of the considered star (some not required anymore) \\
+%
+teff = 40.d3 & float & Effective temperature of the star in [K] \\
+trad = 40.d3 & float & Radiation temperature of the star (used as the inner boundary condition for the specific intensity) in [K] \\
+xlogg = 3.5d0 & float & $\logg$ of the star \\
+rstar = 8.d0 & float & $\Rstar$ in $\rsun$ \\
+lstar = 1.d6 & float & $\Lstar$ in $\lsun$ \\
+rmax = 12.d0 & float & Maximum radius of the computational domain in $[\Rstar]$ along each $x,y,z$ axis \\
+tmin = .8d0 & float & Minimum temperature in the wind in [\Trad] \\
+xmloss = 5.d-6 & float & mass-loss rate \mdot~in \msunyr; only required for 1D benchmarking \\
+vmin = 1.d1 & float & minimum velocity of $\beta$-velocity law \vmin~in \kms; only required for 1D benchmarking \\
+vmax = 2.d3 & float & terminal velocity of $\beta$-velocity law \vinf~in \kms; only required for 1D benchmarking \\
+vmicro = 1.d2 & float & micro-turbulent velocity for the line-profile function \vturb~in [\kms] \\
+vth\_fiducial= 1.d2 & float & fiducial thermal velocity \vthfid~in [\kms] \\
+vrot = 0.d0 & float & rotational velocity \vrot~in [\kms] \\
+beta = 1.d0 & float & $\beta$ parameter for $\beta$-velocity law; only required for 1D benchmarking models \\
+yhe = .1d0 & float & Helium abundance by number, $\yhe$ \\
+hei = 2.d0  & float & Helium ionization fraction (number of free electrons per Helium-atom) \\
+xnue0 = 1.93798d15 & float & Frequency of the line transition \\
+na = 12 & integer & mass number $A$ for the line transition \\\hline
+\&input\_infreg & & Input parameters to define the computational domain (information region) \\
+rmin = 1.d0 & float & Minimum radius of the computational domain in \Rstar \\
+rlim = 13.2d0 & float & Maximum radius of the computational domain in \Rstar \\\hline
+%
+\&input\_cont & & Parameters for the continuum transport \\
+eps\_cont = 0.d0 & float & Thermalization parameter \epsc\\
+kcont = 1.d0 & float & \kcont~parameter (linear scaling factor for the continuum opacity) \\
+%
+\&input\_line & & Parameters of the line transport \\
+eps\_line = 0.d0 & float & Line-scattering parameter \epsl \\
+kline = 1.d0 & float & line-strength parameter \kline \\
+kappa0 = 1.d-1 & float & \cite{Hamann80} parameterization \\
+alpha = 0.5d0  & float & \cite{Hamann80} parameterization \\\hline
+%
+\&dimensions\_1d & & Dimension parameters to set up 1D radial grid \\
+n1d = 17 & integer & number of radial grid points (used to distribute $z$-axis in [\Rmin,\Rmax]) \\
+n1d\_t = 81 & integer & number of 1D grid points to set up equidistant $\tau$-grid \\
+n1d\_r = 22 & integer & number of 1D grid points to set up equidsitant $v_r$-grid \\
+delv = 0.33d0 & float & Preferred velocity steps $\Delta v_r$ in \vthfid \\\hline
+%
+\&dimensions\_3d & & Dimension parameters to set up the 3D grid \\
+ncx=19 & integer & Preferred number of core-points for $x$-axis \\
+ncy=19 & integer & Preferred number of core-points for $y$-axis \\
+ncz=19 & integer & Preferred number of core-points for $z$-axis \\
+delx\_max=.7d0  & float & Maximum allowed $\Delta x$ in \Rstar \\
+dely\_max=.7d0 & float & Maximum allowed $\Delta y$ in \Rstar \\
+delz\_max=.7d0 & float & Maximum allowed $\Delta z$ in \Rstar \\\hline
+%
+\&dimensions\_freq & & Dimension parameters to set up the frequency grid \\
+deltax = 0.333d0 & float & $\Delta \xobs$ steps \\
+xcmf\_max = 3.d0 & float & Maximum frequency width of the line-profile function,  $\xcmf^{\rm (max)}$  \\\hline
+%
+\&dimensions\_angles & & Dimension parameters to set up the angular grid \\
+n\_theta = 11 & integer & Number of $\theta$ angles in first octant; $\phi$ angles are calculated based on that \\\hline
+%
+\&benchmark & & Parameters for setting up a benchmark \\
+benchmark\_mod = 0 & integer & Identifier to define the benchmark model (set to 0 if no benchmark shall be performed) \\
+im\_source = 3  & integer & see benchmark subroutines \\
+im\_opacity = 2 & integer & see benchmark subroutines \\
+im\_vel = 0 & integer & see benchmark subroutines \\
+tau\_min = 0.d0 & float & see benchmark subroutines \\
+tau\_max = 5.d0 & float & see benchmark subroutines \\
+source\_min = 0.1d0 & float & see benchmark subroutines \\
+source\_max = 1.d-6 & float & see benchmark subroutines \\
+n\_y = 0.d0 & float & see benchmark subroutines \\
+n\_z = 0.707107d0 & float & see benchmark subroutines
+\end{longtable}
+\end{footnotesize}
+%
+%
+%
+\begin{footnotesize}
+\begin{longtable}[h]{p{0.24\linewidth}p{0.07\linewidth}p{0.69\linewidth}}
+\caption{\normalsize Input namelist for the program \textit{modelspec.eo}}
+\label{tab:namelist_modelspec}
+\\\hline\hline
+ Example & Data type & Description \\\hline
+\&input\_options & & Main options \\
+\specialcell[t]{input\_file = \\'./outputFILES/output\_model00.h5'} &
+ string & Name of the input file generated by \textit{sc3d.eo}, if source funtions and opacities are to be read in from the solution of \textit{sc3d.eo} \\
+\specialcell[t]{input\_file2 = \\ './inputFILES/model3d.h5'} & string & Name of the input model file generated by \textit{model.eo}. Depending on the input\_mod options, all opacities and source  functions are either interpolated from the \textit{sc3d.eo} output onto this grid, or calculated from a semi-analytical model. This procedure allows us to use a low-resolution grid for the computationally challenging ALI iteration, while still using a high-resolution grid of the wind's density and velocity structure. \\
+\specialcell[t]{output\_file = \\ './outputFILES/modspec\_model00.h5'} & string & Output file \\
+input\_mod = 19 & integer & Identifier for the model to be calculated (see in ./src\_modelspec/modelspec.f90). \\\hline
+%
+\&input\_model & & Parameters of the input model \\
+teff = 258390.7d0 & float & Effective temperature of the star. Only required to get the correct photospheric line profile later on. \\
+trad = 258390.7d0 & float & Radiation temperature of the star. Only used to set the inner boundary condition for the specific intensity. \\
+xlogg = 3.6d0 & float & $\logg$ of the star. Only used to get the correct photospheric line profile later on. \\
+rstar = 1.d0 & float & $\Rstar$ in $\rsun$ \\
+rmax = 11.d0 & float & $\Rmax$ in $\Rstar$, used to define the computational domain \\
+tmin = 1.d0  & float & Minimum temperature of the wind in [$\Teff$]. Only used for very specific test routines. \\
+xmloss = 1.d-6 & float & Mass-loss rate $\mdot$ in [\msunyr]. Only used for very specific test routines. \\
+vmin = 10.d0  & float & Minimum velocity \vmin~of a $\beta$-velocity law in [\kms]. Only used for very specific test routines \\
+vmax = 4.d3  & float & Terminal velocity \vinf~of a $\beta$-velocity law in [\kms]. Only used for very specific test routines \\
+beta = 1.d0  & float & $\beta$ parameter of a $\beta$-velocity law in [\kms]. Only used for very specific test routines \\
+vmicro = 1.0d2  & float & Microturbulent velocity \vturb in [\kms]. \\
+vth\_fiducial=1.d2 & float & Fiducial thermal velocity to be used in  [\kms].\\ 
+yhe = 0.1d0 & float & Helium number abundance, $\yhe=\nhe/\nh$ (\eg~$\yhe=12.25$ corresponds to mass-fraction 0.98). \\
+hei = 2.d0  & float & Number of free electrons per helium atom \\\hline
+%
+\&input\_line & & Line parameters \\
+iline = 0 & integer & Identifier for the line (as defined in src/mod\_iline.f90) to get all line data ($\nu_0, g_l, g_u$, etc) \\
+& & iline=0 - read atomic charge $Z$, element $i$, lower level $l$ and upper level $u$ from file 'in\_linelist.dat' \\
+& & iline=1 - \Ha \\
+& & iline=2 - \Hb \\
+& & iline=10 - C\,IV resonance line \\
+& & iline=11 - C\,III\,5696 line \\
+eps\_line = 0.d0 & float & Line scattering parameter \epsl. Only used for specific test routines (Sobolev solution) \\
+kline = 1.d0 & float & Line-strength parameter or arbitrary scaling factor to increase/decrease the line opacity \\
+kappa0 = 1.d0 & float & \cite{Hamann80} parameterization \\
+alpha = 0.d0 & float & \cite{Hamann80} parameterization \\\hline
+%
+\end{longtable}
+\end{footnotesize}
+%
+%
+%
+\begin{footnotesize}
+\begin{longtable}[h]{p{0.24\linewidth}p{0.07\linewidth}p{0.69\linewidth}}
+\caption{\normalsize Input namelist for the program \textit{spec.eo}}
+\label{tab:namelist_spec}
+\\\hline\hline
+ Example & Data type & Description \\\hline
+\&input\_options & & Main options \\
+ input\_mod = 2 & integer & Type of the input model \\
+ & & input\_mod = 0 -- 1D model on radial grid \\
+ & & input\_mod = 1 -- 3D model on Cartesian grid \\
+ & & input\_mod = 2 -- 3D model on spherical grid \\
+ \specialcell[t]{input\_file = \\ './outputFILES/modspec\_model00.h5'} &
+ string & Name of the input file generated by \textit{modelspec.eo} \\
+\specialcell[t]{output\_dir = \\ './outputFILES'} & string & Output directory \\
+opt\_photprof = 0 & integer & Identifier for defining the photospheric line profile \\
+& & opt\_photprof = 0 - no photospheric line profile (flat illumination) \\
+& & opt\_photprof = 1 - from A. Herrero files \\
+& & opt\_photprof = 2 - from Kurucz (not active at the moment) \\
+& & opt\_photprof = 3 - from own FASTWIND compilation (only active in the binary version at the moment) \\
+& & opt\_photprof = 4 - from \cite{Coelho2005} (only active in the binary version at the moment) \\
+& & opt\_photprof = 5 - from \cite{Coelho2014} (only active in the binary version at the moment) \\
+opt\_obsdir\_read = t & logical & Logical to decide whether observer's direction shall be read in or calculated. \\
+& & opt\_obsdir\_read = t -- read in angles $\alpha\in[0,180]$ (measured from the $z$-axis, inclination) and $\gamma\in[0,360]$ (measured from the $x$-axis, phase) from files in\_alpha.dat and in\_gamma.dat \\
+& & opt\_obsdir\_read = f -- Equidistant $\alpha$, $\gamma$ grid will be calculated based on input options nalpha and ngamma. \\
+opt\_surface = t & logical & Logical to decide if surface brightness shall be calculated instead of emergent flux profiles. \\
+opt\_int2d = f & logical & Logical to decide if the propagation of intensity along a 2D slice trough the computational domain shall be calculated instead of emergent flux profiles \\
+opt\_incl\_gdark = f & logical & Logical to decide if \cite{Zeipel24} gravity darkening shall be included \\
+opt\_incl\_sdist = f & logical & Logical to decide if surface distortion shall be accounted for \\
+nalpha = 1 & integer & Number of $\alpha$ angles to define the directions to the observer \\
+ngamma = 1 & integter & Number of $\gamma$ angles to define the directions to the observer \\\hline
+%
+\&input\_model & & Input parameters for the model \\
+vrot = 0.d0 & float & Surface rotation of the star in [\kms] (at the equator). \\
+vth\_fiducial = 1.d2 & float & Fiducial thermal velocity \vthfid~in[\kms].\\
+vmicro = 1.0d2 & float & Microturbulent velocity \vturb~in[\kms].\\
+rmin = 1.d0 & float & Minimum radius of the computational domain (as used for \textit{modelspec.eo}).\\
+rmax = 10.97d0 & float & Maximum radius of the computational domain
+(typically a bit smaller than used for \textit{modelspec.eo} to avoid
+extrapolation errors/interpolations to zero). \\\hline
+%
+\&input\_surface & & Input parameters for surface brightness calculations and calculating intensities along a 2d slice. Will be used only if either
+opt\_surface or opt\_int2d is set to true \\
+nsurfb = 2 & integer & Number of surface brightnesses to be calculated. \\
+\specialcell[t]{alpha\_surface = \\ 1.570796d0, 1.570796d0} & float & The $\alpha$ angles towards the observer (number of elements needs to be equal to nsurfb). \\
+\specialcell[t]{gamma\_surface = \\ 0.d0, 0.d0} & float & The $\gamma$ angles towards the observer (number of elements needs to be equal to nsurfb). \\
+\specialcell[t]{xobs\_surface = \\  0.d0, 10.d0} & float & The shift from line center in units of $\vthfid$ (number of elements needs to be equal to nsurfb)\\
+& & For this example, two surface brightnesses will be calculated with directions and frequencies taken from (i) the first elements of the arrays and (ii) the second elements of the arrays. 
+%
+\end{longtable}
+\end{footnotesize}
+%
+%
+%
+\subsection{cont3Dslab}
+\label{subsec:cont3d}
+%
+%
+%
+\subsection{boss3D}
+\label{subsec:boss3d}
+The BOSS-3D package (also within the \textit{line3D} folder) contains modules for running global (star-in-a-box)
+radiative transfer simulations of binary systems. There are two different
+code modules further described in the following. Each code module
+requires a specific input file organized by namelists.
+%
+\begin{description}
+\item[modelspec\_vbin.eo] Prepares the data to be used for the
+  line-profile calculations of binary systems. Here, we define the
+  model in terms of density, temperature and velocity fields, as well
+  as opacities and source functions. The corresponding namelist file
+  is described in Table \ref{tab:namelist_modelspec_vbin}.
+\item[spec\_vbin.eo] Calculates line profiles for a specific input
+  file. The corresponding namelist file is described in
+  Table~\ref{tab:namelist_spec_vbin}.
+\end{description}
+%
+\subsubsection{The namelist files}
+The namelist options for the programs \textit{modelspec\_vbin.eo}, and
+\textit{spec\_vbin.eo} are shown in Tables
+\ref{tab:namelist_modelspec_vbin} and \ref{tab:namelist_spec_vbin},
+respectively.
+\begin{footnotesize}
+\begin{longtable}[h]{p{0.24\linewidth}p{0.07\linewidth}p{0.69\linewidth}}
+\caption{\normalsize Input namelist for the program \textit{modelspec\_vbin.eo}, \ie~for the binary version.}
+\label{tab:namelist_modelspec_vbin}
+\\\hline\hline
+ Example & Data type & Description \\\hline
+\&input\_options & & Main options \\
+input\_file = '' & string & Name of the input file generated by \textit{sc3d.eo} (not used yet in binary version) \\
+input\_file2 = '' & string & Name of the input model file generated by \textit{model.eo} (not used yet in binary version) \\
+\specialcell[t]{output\_file = \\ './outputFILES/modspec\_model00.h5'} & string & Output file \\
+input\_mod = 9 & integer & Identifier for the model to be calculated (see in ./src\_modelspec\_vbin/modelspec.f90). \\\hline
+%
+\&input\_model1 & & Parameters of the input model for the primary object. \\
+rstar1 = 1.d0 & float & $\Rstar^{(1)}$ of the primary object in $\rsun$, defining the length scale of the coordinate system of the primary. \\
+rmin1 = 1.d0 & float & Minimum radius defining the computational domain of the primary object, $\Rmin$ in $\Rstar^{(1)}$ \\
+rmax1 = 10.d0 & float & Maximum radius defining the computational domain of the primary object, $\Rmax$ in $\Rstar^{(1)}$ \\
+teff1 = 6.d3 & float & Effective temperature of the primary object. Only required to get the correct photospheric line profile later on. \\
+trad1 = 6.d3 & float & Radiation temperature of the primary object. Only used to set the inner boundary condition for the specific intensity. \\
+logg1 = 1.d0 & float & $\logg$ of the primary object. Only used to get the correct photospheric line profile later on. \\
+yhe1 = 0.1d0 & float & Helium number abundance, $\yhe=\nhe/\nh$, of the primary object. \\
+fehe1 = -1.d0 & float & Fe/He abundance of primary object. Only required for \cite{Coelho2005} and \cite{Coelho2014} photospheric line profiles. \\
+aenh1 = 0.d0 & float & $\alpha$-element enhancement of primary object. Only required for \cite{Coelho2005} and \cite{Coelho2014} photospheric line profiles. \\
+vrot1 = 10.d0 & float & Surface rotation of the primary object in [\kms] (at its equator). \\
+vmicro1 = 1.0d2  & float & Microturbulent velocity of the primary object \vturb in [\kms]. \\
+\specialcell[t]{p\_object01 = \\
+  0.d0, 3.d0, 0.d0} & float & $x,y,z$ position of the primary object within the global (center-of-mass) coordinate system in units [unit\_length] (see \&input\_units) \\
+\specialcell[t]{v\_object01 = \\
+  -10.d0, 0.d0, 0.d0} & float & $v_x, v_y, v_z$ components of the orbit of the primary object within the global center-of-mass coordinate system in [\kms].\\
+ex01 = 1.d0, 0.d0, 0.d0 & float & Orientation of the $\vecown{e}_x$ basis vector of the primary object within the global center-of-mass coordinate system. \\
+ey01 = 0.d0, 1.d0, 0.d0 & float & Orientation of the $\vecown{e}_y$ basis vector of the primary object within the global center-of-mass coordinate system. \\
+ez01 = 0.d0, 0.d0, 1.d0 & float & Orientation of the $\vecown{e}_z$ basis vector of the primary object within the global center-of-mass coordinate system. \\
+\specialcell[t]{rot\_axis01  = \\ 0.d0, 0.d0, 1.d0} & float & Orientation of the rotation axis of the primary object within the global center-of-mass coordinate system (still to be implemented).
+\\\hline
+\&input\_model2 & & Parameters of the input model for the secondary object. Same as for primary object but interchaning the variable name index 1 with 2. \\
+rstar2 = 3.d0 & float & $\Rstar^{(2)}$ of the secondary object in $\rsun$, defining the length scale of the coordinate system of the secondary. \\
+rmin2 = 1.d0 & float & Minimum radius defining the computational domain of the secondary object, $\Rmin$ in $\Rstar^{(2)}$ \\
+rmax2 = 100.d0 & float & Maximum radius defining the computational domain of the secondary object, $\Rmax$ in $\Rstar^{(2)}$ \\
+teff2 = 10.d3 & float & Effective temperature of the secondary object. Only required to get the correct photospheric line profile later on. \\
+trad2 = 10.d3 & float & Radiation temperature of the secondary object. Only used to set the inner boundary condition for the specific intensity. \\
+logg2 = 3.d0 & float & $\logg$ of the secondary object. Only used to get the correct photospheric line profile later on. \\
+yhe2 = 0.1d0 & float & Helium number abundance, $\yhe=\nhe/\nh$, of the secondary object. \\
+fehe2 = -1.d0 & float & Fe/He abundance of secondary object. Only required for \cite{Coelho2005} and \cite{Coelho2014} photospheric line profiles. \\
+aenh2 = 0.d0 & float & $\alpha$-element enhancement of secondary object. Only required for \cite{Coelho2005} and \cite{Coelho2014} photospheric line profiles. \\
+vrot2 = 100.d0 & float & Surface rotation of the secondary object in [\kms] (at its equator). \\
+vmicro2 = 1.0d1  & float & Microturbulent velocity of the secondary object \vturb in [\kms]. \\
+\specialcell[t]{p\_object02 = \\
+  0.d0, -2.d0, 0.d0} & float & $x,y,z$ position of the secondary object within the global (center-of-mass) coordinate system in units [unit\_length] (see \&input\_units) \\
+\specialcell[t]{v\_object02 = \\
+  6.d0, 0.d0, 0.d0} & float & $v_x, v_y, v_z$ components of the orbit of the secondary object within the global center-of-mass coordinate system in [\kms].\\
+ex02 = 1.d0, 0.d0, 0.d0 & float & Orientation of the $\vecown{e}_x$ basis vector of the secondary object within the global center-of-mass coordinate system. \\
+ey02 = 0.d0, 1.d0, 0.d0 & float & Orientation of the $\vecown{e}_y$ basis vector of the secondary object within the global center-of-mass coordinate system. \\
+ez02 = 0.d0, 0.d0, 1.d0 & float & Orientation of the $\vecown{e}_z$ basis vector of the secondary object within the global center-of-mass coordinate system. \\
+\specialcell[t]{rot\_axis01  = \\ 0.d0, 0.d0, 1.d0} & float & Orientation of the rotation axis of the secondary object within the global center-of-mass coordinate system (still to be implemented).\\\hline
+%
+\&input\_line & & Line parameters \\
+iline = 0 & integer & Identifier for the line (as defined in src/mod\_iline.f90) to get all line data ($\nu_0, g_l, g_u$, etc) \\
+& & iline=0 - read atomic charge $Z$, element $i$, lower level $l$ and upper level $u$ from file 'in\_linelist.dat' \\
+& & iline=1 - \Ha \\
+& & iline=2 - \Hb \\
+& & iline=10 - C\,IV resonance line \\
+& & iline=11 - C\,III\,5696 line \\
+eps\_line = 0.d0 & float & Line scattering parameter \epsl. Only used for specific test routines (Sobolev solution) \\
+kline = 1.d0 & float & Line strength parameter \\\hline
+%
+\&input\_units & & Units of the simulation \\
+unit\_length = 1.d0 & float & Length scale of the global coordinate system in [\rsun] \\
+vth\_fiducial = 1.0d2 & float & Fiducial thermal velocity \vthfid. \\\hline
+%
+\end{longtable}
+\end{footnotesize}
+%
+%
+%
+\begin{footnotesize}
+\begin{longtable}[h]{p{0.24\linewidth}p{0.07\linewidth}p{0.69\linewidth}}
+\caption{\normalsize Input namelist for the program \textit{spec\_vbin.eo}, \ie~for the binary version}
+\label{tab:namelist_spec_vbin}
+\\\hline\hline
+Example & Data type & Description \\\hline
+\&input\_options & & Main options \\
+ input\_mod = 2 & integer & Type of the input model \\
+ & & input\_mod = 2 -- 3D model on spherical grid \\
+ \specialcell[t]{input\_file = \\ './outputFILES/modspec\_model00.h5'} &
+ string & Name of the input file generated by \textit{modelspec\_vbin.eo} \\
+\specialcell[t]{output\_dir = \\ './outputFILES'} & string & Output directory \\
+opt\_photprof1 = 5 & integer & Identifier for defining the photospheric line profile of the primary object. \\
+opt\_photprof2 = 0 & integer & Identifier for defining the photospheric line profile of the secondary object. \\
+& & opt\_photprof = 0 - no photospheric line profile (flat illumination) \\
+& & opt\_photprof = 1 - from A. Herrero files \\
+& & opt\_photprof = 2 - from Kurucz (not active at the moment) \\
+& & opt\_photprof = 3 - from own FASTWIND compilation \\
+& & opt\_photprof = 4 - from \cite{Coelho2005} \\
+& & opt\_photprof = 5 - from \cite{Coelho2014} \\
+opt\_obsdir\_read = t & logical & Logical to decide whether observer's direction shall be read in or calculated. \\
+& & opt\_obsdir\_read = t -- read in angles $\alpha\in[0,180]$ (measured from the $z$-axis of the global center-of-mass coordinate system, inclination) and $\gamma\in[0,360]$ (measured from the $x$-axis of the global center-of-mass coordinate system, phase angle) from files in\_alpha.dat and in\_gamma.dat \\
+& & opt\_obsdir\_read = f -- Equidistant $\alpha$, $\gamma$ grid will be calculated based on input options nalpha and ngamma. \\
+opt\_surface = t & logical & Logical to decide if surface brightness shall be calculated instead of emergent flux profiles. \\
+opt\_int2d = f & logical & Logical to decide if the propagation of intensity along a 2D slice trough the computational domain shall be calculated instead of emergent flux profiles \\
+opt\_incl\_gdark1 = f & logical & Logical to decide if \cite{Zeipel24} gravity darkening shall be included for primary object \\
+opt\_incl\_sdist1 = f & logical & Logical to decide if surface distortion of primary object shall be accounted for \\
+opt\_incl\_gdark2 = f & logical & Logical to decide if \cite{Zeipel24} gravity darkening shall be included for secondary object \\
+opt\_incl\_sdist2 = f & logical & Logical to decide if surface distortion of secondary object shall be accounted for \\
+opt\_pgrid01 = 'log' & string & Defining the $p$-grid stratification of the primary object. \\
+opt\_rgrid01 = 'log' & string & Defining the $r$-grid stratification of the primary object. \\
+opt\_pgrid02 = 'lin' & string & Defining the $p$-grid stratification of the secondary object. \\
+opt\_rgrid02 = 'lin' & string & Defining the $r$-grid stratification of the secondary object. \\
+& & 'lin' -- linear stratification \\
+& & 'log' -- logarithmic stratification \\
+& & 'llog' -- $\log-\log$ stratification \\
+
+nalpha = 1 & integer & Number of $\alpha$ angles to define the directions to the observer \\
+ngamma = 1 & integter & Number of $\gamma$ angles to define the directions to the observer \\\hline
+%
+\&input\_model & & Input parameters for the model \\
+vth\_fiducial = 1.d2 & float & Fiducial thermal velocity \vthfid~in[\kms].\\\hline
+%
+\&input\_surface & & Input parameters for surface brightness calculations and calculating intensities along a 2d slice. Will be used only if either
+opt\_surface or opt\_int2d is set to true \\
+alpha\_surface = 1.570796d0 & float & The $\alpha$ angle towards the observer. \\
+gamma\_surface = 0.d0 & float & The $\gamma$ angle towards the observer. \\
+xobs\_surface = 0.d0 & float & The shift from line center in units of $\vthfid$ \\
+& & Note: In contrast to the single-star version, we here only allow for one surface brightness to be calculated at a time. 
+%
+\end{longtable}
+\end{footnotesize}
+
+
+
+
+
+
+\section{Getting started}
+\section{Related papers}
+
+
+\section{Cite}
+Depending on the code modules you are using, we would kindly ask you to cite one of the following papers:
+\begin{itemize}
+\item For the ALI scheme using the finite-volume method, please cite \cite{Hennicker2018}.
+\item For the ALI scheme using the short-characteristics method, please cite \cite{Hennicker2020}.
+\item For the formal solution calculating emergent flux profiles or surface brightnesses of single stars, please cite \cite{Hennicker2018} and/or \cite{Hennicker2021}.
+\item For the formal solution calculating emergent flux profiles or surface brightnesses of binary systems, please cite \cite{Hennicker2021}.
+\item For LTE tabulations of occupation numbers, please cite \cite{Poniatowski2021} (ToDo Luka).
+\end{itemize}
+Thank you very much. \\
+For further reading on the ALI method, we refer to \cite{Hennicker2020b}.
+
+
+\section{Developers and contributors}
+These code modules have been developed in collaboration with: N. Moens, L. Poniatowski., J. Puls, S. Sundqvist.
+The radiative transfer modules use parts of the GEOMPACK2 library\footnote{\url{https://people.math.sc.edu/Burkardt/f_src/geompack2/geompack2.html}} and
+EISPACK libraries\footnote{\url{https://people.sc.fsu.edu/~jburkardt/f77_src/eispack/eispack.html}} (see \cite{Joe1991}).
+
+\section{Known problems and solutions}
+Below, you can find a list of known problems and (possible) solutions:
+\begin{description}
+\item[OMP is not working:] There are (at least) two possibilities that can cause
+  these problems: OMP\_FLAG is not set in the Makefile (set it to
+  -fopenmp). Alternatively, you might not have set the enivironment
+  variable on your system (in the terminal, simply use export OMP\_NUM\_THREADS=N, with N the number of OMP threads to be used, \eg, 12).
+\item[Segmentation fault when running in OMP mode:] By default, the
+  stacksize for each thread can be very low. Particularly when
+  requiring huge arrays in the formal solution with a lot of
+  grid refinement (\eg for LDI simulations), the local copies in each thread might run out of stacksize. Probably at the expense of computing efficiency, this problem can be solved by setting the corresponding environment variable: export OMP\_STACKSIZE=10M  (or larger if required).
+\item[Comiplation errors of HDF5] Sometimes, a new fortran compiler is
+  not compatible with an old HDF5 version. Then you might want to
+  switch to a later HDF5 release (version 1.10.7 or higher), or
+  downgrade your fortran compiler.
+\end{description}
+
+
+\section{ToDo}
+\begin{itemize}
+\item In src/mod\_iline.f90, LTE tables are read in only for 'lte\_tables/Y02800'
+\end{itemize}
+
+
+\section{Acknowledgements}
+We like to thank B. Joe and J. Burkardt for providing the GEOMPACK2 libraries.
+Further, we thank the developers of the EISPACK library.
+%\begin{figure}[ht]
+%\resizebox{\hsize}{!}{
+%   \begin{minipage}{0.5\hsize}
+%      \resizebox{\hsize}{!}{\includegraphics{plots/paperI/mhd_model.ps}}
+%   \end{minipage}
+%   \begin{minipage}{0.5\hsize}
+%      \resizebox{\hsize}{!}{\includegraphics{plots/paperI/mhd_model_average.ps}}
+%   \end{minipage}
+%}
+%%file: testsDATABASE/mhd_plots/mhd.pro
+%%
+%\caption[Small caption.]{Long caption}
+%%
+%\label{fig:density_mhd}
+%\end{figure}
+
+
+
+
+\bibliographystyle{aamod}
+\bibliography{bib_levin}
+
+%\begin{thebibliography}{test}
+%   \bibitem[label printout]{biblabel} author, n. : ''title'', AA,  2004;
+%\end{thebibliography}
+
+
+\end{document}
+

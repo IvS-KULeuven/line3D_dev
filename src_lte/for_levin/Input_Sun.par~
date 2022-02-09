@@ -1,0 +1,15 @@
+&init_param
+DIR = 'output'
+lgTmin  = 4.
+lgTmax  = 5.5
+N_lgT   = 40 
+lgDmin  = -15.d0
+lgDmax  = -6.0d0
+N_lgD   = 40
+X_mass = 0.   !X_mass  = -1.0d0  ! set to -1 if using solar
+Z_mass = 0.02  !Z_mass  = -1.02d0
+SpecZ   = 6 ! atomic number of element 
+SpecI   = 3 ! ionisation stage (1 = neutral)
+SpecL   = 9 ! excitations level (1 = ground)
+ver     = .FALSE. !verbose
+/

@@ -1,0 +1,2 @@
+-functions and subroutines to calculate the final line profile
+-some routines are shared with the main program sc3d.f90 and are in the main folder

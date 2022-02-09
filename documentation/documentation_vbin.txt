@@ -1,0 +1,282 @@
+install program as follows:
+1. install hdf5 libraries
+1.1 export FC=ifort  (or gfortran)
+    export CC=gcc (or icc for intel c compiler)
+    export F9X=ifort
+    export CXX=g++ (or icpc for intel c++ compiler)
+1.2 download hdf5-1.10.6.tar.gz  (or whatever else version)
+    tar -zxvf hdf5-1.10.6.tar.gz
+    cd hdf5-1.10.6
+    ./configure --prefix=path_where_everything_shall_be_installed --enable-fortran (and, if required --enable-cxx
+    make   (and watch for fatal errors)
+    make check    (and verify if all tests return "pass")
+    make install
+1.3 include path in Makefile (include path and lib path)
+1.4 update path-variable in .bashrc
+    ADD_LIB_PATH=/home/levin/Postdoc/hdf5_lib/lib
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ADD_LIB_PATH
+    export LD_LIBRARY_PATH
+
+2. Use Makefile to compile complete program
+
+
+
+run program as follows:
+
+1. modelspec_vbin.eo
+   -> transform solution (1d, 2d, 3d or calculated from some approximation)
+      to file-structure that can be read in by spec_vbin.eo (to calculate final
+      spectrum/line profile)
+   -> OR calculates solution (e.g. for H-alpha) for input model, and
+      stores everything in file structure that can be read in by spec_vbin.eo
+4. spec_vbin.eo
+   -> calculate line profile from input-file
+
+
+available options in indat_modelspec_vbin.nml:
+
+------------------------input_options---------------------
+
+input_file = string
+   input file if source function shall be read in from own calculations
+   
+input_file2 = string
+   input file if atmospheric structure shall be read in from model-files and source
+   functions are back interpolated to that original grid
+   
+output_file = string
+   specify file where atmospheric structure shall be stored
+   
+input_mod = integer
+   specify the model that shall be read in or calculated within the program
+
+---------------------input_model1-------------------------
+
+rstar1 = float
+   radius of primary object (also length scale of corresponding coordinate system) in units of rsun
+   
+rmin1 = float
+   minimum radius of primary object in units of rstar1
+   
+rmax1 = float
+   maximum radius of primary object (setting computational domain) in units of rstar1
+   
+teff1 = float
+   effective temperature of primary object (used for photospheric profile)
+   
+trad1 = float
+   radiation temperature of primary object (actually used for specifying continuum flux from boundary)
+   
+logg1 = float
+   log(gravity) of primary object (used for photospheric profile)
+   
+yhe1 = float
+   helium abundance by number of primary object (used sometimes for photospheric profiles)
+   
+fehe1 = float
+   Fe/He abundance of primary object (only used sometimes for photospheric profiles)
+   
+aenh1 = float
+   alpha element enhancemend of primary object (used sometimes for photospheric profiles)
+   
+vrot1 = float
+   surface rotational velocity of primary object (to get the broadened photospheric profile)
+   
+vmicro1 = float
+   mictor-turbulent velocity of primary object (artificially broaden line-profile function if wanted)
+   
+p_object01 = float, float, float
+   x,y,z position of primary object within the global coordinate system (in units of unit_length, see below)
+   
+v_object01 = float, float, float
+   v_x, v_y, v_z velocity components of the primary object in global coordinate system (in km/s)
+   
+ex01 = float, float, float
+ey01 = float, float, float
+ez01 = float, float, float
+   unit vectors of the objects coordinate system in global coordinate system (allowing for arbitrary tilts)
+   
+rot_axis01 = float, float, float
+   rotation axis of object 1 as measured in the global coordinate
+   system (allowing for a line-of-sight broadening of the photospheric
+   profile with given rotational velocity. Not implemented yet)
+
+---------------------input_model2-------------------------
+
+rstar2 = float
+   radius of secondary object (also length scale of corresponding coordinate system) in units of rsun
+   
+rmin2 = float
+   minimum radius of secondary object in units of rstar2
+   
+rmax2 = float
+   maximum radius of secondary object (setting computational domain) in units of rstar2
+   
+teff2 = float
+   effective temperature of secondary object (used for photospheric profile)
+   
+trad2 = float
+   radiation temperature of secondary object (actually used for specifying continuum flux from boundary)
+   
+logg2 = float
+   log(gravity) of secondary object (used for photospheric profile)
+   
+yhe2 = float
+   helium abundance by number of secondary object (used sometimes for photospheric profiles)
+   
+fehe2 = float
+   Fe/He abundance of secondary object (only used sometimes for photospheric profiles)
+   
+aenh2 = float
+   alpha element enhancemend of secondary object (used sometimes for photospheric profiles)
+   
+vrot2 = float
+   surface rotational velocity of secondary object (to get the broadened photospheric profile)
+   
+vmicro2 = float
+   mictor-turbulent velocity of secondary object (artificially broaden line-profile function if wanted)
+   
+p_object02 = float, float, float
+   x,y,z position of secondary object within the global coordinate system (in units of unit_length, see below)
+   
+v_object02 = float, float, float
+   v_x, v_y, v_z velocity components of the secondary object in global coordinate system (in km/s)
+   
+ex02 = float, float, float
+ey02 = float, float, float
+ez02 = float, float, float
+   unit vectors of the objects coordinate system in global coordinate system (allowing for arbitrary tilts)
+   
+rot_axis02 = float, float, float
+   rotation axis of object 2 as measured in the global coordinate
+   system (allowing for a line-of-sight broadening of the photospheric
+   profile with given rotational velocity. Not implemented yet)
+
+
+---------------------input_line---------------------------
+
+iline=integer
+   line identifier
+   iline = 1: Halpha
+   iline = 2: Hbeta
+   iline = 10: CIV
+   
+eps_line = float
+   thermalization parameter epsilon_L (only required for Sobolev approximation)
+   
+kline = float
+   arbitrary scaling factor to increase/decrease the opacity
+
+---------------------input_line---------------------------
+
+unit_length = float
+   length scale of global coordinate system in units of rsun
+   
+vth_fiducial = float
+   fiducial thermal velocity in km/s
+
+---------------------input_usr----------------------------
+
+only locally used model-parameters, not required for the global simulation setup
+
+
+#############################################################################
+#############################################################################
+#############################################################################
+
+available options in indat_spec_vbin.nml:
+
+
+---------------------input_options------------------------
+
+input_mod = integer
+   file-structure of input model
+   input_mod = 0 for standard 1d structure (not implemented yet)
+   input_mod = 1 for 3d structure in Cartesian coordinates (not implemented yet)
+   input_mod = 2 for 3d structure in spherical coordinates
+   
+input_file = string
+   input file to be used (should correspond to output_file within indat_modelspec_vbin.nml)
+   
+output_dir = string
+   directory where all output shall be stored (photospheric profiles, emergent flux profiles, etc.)
+   
+opt_photprof1 = integer
+opt_photprof2 = integer
+   option to specify which sort of photospheric profile should be used for the individual stars
+   opt_photprof(1,2) = 0   just planck function
+   opt_photprof(1,2) = 1   Artemio Herrero's library (hot stars)
+   opt_photprof(1,2) = 2   not implemented (artefact from old versions)
+   opt_photprof(1,2) = 3   Standard file format from FASTWIND
+   opt_photprof(1,2) = 4   Coelho 2005 photospheric profiles
+   
+opt_obsdir_read = logical
+   option to specify if observers directions shall be read in from in_alpha.dat and in_gamma.dat
+   if false, then just equidistant alpha,gamma grid
+   note: alpha corresponds to inclination and gamma to phase angle
+
+opt_surface = logical
+   set to true if surface brightness shall be calculated instead of emergent flux profiles
+   observer's direction and wavelength specified in input_surface (see below)
+
+opt_int2d = logical (not yet implemented)
+   set to true if intensity shall be calculated and printed along a certain direction instead of emergent flux profiles
+   observer's direction and wavelength specified in input_surface (see below)
+   
+opt_incl_gdark1 = logical
+   set to true if standard von_Zeipel gravity darkening shall be used for object 1 (not implemented yet)
+   
+opt_incl_sdist1 = logical
+   set to true if rotational surface distortion of object 1 shall be accounted for (not implemented yet)
+   
+opt_incl_gdark2 = logical
+   set to true if standard von_Zeipel gravity darkening shall be used for object 2 (not implemented yet)
+   
+opt_incl_sdist2 = logical
+   set to true if rotational surface distortion of object 2 shall be accounted for (not implemented yet)
+   
+opt_pgrid01 = string
+   set the grid stratification for impact parameters of object 1
+   opt_pgrid01 = 'lin'  for linear stratification
+   opt_pgrid01 = 'log'  for logarithmic stratification
+   opt_pgrid01 = 'llog'  for log-log stratification   
+   
+opt_rgrid01 = 'log'
+   set the grid stratification for radial grid of object 1
+   opt_rgrid01 = 'lin'  for linear stratification
+   opt_rgrid01 = 'log'  for logarithmic stratification
+   opt_rgrid01 = 'llog'  for log-log stratification   
+
+opt_pgrid02 = 'lin'
+   set the grid stratification for impact parameters of object 2
+   opt_pgrid02 = 'lin'  for linear stratification
+   opt_pgrid02 = 'log'  for logarithmic stratification
+   opt_pgrid02 = 'llog'  for log-log stratification
+   
+opt_rgrid02 = 'lin'
+   set the grid stratification for radial grid of object 2
+   opt_rgrid02 = 'lin'  for linear stratification
+   opt_rgrid02 = 'log'  for logarithmic stratification
+   opt_rgrid02 = 'llog'  for log-log stratification
+   
+nalpha = integer
+   number of inclination angles for which photospheric profile will be be calculated
+   
+ngamma = integer
+   number of phase angles for which photospheric profile will be be calculated
+
+---------------------input_model--------------------------
+
+vth_fiducial = float
+   fiducial thermal velocity (only normalization for output in xobs)
+
+---------------------input_surface------------------------
+
+alpha_surface = float
+   specify inclination angle for which surface brightness or intensity along ray shall be calculated
+   
+gamma_surface = float
+   specify phase angle for which surface brightness or intensity along ray shall be calculated
+   
+xobs_surface = float
+   specify xobs=(nu-nu_0)/fiducial_doppler_width for which surface brightness or intensity along ray shall be calculated
