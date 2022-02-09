@@ -1,0 +1,38 @@
+&input_options
+input_mod=2
+input_file='outputFILES/modspec_model00.h5'
+output_dir='outputFILES'
+opt_photprof1=0
+opt_photprof2=0
+opt_obsdir_read=t
+opt_surface=t
+opt_int2d=f
+opt_incl_gdark1=f
+opt_incl_sdist1=f
+opt_incl_gdark2=f
+opt_incl_sdist2=f
+opt_pgrid01 = 'log'
+opt_rgrid01 = 'log'
+opt_pgrid02 = 'log'
+opt_rgrid02 = 'log'
+nalpha=1
+ngamma=17 /
+
+input_mod=0   1D input model
+input_mod=1   3d input model (cartesian coordinates)
+input_mod=2   3d input model (spherical coordinates)
+
+&input_model
+vth_fiducial = 1.d2
+/
+
+
+&input_surface
+alpha_surface=1.57d0
+gamma_surface=3.35103 !3.14d0
+xobs_surface=0.d0 /
+0.785d0
+
+
+&dum
+/

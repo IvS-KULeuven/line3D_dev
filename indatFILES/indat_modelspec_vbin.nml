@@ -1,0 +1,63 @@
+&input_options
+input_file = './outputFILES/output_model00.h5'
+input_file2 = './inputFILES/model2d.h5'
+output_file = './outputFILES/modspec_model00.h5'
+input_mod = 1 /
+
+&input_model1
+rstar1 = 19.d0
+rmin1 = 1.d0
+rmax1 = 12.d0
+teff1 = 40.d3
+trad1 = 40.d3
+x01 = 0.d0
+y01 = 0.d0
+z01 = 0.d0
+vx01 = 0.d0
+vy01 = 0.d0
+vz01 = 0.d0
+/
+teff = 18.d3
+vy01 = 
+rmax1 = 10.223429999999997d0
+
+&input_model2
+rstar2 = 8.d0
+rmin2 = 1.d0
+rmax2 = 2.d0
+teff2 = 1.d2
+trad2 = 1.d2
+x02 = -15.d0
+y02 = 0.d0
+z02 = 0.d0
+vx02 = 0.d0
+vy02 = 0.d0
+vz02 = 0.d0
+/
+rmax2 = 10.d0
+
+
+&input_line
+iline=10
+eps_line = 0.d0
+kline = 1.d0
+/
+iline=1: halpha
+iline=2: hbeta
+iline=10: civ resonance line
+
+
+&input_units
+unit_length = 19.d0
+/
+
+TRANSITION-FREQUENCY (LAMBDA=1367 A):
+XNUE0=2.191983810829996D15
+FOR MODELS PULS DIPLOMA (LAMBDA=1548 A):
+XNUE0=1.93798D15
+H-ALPHA:
+XNUE0=4.5680294d14
+
+
+&dum
+/

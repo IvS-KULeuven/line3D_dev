@@ -1,0 +1,116 @@
+&input_options
+model_dir = 'inputFILES'                     ! Name of the output directory 
+output_file = 'output_model00.h5'  ! name of the output model file 
+input_mod = 13                               ! Model read in instruction 12 = read 2dLDI
+input_mod_dim = 3                            ! Dimensionality of the problem 1,2,3D
+spatial_grid1d = 5
+spatial_grid3d = 5
+opt_opac = 0
+opt_opal = 0
+opt_angint_method = 9
+opt_method = -1
+opt_sol2d = f
+opt_ltec = 0
+opt_incl_cont = f
+opt_start_cont = t
+opt_ng_cont = t
+opt_ait_cont = f
+opt_incl_line = t
+opt_start_line = t
+opt_ng_line = t
+opt_ait_line = f
+opt_alo_cont = 1
+opt_alo_line = 3
+opt_incl_gdark = f
+opt_incl_sdist = f
+/
+
+&input_mod_1d
+teff = 40.d3
+trad = 40.d3
+xlogg = 3.6d0
+rstar = 20.015520723398144d0 
+rmax = 5.9895d0 
+tmin = 1.d0
+xmloss = 2.d-6
+vmin = 1.d0
+vmax = 2.8d3
+vmicro = 1.0d2
+vth_fiducial = 1.d2
+vrot = 0.d0
+beta = 1.d0
+yhe = .1d0
+hei = 2.d0
+xnue0 = 1.93798d15
+na = 12
+/
+
+&input_infreg
+rmin = 1.d0
+rlim = 5.9d0
+/
+
+&input_cont
+eps_cont = 0.d0
+kcont = 1.d0
+/
+
+&input_line
+eps_line = 0.d0
+kline = 1.0d5
+kappa0 = 5.d-1
+alpha = 0.d0 
+/
+
+&dimensions_1d
+n1d = 27
+n1d_t = 81
+n1d_r = 22
+delv = 0.3333333d0
+/
+
+&dimensions_3d
+ncx=19
+ncy=19
+ncz=19
+delx_max=0.7d0
+dely_max=0.7d0
+delz_max=0.7d0
+/
+
+&dimensions_freq
+deltax = 0.3333333d0
+xcmf_max = 3.d0
+/
+
+&dimensions_angles
+n_theta = 16
+/
+
+&benchmark
+benchmark_mod = 0
+im_source = 3
+im_opacity = 2
+im_vel = 0
+tau_min = 0.d0
+tau_max = 5.d0
+source_min = 0.1d0
+source_max = 1.d-6
+n_y = 0.d0
+n_z = 0.707107d0
+/
+
+&input_usr
+fname_model='./models/florian/qbar2000/ldi'       ! name of the input models
+is_min = 40
+is_max = 100
+nphi=41
+opt_bvel = 3
+/
+
+
+
+&test
+/
+
+test

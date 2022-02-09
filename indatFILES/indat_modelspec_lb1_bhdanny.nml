@@ -1,0 +1,93 @@
+&input_options
+input_file = './outputFILES/output_model00.h5'
+input_file2 = './inputFILES/model2d.h5'
+output_file = './outputFILES/modspec_model00.h5'
+input_mod = 5 /
+
+&input_model1
+rstar1 = 1.d0
+rmin1 = 1.d0
+rmax1 = 180.d0
+teff1 = 18.d1
+trad1 = 18.d1
+p_object01 = 8.34d0, 0.d0, 0.d0
+v_object01 = 0.d0, 19.78d0, 0.d0
+ex01 = 1.d0, 0.d0, 0.d0
+ey01 = 0.d0, 1.d0, 0.d0
+ez01 = 0.d0, 0.d0, 1.d0
+rot_axis01 = 0.d0, 0.d0, 1.d0
+
+/
+teff = 18.d3
+vy01 = 
+rmax1 = 10.223429999999997d0
+
+&input_model2
+rstar2 = 5.3d0
+rmin2 = 1.d0
+rmax2 = 2.d0
+teff2 = 14.d3
+trad2 = 14.d3
+p_object02 = -59.64d0, 0.d0, 0.d0
+v_object02 = 0.d0, -141.3d0, 0.d0
+ex02 = 1.d0, 0.d0, 0.d0
+ey02 = 0.d0, 1.d0, 0.d0
+ez02 = 0.d0, 0.d0, 1.d0
+rot_axis02 = 0.d0, 0.d0, 1.d0
+/
+rmax2 = 10.d0
+
+
+&input_line
+iline=1
+eps_line = 0.d0
+kline = 1.d0
+/
+iline=1: halpha
+iline=2: hbeta
+iline=10: civ resonance line
+
+
+&input_units
+unit_length = 3.7d0
+/
+
+&input_usr
+opt_temperature1 = 0
+opt_temperature2 = 4
+kcont=1.d0
+kline=1.d0
+vmicro1 = 10.d0
+logg1 = 5.914d0   !4.77
+yhe1 = 0.1d0
+hi1 = 1.d0
+hei1 = 2.d0
+lstar1 = 1.d6
+tdisc1 = 8.d3
+tdisc1a = 2.d3
+tdisc1b = 2.d3
+mdisc1 = 1.06d-14
+rdisc1_max = 45.d0
+dtheta_disc1 = 45.d0
+slope1 = 1.5d0
+vmicro2 = 20.d0
+logg2 = 3.5d0
+yhe2 = 0.2d0
+hi2 = 1.d0
+hei2 = 2.d0
+lstar2 = 1.d6
+tdisc2 = 10.d3
+tdisc2a = 12.7d3
+tdisc2b = 5.d3
+mdisc2 = 1.78d-22
+rdisc2_max = 0.d0
+dtheta_disc2 = 45.d0
+slope2 = 2.5d0
+vrot2fac=1.d0
+vth_fiducial=1.d2
+/
+mdisc2 = 1.78d-12
+rdisc2_max = 13.5d0
+
+&dum
+/

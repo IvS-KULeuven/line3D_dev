@@ -1,0 +1,82 @@
+&input_options
+input_file = './outputFILES/output_model00.h5'
+input_file2 = './inputFILES/model2d.h5'
+output_file = './outputFILES/modspec_model00.h5'
+input_mod = 3 /
+
+&input_model1
+rstar1 = 10.d0
+rmin1 = 1.d0
+rmax1 = 15.d0
+teff1 = 20.d3
+trad1 = 20.d3
+logg1 = 3.6
+yhe1 = 0.1
+fehe1 = -2.5d0
+aenh1 = 0.d0
+vrot1 = 0.
+vmicro1 = 100.d0
+p_object01 = 5.d0, 0.d0, 0.d0
+v_object01 = 0.d0, 0.d0, 0.d0
+ex01 = 1.d0, 0.d0, 0.d0
+ey01 = 0.d0, 1.d0, 0.d0
+ez01 = 0.d0, 0.d0, 1.d0
+rot_axis01 =0.d0, 0.d0, 1.d0
+/
+teff = 18.d3
+vy01 = 
+rmax1 = 10.223429999999997d0
+
+&input_model2
+rstar2 = 1.d0
+rmin2 = 1.d0
+rmax2 = 1.1d0
+teff2 = 1.d2
+trad2 = 1.d2
+logg2 = 3.
+yhe2= 0.1
+fehe2 = -2.5d0
+aenh2 = 0.d0
+vrot2 = 0.
+vmicro2 = 100.d0
+p_object02 = -30.d0, 0.d0, 0.d0
+v_object02 = 0.d0, 0.d0, 0.d0
+ex02 = 1.d0, 0.d0, 0.d0
+ey02 = 0.d0, 1.d0, 0.d0
+ez02 = 0.d0, 0.d0, 1.d0
+rot_axis02 = 0.d0, 0.d0, 1.d0
+/
+
+&input_line
+iline=1
+eps_line = 0.d0
+kline = 1.d0
+/
+iline=1: halpha
+iline=2: hbeta
+iline=10: civ resonance line
+
+
+&input_units
+unit_length = 10.d0
+vth_fiducial = 100.d3
+/
+
+for IRAS06165+3185
+&input_usr
+p_rho = 9.6d0
+logc_rho = -19.d0
+p_vel = 0.05d0
+theta_in = 0.d0
+theta_out = 31.d0
+theta_cav = 0.d0
+vel_in = 402.d0
+vel_out = 38.4d0
+phi_tilt = 0.93d0
+tjet = 3900.d0
+rmax_jet = 350.d0
+/
+
+sad
+&dum
+/

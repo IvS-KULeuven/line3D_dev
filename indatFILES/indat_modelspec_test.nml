@@ -1,0 +1,33 @@
+&input_options
+input_file = './outputFILES/output_model00.h5'
+input_file2 = './inputFILES/model3d.h5'
+output_file = './outputFILES/modspec_model00.h5'
+input_mod = 1 /
+
+&input_model
+teff = 40.d3
+trad = 40.d3
+xlogg = 3.5d0
+rstar = 20.d0
+rmax = 30.d0
+tmin = 1.d0
+xmloss = 1.d-6
+vmin = 10.d0
+vmax = 2.d3
+vmicro = 1.d2
+vth_fiducial=1.d2
+beta = 1.d0
+yhe = .1d0
+hei = 2.d0
+/
+rmax=10.223429999999997d0
+
+&input_line
+iline = 10
+eps_line = 1.d-6
+kline = 1.d3
+kappa0 = 1.d0
+alpha = 0.d0 /
+
+&dum
+/

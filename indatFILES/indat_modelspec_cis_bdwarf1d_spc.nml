@@ -1,0 +1,33 @@
+&input_options
+input_file = './outputFILES/output_model00.h5'
+input_file2 = './inputFILES/model1d.h5'
+output_file = './outputFILES/spc/modspec_model00.h5'
+input_mod = 14 /
+
+&input_model
+teff = 23.d3
+trad = 23.d3
+xlogg = 3.6d0
+rstar = 5.0008478d0
+rmax = 9.9d0
+tmin = 1.d0
+xmloss = 2.d-9
+vmin = 1.d0
+vmax = 2.4d3
+vmicro = 1.d2
+vth_fiducial=1.d2
+beta = 1.d0
+yhe = .1d0
+hei = 2.d0
+/
+rmax=10.223429999999997d0
+
+&input_line
+iline = 10
+eps_line = 0.d0
+kline = 1.d5
+kappa0 = 1.d0
+alpha = 0.d0 /
+
+&dum
+/

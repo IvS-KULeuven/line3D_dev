@@ -1,0 +1,152 @@
+&input_options
+model_dir = 'inputFILES'                     ! Name of the output directory 
+output_file = 'nico_wr3d/output_model00.h5'  ! name of the output model file 
+input_mod = 17                               ! Model read in instruction 17 = read 3dWR (see ./src_model/model.f90); 1 -for beta law, see &input_mod_1d
+input_mod_dim = 3                            ! Dimensionality of the problem 1,2,3D
+spatial_grid1d = 5
+                         ! ! ! Below is only for Sort-Characteristic solution ! ! !spatial_grid3d = 4
+opt_opac = 0
+opt_opal = 0
+opt_angint_method = 9
+opt_method = 1
+opt_sol2d = f
+opt_ltec = 1
+opt_incl_cont = t
+opt_start_cont = t
+opt_ng_cont = t
+opt_ait_cont = f
+opt_incl_line = f
+opt_start_line = t
+opt_ng_line = t
+opt_ait_line = f
+opt_alo_cont = 3
+opt_alo_line = 3
+opt_incl_gdark = f
+opt_incl_sdist = f
+/
+
+&input_mod_1d
+teff = 258390.7d0
+trad = 258390.7d0
+xlogg = 3.6d0
+rstar = 1.d0
+rmax = 11.d0
+tmin = 1.d0
+xmloss = 1.d-6
+vmin = 10.d0
+vmax = 4000.d0
+vmicro = 1.d2
+vth_fiducial = 1.d2
+vrot = 0.d0
+beta = 1.d0
+yhe = .98d0
+hei = 2.d0
+xnue0 = 1.93798d15
+na = 12
+/
+
+&input_infreg
+rmin = 1.d0
+rlim = 5.9d0
+/
+
+&input_cont
+eps_cont = 0.d0
+kcont = 1.d0
+
+&input_line
+eps_line = 0.d0
+kline = 1.d0
+kappa0 = 5.d-1
+alpha = 0.d0 
+/
+
+&input_mod_adm
+ralfven = 2.7d0
+delta = 0.5d0
+chi_inf = 1.d-1
+obliquity = 0.d0
+/
+
+&input_mod_bc
+mstar = 52.5d0
+zeta = 4.18d0
+gamma = 0.35d0
+xi = -0.43d0
+alpha_cak = 0.66d0
+delta_cak = 0.07d0
+/
+
+&input_mod_abl
+theta_d = 12.d0
+dtheta_abl = 4.d0
+beta_accr = 1.5d0
+tau_d = 1.d3
+/
+
+&input_mod_be
+mdisc = 4.5d-8
+rdisc = 13.5d0
+tdisc = 30.d3
+dtheta = 45.d0
+slope = 1.5d0
+/
+
+&dimensions_1d
+n1d = 27
+n1d_t = 81
+n1d_r = 22
+delv = 0.3333333d0
+/
+
+&dimensions_3d
+ncx=19
+ncy=19
+ncz=19
+delx_max=0.7d0
+dely_max=0.7d0
+delz_max=0.7d0
+/
+
+&dimensions_freq
+deltax = 0.3333333d0
+xcmf_max = 3.d0
+/
+
+&dimensions_angles
+n_theta = 16
+/
+
+&benchmark
+benchmark_mod = 0
+im_source = 3
+im_opacity = 2
+im_vel = 0
+tau_min = 0.d0
+tau_max = 5.d0
+source_min = 0.1d0
+source_max = 1.d-6
+n_y = 0.d0
+n_z = 0.707107d0
+/
+
+&input_usr
+fname_model='models/nico_wr3d/WR_3D_alpha_LTE_longbox       ! name of the input models '
+is_min= 40                                                ! first snapshot 
+is_max= 40                                                ! the last snapshot
+unit_length = 1.d0                                       ! unit length in units of R_\odot in hydro syms 
+unit_density = 2.5d-8                                    ! unit density in hydro syms
+unit_velocity = 1.d8                                     ! unit velocity in hydro syms
+unit_temperature = 1.d0                                  ! unit temperature in hydro syms
+opt_bvel= 0                                               ! 0 - read hydro file ; 1 - set eta velocity law with mdot and vinf from hydro ; 2 - set eta velocity law with mdot and vinf from this input file
+beta= 2.0d1                                                  ! beta value if opt_bvel=1,2
+vmin= 1.0d1                                                  ! vmin in km/s if opt_bvel=1,2
+vinf= 2.0d3                                               ! vinf in km/s if opt_bvel=2
+mdot= 10.0d-4                                                ! mass-loss rate in msun/yr if opt_bvel=2
+max_refinement=4                                          ! refinement level of the hydro grid
+nd = 512, 64, 64                                         ! resolution of the output grid 
+/
+
+&test
+/
+

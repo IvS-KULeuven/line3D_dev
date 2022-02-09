@@ -1,0 +1,171 @@
+&input_options
+model_dir = 'inputFILES'
+output_file = 'output_model00.h5'
+input_mod = 0
+input_mod_dim = 1
+spatial_grid1d = 5
+spatial_grid3d = 1
+opt_opac = 0
+opt_opal = 0
+opt_angint_method = 0
+opt_method = 1
+opt_sol2d = f
+opt_ltec = 0
+opt_incl_cont = t
+opt_start_cont = t
+opt_ng_cont = t
+opt_ait_cont = f
+opt_incl_line = f
+opt_start_line = t
+opt_ng_line = t
+opt_ait_line = f
+opt_alo_cont = 0
+opt_alo_line = 0
+opt_incl_gdark = f
+opt_incl_sdist = f /
+
+input_mod=0 if spherically symmetric model is used (beta-velocity-law)
+               temperatures are read from JO's solution: RAD_JO.dat, TEMP_JO.dat
+input_mod=1 if Dylan Kee's 2d model is used (snapshot)
+input_mod=2 if Dylan Kee's 2d model is uised (wind ablation from initial
+               conditions)
+input_mod=3 if ADM model is used
+input_mod=4 if ADM model is used (with spherical beta-velocities in wind)
+input_mod=5 if MHD snapshot is read in (from Asif's 3d atmosphere)
+
+input_mod_dim=[1,2,3] if 1d, 2d, 3d model shall be read in
+
+spatial_grid3d=0 if 3d grid is calculated from 1d grid with equidistant core
+                 points 
+spatial_grid3d=1 if 3d grid is calculated from a mean-value approach
+                 (minimizing distance of subsequent coordinates from 1d-grid)
+spatial_grid3d=2 if 3d grid is calculated from a mean-value approach 
+                 (minimizing distance of subsequent coordinates from original
+                 input-grid)
+spatial_grid3d=3 if 3d grid is calculated completely equidistant
+
+spatial_grid1d=0 if equidistant radial grid is used (subroutine grid1d_r_equi)
+spatial_grid1d=1 if equidistant velocity grid is used (subroutine grid1d_vel_equi)
+spatial_grid1d=2 if equidistant tau_thomson grid is used (subroutine grid1d_tau_equi)
+spatial_grid1d=3 if equidistant log(tau_thomson) grid is used (subroutine grid1d_tau_log)
+spatial_grid1d=4 if combination is used (see subroutine grid1d_final for details)
+spatial_grid1d=5 if combination is used (see subroutine grid1d_final_2 for details)
+spatial_grid1d=6 if grid is calucalted equidistant in log-space (subroutine grid1d_r_log)
+
+&input_mod_1d
+teff = 40.d3
+trad = 40.d3
+xlogg = 3.5d0
+rstar = 19.d0
+lstar = 1.d6
+rmax = 12.d0
+tmin = .8d0
+xmloss = 5.d-6
+vmin = 1.d1
+vmax = 2.d3
+vmicro = 1.d2
+vth_fiducial=100.274758798836d0
+vrot = 0.d0
+beta = 1.d0
+yhe = .1d0
+hei = 2.d0 
+xnue0=2.191983810829996D15
+na = 12 /
+
+TRANSITION-FREQUENCY (LAMBDA=1367 A):
+XNUE0=2.191983810829996D15
+FOR MODELS PULS DIPLOMA (LAMBDA=1548 A):
+XNUE0=1.93798D15
+H-ALPHA:
+XNUE0=4.5680294d14
+	
+&input_infreg
+rmin = 1.d0
+rlim = 13.2d0 /
+
+&input_cont
+eps_cont = 1.d-6
+kcont = 1.d-10 /
+
+&input_line
+eps_line = 0.d0
+kline = 1.d0
+kappa0 = 1.d-1
+alpha = 0.5d0 /
+
+&input_mod_adm
+ralfven = 2.7d0
+delta = 0.5d0
+chi_inf = 1.d-1
+obliquity = 0.d0 /
+obliquity in degree
+
+&input_mod_bc
+mstar = 52.5d0
+zeta = 3.077d0
+gamma = 0.35d0
+xi = -0.43d0
+alpha_cak = 0.66d0
+delta_cak = 0.07d0 /
+
+&input_mod_abl
+theta_d = 12.d0
+dtheta_abl = 4.d0
+beta_accr = 1.5d0
+tau_d = 1.d3 /
+
+&input_mod_be
+mdisc = 4.5d-8
+rdisc = 13.5d0
+tdisc = 30.d3
+dtheta = 45.d0
+slope = 1.5d0
+/
+
+&dimensions_1d
+n1d = 33
+n1d_t = 81
+n1d_r = 22
+delv = 0.3333333d0 /
+
+!three different grids:
+n1d=60
+n1d=40
+n1d=17
+n1d_t = 81
+n1d_r = 22
+
+&dimensions_3d
+ncx=19
+ncy=19
+ncz=19
+delx_max=.7d0
+dely_max=.7d0 
+delz_max=.7d0 /
+
+&dimensions_freq
+deltax = 0.3333333d0
+xcmf_max = 3.d0 /
+
+&dimensions_angles
+n_theta = 17 /
+
+!low resolution:
+n_theta=6
+n_phi=5
+!high resolution:
+n_theta=16
+n_phi=5
+
+&benchmark
+benchmark_mod = 11
+im_source = 3
+im_opacity = 2
+im_vel = 0
+tau_min = 0.d0
+tau_max = 5.d0
+source_min = 0.1d0
+source_max = 1.d-6
+n_y = 0.d0
+n_z = 0.707107d0 /
+n_z = 0.707107d0 
