@@ -496,7 +496,7 @@ rmax = 11.d0 & float & $\Rmax$ in $\Rstar$, used to define the computational dom
 tmin = 1.d0  & float & Minimum temperature of the wind in [$\Teff$]. Only used for very specific test routines. \\
 xmloss = 1.d-6 & float & Mass-loss rate $\mdot$ in [\msunyr]. Only used for very specific test routines. \\
 vmin = 10.d0  & float & Minimum velocity \vmin~of a $\beta$-velocity law in [\kms]. Only used for very specific test routines \\
-vmax = 4.d3  & float & Terminal velocity \vinf~of a $\beta$-velocity law in [\kms]. Only used for very specific test routines \\
+vmax = 4.d3  & float & Terminal velocity \vinf~of a $\beta$-velocity law in [\kms]. \textbf{If not overwritten within the specific model routines, this sets also the range of velocities/frequencies for which the line-profiles are calculated} \\
 beta = 1.d0  & float & $\beta$ parameter of a $\beta$-velocity law in [\kms]. Only used for very specific test routines \\
 vmicro = 1.0d2  & float & Microturbulent velocity \vturb in [\kms]. \\
 vth\_fiducial=1.d2 & float & Fiducial thermal velocity to be used in  [\kms].\\ 
@@ -769,6 +769,13 @@ Below, you can find a list of known problems and (possible) solutions:
   not compatible with an old HDF5 version. Then you might want to
   switch to a later HDF5 release (version 1.10.7 or higher), or
   downgrade your fortran compiler.
+
+\item[Mac -- Illegal Instruction 4:] On the Mac, an Illegal Instruction 4 error can occur when static arrays are not properly
+  initialized. To solve this issue, and to still be able to use \textsc{OpenMP} parallelization, please dynamically allocate static arrays, e.g.:\\
+  real(dp), dimension(nd) :: my\_array \\
+  becomes \\
+  real(dp), dimension(:), allocatable :: my\_array \\
+  allocate(my\_array(nd))
 \end{description}
 
 

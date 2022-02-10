@@ -30,7 +30,7 @@ ifeq ($(COMPILER),gfortran)
    LD = gfortran
 
 #replace your hdf5 path here
-   DIR_HDF5=$(HOME)/hdf5_lib/gfortran_build
+   DIR_HDF5=$(HOME)/Postdoc/hdf5_lib/version1.10.5
 
 #for MAC users: replace *.so with *.dylib
    DIR_MOD_HDF5=$(DIR_HDF5)/include

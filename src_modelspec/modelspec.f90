@@ -62,7 +62,10 @@ select case(input_mod)
       call output3d_spc
    case(19)
       call calc_model3d_nicowr3d
-      call output3d_spc            
+      call output3d_spc
+   case(20)
+      call calc_model3d_js_lh
+      call output3d_spc
    case default
       stop 'error in modspec: input_mod not specified'
 end select
@@ -156,7 +159,9 @@ yhe_mass = one / (one + one/four/yhe)
 call get_opal_table(yhe_mass)
 !
 !lte tables
-call get_lte_table(yhe_mass)
+if(iline.eq.0) then
+   call get_lte_table(yhe_mass)
+endif
 !
 !
 end subroutine read_input
@@ -4807,3 +4812,155 @@ enddo
 !stop 'go on in here'
 !
 end subroutine calc_model3d_nicowr3d
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+subroutine calc_model3d_js_lh
+!
+use prog_type
+use fund_const, only: cgs_planck, cgs_clight, cgs_kb, rsu, xmsu, pi, zero, one, half
+use options_modspec, only: indat_file, input_file, input_file2, input_mod
+use dime_modspec, only: nr, ntheta, nphi, r, theta, phi, velx3d, vely3d, velz3d, opac3d, &
+                        opalbar3d, sline3d, scont3d, imask3d, t3d, trad3d
+use params_modspec, only: teff, trad, xic1, vth_fiducial, sr, rstar, vmax, vmicro, &
+                          opt_opal, eps_line, lstar, xlogg, vrot, yhe, yhe_mass, hei, xmloss, unit_length, rmax
+use mod_opal
+use mod_lte
+use hdf5
+use mod_opacities
+use mod_iline, only: alpha, kappa0, kline, xnue0, na, gl, flu, na, iline
+use mod_grid
+!
+implicit none
+!
+! ... local scalars
+integer(i4b) :: i, j, k, err
+real(dp) :: b2, b3, bb, beta, mdot, rmin, vmin
+real(dp) :: sint, cost, sinp, cosp
+real(dp) :: velr, velth, velphi, rho
+!
+! ... local arrays
+!
+! ... local characters
+character(len=500) :: cdum
+!
+! ... local functions
+real(dp) :: dilfac, bnue, sline_depcoeff
+!
+! ... for hdf5 file
+!
+! ... namelists
+!
+!
+write(*,*) '--------------------test model js_lh-------------------------------------------'
+write(*,*)
+!
+!-----------------------------------------------------------------------
+!
+nr=101
+ntheta=41
+nphi=81
+!
+!allocate arrays
+allocate(r(nr), stat=err)
+   if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
+allocate(theta(ntheta), stat=err)
+   if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
+allocate(phi(nphi), stat=err)
+   if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
+allocate(opac3d(nr,ntheta,nphi), stat=err)
+   if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
+allocate(opalbar3d(nr,ntheta,nphi), stat=err)
+   if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
+allocate(scont3d(nr,ntheta,nphi), stat=err)
+   if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
+allocate(sline3d(nr,ntheta,nphi), stat=err)
+   if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
+allocate(velx3d(nr,ntheta,nphi), stat=err)
+   if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
+allocate(vely3d(nr,ntheta,nphi), stat=err)
+   if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
+allocate(velz3d(nr,ntheta,nphi), stat=err)
+   if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
+allocate(t3d(nr,ntheta,nphi), stat=err)
+   if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
+allocate(trad3d(nr,ntheta,nphi), stat=err)
+   if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
+
+vmin=10.d5
+vmax=2000.d5
+beta=1.d0
+bb = one - (vmin/vmax)**(1./beta)
+mdot = 1.d-6*xmsu/yr
+!
+rmin=1.
+   
+call grid_log(rmin, rmax, nr, r)
+call grid_equi(zero, pi, ntheta, theta)
+call grid_equi(zero, two*pi, nphi, phi)
+!
+!
+!
+do i=1, nr
+   do j=1, ntheta
+      do k=1, nphi
+!        
+         sint=sin(theta(j))
+         cost=cos(theta(j))
+         sinp=sin(phi(k))
+         cosp=cos(phi(k))
+!
+!-----------------------------------------------------------------------
+!
+         velr = vmax*(1.-bb/r(i))**beta
+         velth = zero
+         velphi = zero
+
+         rho = mdot/4./pi/(r(i)*sr)**2/velr
+         
+         t3d(i,j,k) = 40.d3
+         trad3d(i,j,k) = 40.d3
+
+         velx3d(i,j,k) = velr*sint*cosp + velth*cost*cosp-velphi*sinp
+         vely3d(i,j,k) = velr*sint*sinp + velth*cost*sinp+velphi*cosp
+         velz3d(i,j,k) = velr*cost - velth*sint         
+
+         opac3d(i,j,k) = 0.34*rho*sr
+!        opac3d(i,j,k) = opac_opal(kcont, yhe_mass, hei, log10(rho),log10(t3d(i,j,k)), nrho_opal, ntemp_opal, rho_opal, temp_opal, kappa_opal)*unit_length
+!        opac3d(i,j,k) = opac_thomson(yhe,hei,rho,kcont)*unit_length
+!        
+         b2 = one
+         b3 = one
+         opalbar3d(i,j,k) = opalbar_model_kline(0.1d0, 2.d0, rho, kline)*sr         
+!         opalbar3d(i,j,k) = get_opalbar(iline, kline, unit_length, yhe, hei, t3d(i,j,k), vth_fiducial, xnue0, b2, b3, rho) !in 1/unit_length
+!         
+         scont3d(i,j,k) = zero
+         sline3d(i,j,k) = bnue(xnue0,t3d(i,j,k))*dilfac(r(i))
+!
+!
+      enddo
+   enddo
+enddo
+!
+!stop 'go on here'
+!-----------------------------set velocities------------------------------
+!
+!need to set that here!!!
+xic1=bnue(xnue0,trad)
+!
+!maximum velocity in global system
+!vmax=zero
+!do i=1, nr
+!   do j=1, ntheta
+!      do k=1, nphi
+!         vel=sqrt((velx3d(i,j,k))**2+(vely3d(i,j,k))**2+(velz3d(i,j,k))**2)
+!         if(vel.gt.vmax) vmax=vel
+!      enddo
+!   enddo
+!enddo!
+!
+!stop 'go on in here'
+!
+end subroutine calc_model3d_js_lh

@@ -9,7 +9,7 @@ use prog_type
 !
 implicit none
 !
-character(len=100) :: indat_file, input_file, input_file2, output_file
+character(len=500) :: indat_file, input_file, input_file2, output_file
 !
 integer(i4b) :: input_mod
 !input_mod=0  3D model: calculate stuff

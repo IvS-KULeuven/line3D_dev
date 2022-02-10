@@ -7,7 +7,7 @@ module options_spec
 !
 implicit none 
 !
-character(len=100) :: input_file, output_dir
+character(len=500) :: input_file, output_dir
 !
 integer :: opt_photprof1
 integer :: opt_photprof2

@@ -66,10 +66,10 @@ real(dp) :: tstart, tend
 !
 ! ... local arrays
 real(dp), dimension(3) :: vec_cac, vec_cyc, vec_vel
-integer(i1b), dimension(nz_max) :: imaskdum_ray, imaskdum2_ray
-real(dp), dimension(nz_max) :: zdum_ray, veldum_ray, vthdum_ray, &
+integer(i1b), dimension(:), allocatable :: imaskdum_ray, imaskdum2_ray
+real(dp), dimension(:), allocatable :: zdum_ray, veldum_ray, vthdum_ray, &
                                opacdum_ray, opalbardum_ray, scontdum_ray, slinedum_ray, tempdum_ray
-real(dp), dimension(nz_max) :: zdum2_ray, veldum2_ray, vthdum2_ray, opacdum2_ray, opalbardum2_ray, scontdum2_ray, &
+real(dp), dimension(:), allocatable :: zdum2_ray, veldum2_ray, vthdum2_ray, opacdum2_ray, opalbardum2_ray, scontdum2_ray, &
                                slinedum2_ray, tempdum2_ray
 !
 ! ... local logicals
@@ -83,6 +83,14 @@ real(dp) :: vthermal
 logical :: boundary
 !
 tstart = omp_get_wtime()
+!
+allocate(imaskdum_ray(nz_max), imaskdum2_ray(nz_max))
+allocate(zdum_ray(nz_max), veldum_ray(nz_max), vthdum_ray(nz_max), &
+         opacdum_ray(nz_max), opalbardum_ray(nz_max), &
+         scontdum_ray(nz_max), slinedum_ray(nz_max), tempdum_ray(nz_max))
+allocate(zdum2_ray(nz_max), veldum2_ray(nz_max), vthdum2_ray(nz_max), &
+         opacdum2_ray(nz_max), opalbardum2_ray(nz_max), &
+         scontdum2_ray(nz_max), slinedum2_ray(nz_max), tempdum2_ray(nz_max))
 !
 !------------------transform given cs0_x, cs0_y-------------------------
 !----------------to coordinate system of star 1-------------------------
@@ -483,9 +491,9 @@ real(dp) :: tstart, tend
 !
 ! ... local arrays
 real(dp), dimension(3) :: vec_cac, vec_cyc, vec_vel
-real(dp), dimension(nz_max) :: zdum_ray, veldum_ray, vthdum_ray, &
+real(dp), dimension(:), allocatable :: zdum_ray, veldum_ray, vthdum_ray, &
                                opacdum_ray, opalbardum_ray, scontdum_ray, slinedum_ray, tempdum_ray
-real(dp), dimension(nz_max) :: zdum2_ray, veldum2_ray, vthdum2_ray, opacdum2_ray, opalbardum2_ray, scontdum2_ray, &
+real(dp), dimension(:), allocatable :: zdum2_ray, veldum2_ray, vthdum2_ray, opacdum2_ray, opalbardum2_ray, scontdum2_ray, &
                                slinedum2_ray, tempdum2_ray
 !
 ! ... local logicals
@@ -499,6 +507,13 @@ real(dp) :: vthermal
 logical :: boundary
 !
 tstart = omp_get_wtime()
+!
+allocate(zdum_ray(nz_max), veldum_ray(nz_max), vthdum_ray(nz_max), &
+         opacdum_ray(nz_max), opalbardum_ray(nz_max), &
+         scontdum_ray(nz_max), slinedum_ray(nz_max), tempdum_ray(nz_max))
+allocate(zdum2_ray(nz_max), veldum2_ray(nz_max), vthdum2_ray(nz_max), &
+         opacdum2_ray(nz_max), opalbardum2_ray(nz_max), &
+         scontdum2_ray(nz_max), slinedum2_ray(nz_max), tempdum2_ray(nz_max))
 !
 !-------------transform given cs0_p, cs0_x, cs0_y-----------------------
 !----------------to coordinate system of star 2-------------------------
@@ -606,7 +621,7 @@ if(cs2_p.ge.rmax2) then
       if(i.eq.iz) then
          if(linfo_phot.eqv..false.) then
             write(*,*) vec_cac(1)**2+vec_cac(2)**2+vec_cac(3)**2, linfo_phot, linfo_max
-            stop 'error'
+            stop 'error in setup_ray3d_cs2spc: point outside information region'
          endif
       endif
 !interpolation only if point lies within region where information is stored
@@ -900,11 +915,12 @@ real(dp) :: tstart, tend
 !
 ! ... local arrays
 real(dp), dimension(3) :: vec_cac, vec_cyc
-integer(i1b), dimension(nz_max) :: imaskdum_ray, imaskdum2_ray
-real(dp), dimension(nz_max) :: zdum_ray, veldum_ray, vthdum_ray, &
+integer(i1b), dimension(:), allocatable :: imaskdum_ray, imaskdum2_ray
+real(dp), dimension(:), allocatable :: zdum_ray, veldum_ray, vthdum_ray, &
                                opacdum_ray, opalbardum_ray, scontdum_ray, slinedum_ray, tempdum_ray
-real(dp), dimension(nz_max) :: zdum2_ray, veldum2_ray, vthdum2_ray, &
+real(dp), dimension(:), allocatable :: zdum2_ray, veldum2_ray, vthdum2_ray, &
                                opacdum2_ray, opalbardum2_ray, scontdum2_ray, slinedum2_ray, tempdum2_ray
+
 !
 ! ... local logicals
 logical :: llcore1, llcore2
@@ -915,6 +931,14 @@ real(dp) :: vthermal
 logical :: boundary
 !
 tstart = omp_get_wtime()
+!
+allocate(imaskdum_ray(nz_max), imaskdum2_ray(nz_max))
+allocate(zdum_ray(nz_max), veldum_ray(nz_max), vthdum_ray(nz_max), &
+         opacdum_ray(nz_max), opalbardum_ray(nz_max), &
+         scontdum_ray(nz_max), slinedum_ray(nz_max), tempdum_ray(nz_max))
+allocate(zdum2_ray(nz_max), veldum2_ray(nz_max), vthdum2_ray(nz_max), &
+         opacdum2_ray(nz_max), opalbardum2_ray(nz_max), &
+         scontdum2_ray(nz_max), slinedum2_ray(nz_max), tempdum2_ray(nz_max))
 !
 !-----------------since projected velocities along z--------------------
 !--------------only given in local coordinate systems-------------------

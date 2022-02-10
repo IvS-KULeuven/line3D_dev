@@ -1286,9 +1286,9 @@ real(dp) :: velx, vely, velz, velr, vel_abs, rad
 !
 ! ... local arrays
 real(dp), dimension(3) :: vec_cac, vec_cyc, vec_vel
-real(dp), dimension(nz_max) :: zdum_ray, veldum_ray, vthdum_ray, &
+real(dp), dimension(:), allocatable :: zdum_ray, veldum_ray, vthdum_ray, &
                                opacdum_ray, opalbardum_ray, scontdum_ray, slinedum_ray, tempdum_ray
-real(dp), dimension(nz_max) :: zdum2_ray, veldum2_ray, vthdum2_ray, opacdum2_ray, opalbardum2_ray, scontdum2_ray, &
+real(dp), dimension(:), allocatable :: zdum2_ray, veldum2_ray, vthdum2_ray, opacdum2_ray, opalbardum2_ray, scontdum2_ray, &
                                slinedum2_ray, tempdum2_ray
 !
 ! ... local logicals
@@ -1301,6 +1301,16 @@ logical :: boundary
 !
 !
 call cpu_time(ts_setup)
+!
+!might need to double check allocations
+allocate(zdum_ray(nz_max), veldum_ray(nz_max), vthdum_ray(nz_max), opacdum_ray(nz_max), &
+         opalbardum_ray(nz_max), scontdum_ray(nz_max), slinedum_ray(nz_max), tempdum_ray(nz_max))
+
+allocate(zdum2_ray(nz_max), veldum2_ray(nz_max), vthdum2_ray(nz_max), opacdum2_ray(nz_max), &
+         opalbardum2_ray(nz_max), scontdum2_ray(nz_max), slinedum2_ray(nz_max), tempdum2_ray(nz_max))
+!
+!
+!
 !
 iz=0
 !
@@ -1715,9 +1725,9 @@ real(dp) :: m11, m12, m13, m21, m22, m23, m31, m32, m33, x_cyc, y_cyc, z_cyc, z_
 !
 ! ... local arrays
 real(dp), dimension(3) :: vec_cac, vec_cyc, vec_vel
-real(dp), dimension(nz_max) :: zdum_ray, veldum_ray, vthdum_ray, &
+real(dp), dimension(:), allocatable :: zdum_ray, veldum_ray, vthdum_ray, &
                                opacdum_ray, opalbardum_ray, scontdum_ray, slinedum_ray, tempdum_ray
-real(dp), dimension(nz_max) :: zdum2_ray, veldum2_ray, vthdum2_ray, opacdum2_ray, opalbardum2_ray, scontdum2_ray, &
+real(dp), dimension(:), allocatable :: zdum2_ray, veldum2_ray, vthdum2_ray, opacdum2_ray, opalbardum2_ray, scontdum2_ray, &
                                slinedum2_ray, tempdum2_ray
 real(dp), dimension(:), allocatable :: r_dum
 !
@@ -1731,6 +1741,13 @@ logical :: boundary
 !
 !
 call cpu_time(ts_setup)
+!
+!might need to double check allocations
+allocate(zdum_ray(nz_max), veldum_ray(nz_max), vthdum_ray(nz_max), opacdum_ray(nz_max), &
+         opalbardum_ray(nz_max), scontdum_ray(nz_max), slinedum_ray(nz_max), tempdum_ray(nz_max))
+
+allocate(zdum2_ray(nz_max), veldum2_ray(nz_max), vthdum2_ray(nz_max), opacdum2_ray(nz_max), &
+         opalbardum2_ray(nz_max), scontdum2_ray(nz_max), slinedum2_ray(nz_max), tempdum2_ray(nz_max))
 !
 !-----------calculate start-value of z-coordinate along ray-------------
 !-----------------------for distorted surface---------------------------
@@ -2186,9 +2203,14 @@ real(dp) :: radp, thetap, phip, fdum
 !
 ! ... local arrays
 real(dp), dimension(3) :: vec_cac, vec_cyc, vec_vel
-real(dp), dimension(nz_max) :: zdum_ray, veldum_ray, vthdum_ray, &
+!real(dp), dimension(nz_max) :: zdum_ray, veldum_ray, vthdum_ray, &
+!                               opacdum_ray, opalbardum_ray, scontdum_ray, slinedum_ray, tempdum_ray
+!real(dp), dimension(nz_max) :: zdum2_ray, veldum2_ray, vthdum2_ray, opacdum2_ray, opalbardum2_ray, scontdum2_ray, &
+!                               slinedum2_ray, tempdum2_ray
+
+real(dp), dimension(:), allocatable :: zdum_ray, veldum_ray, vthdum_ray, &
                                opacdum_ray, opalbardum_ray, scontdum_ray, slinedum_ray, tempdum_ray
-real(dp), dimension(nz_max) :: zdum2_ray, veldum2_ray, vthdum2_ray, opacdum2_ray, opalbardum2_ray, scontdum2_ray, &
+real(dp), dimension(:), allocatable :: zdum2_ray, veldum2_ray, vthdum2_ray, opacdum2_ray, opalbardum2_ray, scontdum2_ray, &
                                slinedum2_ray, tempdum2_ray
 !
 ! ... local logicals
@@ -2199,7 +2221,19 @@ real(dp) :: calc_vmicro
 real(dp) :: vthermal
 logical :: boundary
 !
+!
+!
 call cpu_time(ts_setup)
+!
+!might need to double check allocations
+!maybe  need to initialize these arrays with zeros
+allocate(zdum_ray(nz_max), veldum_ray(nz_max), vthdum_ray(nz_max), opacdum_ray(nz_max), &
+         opalbardum_ray(nz_max), scontdum_ray(nz_max), slinedum_ray(nz_max), tempdum_ray(nz_max))
+
+allocate(zdum2_ray(nz_max), veldum2_ray(nz_max), vthdum2_ray(nz_max), opacdum2_ray(nz_max), &
+     opalbardum2_ray(nz_max), scontdum2_ray(nz_max), slinedum2_ray(nz_max), tempdum2_ray(nz_max))
+!
+
 !
 iz=0
 !
@@ -2261,7 +2295,7 @@ do i=1, iz
    if(i.eq.iz) then
       if(.not.linfo_phot) then
          write(*,*) vec_cac(1)**2+vec_cac(2)**2+vec_cac(3)**2, linfo_phot, linfo_max
-         stop 'error'
+         stop 'error in setup_ray3d_spc: linfo_phot is false, i.e., point (x,y,z) is within rmin'
       endif
    endif
 !interpolation only if point lies within region where information is stored
@@ -3057,9 +3091,9 @@ real(dp) :: rad
 !
 ! ... local arrays
 real(dp), dimension(3) :: vec_cac, vec_cyc
-real(dp), dimension(nz_max) :: zdum_ray, velxdum_ray, velydum_ray, velzdum_ray, veldum_ray, vthdum_ray, &
+real(dp), dimension(:), allocatable :: zdum_ray, velxdum_ray, velydum_ray, velzdum_ray, veldum_ray, vthdum_ray, &
                                opacdum_ray, opalbardum_ray, scontdum_ray, slinedum_ray, tempdum_ray
-real(dp), dimension(nz_max) :: zdum2_ray, veldum2_ray, vthdum2_ray, opacdum2_ray, opalbardum2_ray, scontdum2_ray, &
+real(dp), dimension(:), allocatable :: zdum2_ray, veldum2_ray, vthdum2_ray, opacdum2_ray, opalbardum2_ray, scontdum2_ray, &
                                slinedum2_ray, tempdum2_ray
 !
 ! ... local logicals
@@ -3070,6 +3104,16 @@ logical :: boundary
 real(dp) :: calc_vmicro, vthermal
 !
 call cpu_time(ts_setup)
+!
+!might need to double check allocations
+!maybe  need to initialize these arrays with zeros
+allocate(zdum_ray(nz_max), veldum_ray(nz_max), vthdum_ray(nz_max), opacdum_ray(nz_max), &
+         opalbardum_ray(nz_max), scontdum_ray(nz_max), slinedum_ray(nz_max), tempdum_ray(nz_max))
+
+allocate(zdum2_ray(nz_max), veldum2_ray(nz_max), vthdum2_ray(nz_max), opacdum2_ray(nz_max), &
+     opalbardum2_ray(nz_max), scontdum2_ray(nz_max), slinedum2_ray(nz_max), tempdum2_ray(nz_max))
+!
+!
 !
 iz=0
 !
