@@ -1,4 +1,4 @@
-pro read_surfb, fname=fname, np=np, nzeta=nzeta, p=p, zeta=zeta, xic1=xic1, xobs=xobs, obliquity=obliquity, alpha=alpha, gamma=gamma, int2d_tot=int2d_tot, int2d_abs=int2d_abs, int2d_emi=int2d_emi, help=print_help
+pro read_surfb, fname=fname, np=np, nzeta=nzeta, p=p, zeta=zeta, xic1=xic1, xobs=xobs, alpha=alpha, gamma=gamma, int2d_tot=int2d_tot, int2d_abs=int2d_abs, int2d_emi=int2d_emi, int2d_cont=int2d_cont, help=print_help
 
 
 ;+
@@ -63,8 +63,8 @@ endif
 ;
 file_id = h5f_open(fname)
 ;
-   group_id = h5g_open(file_id, 'parameter')
-      att_id=h5a_open_name(group_id, 'xic')
+   group_id = h5g_open(file_id, 'input_parameters')
+      att_id=h5a_open_name(group_id, 'xic1')
          xic1=h5a_read(att_id)
          xic1=xic1(0)
       h5a_close, att_id
@@ -79,10 +79,6 @@ file_id = h5f_open(fname)
       att_id=h5a_open_name(group_id, 'xobs')
          xobs=h5a_read(att_id)
          xobs=xobs(0)
-      h5a_close, att_id
-      att_id=h5a_open_name(group_id, 'obliquity')
-         obliquity=h5a_read(att_id)
-         obliquity=obliquity(0)
       h5a_close, att_id
 ;
    group_id = h5g_open(file_id, 'dimensions')
@@ -105,15 +101,18 @@ file_id = h5f_open(fname)
       h5d_close, dset_id
    h5g_close, group_id
 ;
-   group_id = h5g_open(file_id, 'surface')
-      dset_id=h5d_open(group_id, 'intensity2d')
+   group_id = h5g_open(file_id, 'surfb')
+      dset_id=h5d_open(group_id, 'iem_surface')
          int2d_tot=h5d_read(dset_id)
       h5d_close, dset_id
-      dset_id=h5d_open(group_id, 'intensity2d_abs')
+      dset_id=h5d_open(group_id, 'iabs_surface')
          int2d_abs=h5d_read(dset_id)
       h5d_close, dset_id
-      dset_id=h5d_open(group_id, 'intensity2d_emi')
+      dset_id=h5d_open(group_id, 'iemi_surface')
          int2d_emi=h5d_read(dset_id)
+      h5d_close, dset_id
+      dset_id=h5d_open(group_id, 'icont_surface')
+         int2d_cont=h5d_read(dset_id)
       h5d_close, dset_id
    h5g_close, group_id
 ;

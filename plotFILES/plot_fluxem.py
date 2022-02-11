@@ -152,8 +152,8 @@ fnames=['../outputFILES/models_olivier/'+base_dir+'phase001/FLUXEM_00001.dat',
         '../outputFILES/models_olivier/'+base_dir+'phase016/FLUXEM_00001.dat',
         '../outputFILES/models_olivier/'+base_dir+'phase017/FLUXEM_00001.dat']
 
-fnames=['../outputFILES/models_olivier/photprof0_sline0_vmicro20_kline1d0_test/phase001/FLUXEM_00001.dat',
-        '../outputFILES/models_olivier/photprof0_sline0_vmicro20_kline1d0/phase001/FLUXEM_00001.dat',]
+fnames=['../outputFILES/models_olivier/photprof0_sline0_vmicro20_kline1d0_test/phase015/FLUXEM_00001.dat',
+        '../outputFILES/models_olivier/photprof0_sline0_vmicro20_kline1d0/phase015/FLUXEM_00001.dat',]
 main(fnames=fnames, xscalefac=vthfid/vinf, xlim=[400.,-400.], lambda0=6562.4,xlim_wave=[6550.,6570.],ylim=[0.,1.5],vth_fid=100.,windx=windx, llegend=False)
 
 #

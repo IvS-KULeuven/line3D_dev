@@ -387,13 +387,8 @@ def copy_to_directory(dir_base,
     command04 = 'mv ' + dir_base + 'spec_points*.dat ' + dir_out
     command05 = 'mv ' + dir_base + 'spec_triangles*.dat ' + dir_out
     command06 = 'mv ' + dir_base + 'modspec_model00.h5 ' + dir_out
-#    command02 = 'mv ./outputFILES/models_olivier/FLUXEM*.dat ' + dir_out
-#    command03 = 'mv ./outputFILES/models_olivier/photprof*.dat ' + dir_out
-#    command04 = 'mv ./outputFILES/models_olivier/spec_points*.dat ' + dir_out
-#    command05 = 'mv ./outputFILES/models_olivier/spec_triangles*.dat ' + dir_out
-#    command06 = 'mv ./outputFILES/models_olivier/modspec_model00.h5 ' + dir_out
-    command07 = 'mv ./indat_modelspec_olivier.nml ' + dir_out
-    command08 = 'mv ./indat_spec_olivier.nml ' + dir_out
+    command07 = 'mv ./indatFILES/indat_modelspec_olivier.nml ' + dir_out
+    command08 = 'mv ./indatFILES/indat_spec_olivier.nml ' + dir_out
     command09 = 'mv ./output_modelspec.log ' + dir_out
     command10 = 'mv ./output_spec.log ' + dir_out
 
@@ -501,7 +496,7 @@ indx = 1
 dir_base = '/lhome/levin/Postdoc/line3D/outputFILES/models_olivier/'
 
 kline=1.e0
-dir_base = '/lhome/levin/Postdoc/line3D/outputFILES/models_olivier/photprof0_sline0_vmicro20_kline1d0/'
+dir_base = '/lhome/levin/Postdoc/line3D/outputFILES/models_olivier/photprof0_sline0_vmicro20_kline1d0_test/'
 
 
 
@@ -522,12 +517,12 @@ for phase in phases:
 
     #set the indat file for modelspec
     indat_modelspec(model,
-                    fname='indat_modelspec_olivier.nml',
+                    fname='indatFILES/indat_modelspec_olivier.nml',
                     dir_base=dir_base)
 
 
     #set the indat file for spec
-    indat_spec(fname='indat_spec_olivier.nml', dir_base=dir_base)
+    indat_spec(fname='indatFILES/indat_spec_olivier.nml', dir_base=dir_base)
 
     #calculate everything and copy to directories
     calc_all(dir_base, indx, nphases)
