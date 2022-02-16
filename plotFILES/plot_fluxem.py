@@ -155,23 +155,25 @@ fnames=['../outputFILES/models_olivier/'+base_dir+'phase001/FLUXEM_00001.dat',
 
 
 
-base_dir = 'photprof0_sline0_vmicro20_kline1d0_ecc0/'
-base_dir_test = 'photprof0_sline0_vmicro20_kline1d0_ecc0_single/'
-fnames=['../outputFILES/models_olivier/'+base_dir+'phase018/FLUXEM_00001.dat',
-        '../outputFILES/models_olivier/'+base_dir_test+'phase021/FLUXEM_00001.dat']
+base_dir1 = 'test/'
+base_dir2 = 'test2/'
+base_dir3 = 'photprof0_sline0_vmicro20_kline1d0_ecc0_single/'
+fnames=['../outputFILES/models_olivier/'+base_dir1+'FLUXEM_00001.dat',
+        '../outputFILES/models_olivier/'+base_dir2+'FLUXEM_00001.dat',
+        '../outputFILES/models_olivier/'+base_dir3+'phase019/FLUXEM_00001.dat']
 
 
 
 #fnames=['../outputFILES/models_olivier/photprof0_sline0_vmicro20_kline1d0_test/phase015/FLUXEM_00001.dat',
 #        '../outputFILES/models_olivier/photprof0_sline0_vmicro20_kline1d0/phase015/FLUXEM_00001.dat',]
-#main(fnames=fnames, xscalefac=vthfid/vinf, xlim=[300.,-300.], lambda0=6562.4,xlim_wave=[6550.,6570.],ylim=[0.,1.2],vth_fid=100.,windx=windx, llegend=False)
+main(fnames=fnames, xscalefac=vthfid/vinf, xlim=[300.,-300.], lambda0=6562.4,xlim_wave=[6550.,6570.],ylim=[0.,1.2],vth_fid=100.,windx=windx, llegend=False)
 
 #
-vthfid=100.
-vinf=2000.
-fnames=['../outputFILES/test_js_lh/FLUXEM_00001.dat']
+#vthfid=100.
+#vinf=2000.
+#fnames=['../outputFILES/test_js_lh/FLUXEM_00001.dat']
 
-main(fnames=fnames, xscalefac=vthfid/vinf, xlim=[1.2,-1.2], lambda0=1548.,xlim_wave=[1540.,1560.],ylim=[0.,2.5],vth_fid=100.,windx=windx, llegend=False)
+#main(fnames=fnames, xscalefac=vthfid/vinf, xlim=[1.2,-1.2], lambda0=1548.,xlim_wave=[1540.,1560.],ylim=[0.,2.5],vth_fid=100.,windx=windx, llegend=False)
 
 
 

@@ -1,7 +1,7 @@
 &input_options
 input_file = ''
 input_file2 = ''
-output_file = '/lhome/levin/Postdoc/line3D/outputFILES/models_olivier/photprof0_sline0_vmicro20_kline1d0_ecc0_single/modspec_model00.h5'
+output_file = '/lhome/levin/Postdoc/line3D/outputFILES/models_olivier/test2/modspec_model00.h5'
 input_mod = 9 /
 
 &input_model1
@@ -16,13 +16,14 @@ fehe1 = -1.d0
 aenh1 = 0.d0
 vrot1 = 1.236067977499734d1
 vmicro1 = 2.0d1
-p_object01 = -2.2300253195818405d0, -2.2300253195818396d0, 0.d0
-v_object01 = 1.1107992860859666d1, -1.110799286085967d1, 0.d0
+p_object01 = -3.15373205d0, 0.d0, 0.d0
+v_object01 = 0.d0, -1.57090742d1, 0.d0
 ex01 = 1.d0, 0.d0, 0.d0
 ey01 = 0.d0, 1.d0, 0.d0
 ez01 = 0.d0, 0.d0, 1.d0
 rot_axis01 = 0.d0, 0.d0, 1.d0
 /
+
 
 &input_model2
 rstar2 = 2.8754468919386458d0
@@ -36,8 +37,8 @@ fehe2 = -1.d0
 aenh2 = 0.d0
 vrot2 = 0.d0
 vmicro2 = 2.0d1
-p_object02 = 1.13535979998733d0, 1.1353597999873297d0, 0.d0
-v_object02 = -5.655347695841929d0, 5.6553476958419315d0, 0.d0
+p_object02 = 1.60564123d0, 0.d0, 0.d0
+v_object02 = 0.d0, 7.99786941d0, 0.d0
 ex02 = 1.d0, 0.d0, 0.d0
 ey02 = 0.d0, 1.d0, 0.d0
 ez02 = 0.d0, 0.d0, 1.d0

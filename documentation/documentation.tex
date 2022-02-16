@@ -582,7 +582,7 @@ semi-analytic model. All source files can be found in the
 
 To create a new model here, we essentially follow the same philosophy
 as for the \textit{model.eo} program, and recommend the following two steps:
-\begin{itemize}
+\begin{enumerate}
 \item In \textit{src\_modelspec/modelspec.f90}, we can add a new model identifier as a case for the namelist variable inuput\_mod.
   As before, we can then create and call a new subroutine describing our model.
   \item In \textit{src\_modelspec/modelspec.f90}, we also create the
@@ -613,7 +613,7 @@ as for the \textit{model.eo} program, and recommend the following two steps:
       xic1 = \Bnu\left(\Teff\right) \qquad \qquad xic2 = \dfrac{\dd B\nu}{\chi_\nu \dd z} \,.
       \eeq
       \end{description}
-  \end{itemize}
+  \end{enumerate}
 %
 Again, we can display the resulting model by using the programs
 \textit{plotFILES/modelspec3d.py} or
@@ -670,6 +670,7 @@ alpha = 0.d0 & float & \cite{Hamann80} parameterization \\\hline
 
 
 \subsubsection{Program spec.eo}
+\label{subsubsec:spec}
 This program calculates synthetic line profiles and surface
 brigthnesses for a given model obtained by the program
 \textit{modelspec.eo}. To this end, we rely on a cylindric coordiante
@@ -783,14 +784,63 @@ by namelists.
   is described in Table \ref{tab:namelist_modelspec_vbin}.
 \item[spec\_vbin.eo] Calculates line profiles for a specific input
   file. The corresponding namelist file is described in
-  Table~\ref{tab:namelist_spec_vbin}.
+  Table~\ref{tab:namelist_spec_vbin}. 
 \end{description}
 %
-\subsubsection{The namelist files}
-The namelist options for the programs \textit{modelspec\_vbin.eo}, and
-\textit{spec\_vbin.eo} are shown in Tables
-\ref{tab:namelist_modelspec_vbin} and \ref{tab:namelist_spec_vbin},
-respectively.
+%
+%
+\subsubsection{Program modelspec\_vbin.eo}
+%
+All source files for this program are stored in the directory
+\textit{line3D/src\_modelspec\_vbin}. The namelist options are
+summarized in Table~\ref{tab:namelist_modelspec_vbin}. Similar to the
+single-star code \textit{modelspec.eo}, we recommend the following
+two-step approach to register a new model:
+\begin{enumerate}
+  \item In \textit{src\_modelspec\_vbin/modelspec.f90}, we can add a new model identifier as a case for the namelist variable inuput\_mod. We can then create and call a new subroutine describing our model.
+  \item In \textit{src\_modelspec\_vbin/modelspec.f90}, we also create
+    the new subroutine, e.g., \textit{subroutine my\_model}. Within
+    this subroutine, we need to specify the following global variables
+    \begin{description}
+    \item[cs1\_nr] Number of radial grid points for the primary object's coordinate system $\Sigma_{\rm spc}^{(1)}$.
+    \item[cs1\_ntheta] Number of $\clatitude$ grid points for the primary object's coordinate system $\Sigma_{\rm spc}^{(1)}$.
+    \item[cs1\_nphi] Number of $\azimuth$ grid points for the primary object's coordinate system $\Sigma_{\rm spc}^{(1)}$.
+    \item[cs1\_r] Radial grid for the primary object in $R_\ast^{(1)}$.
+    \item[cs1\_theta] $\clatitude$ grid for the primary object in the range $[0,\pi]$.
+    \item[cs1\_phi] $\azimuth$ grid for the primary object in the range $[0,2\pi]$.
+    \item[cs1\_sline3d] Line source function, \sline, for the primary object in cgs (dimensions (nr\_cs1, ntheta\_cs1, nphi\_cs1)).
+    \item[cs1\_scont3d] Continuum source function, \scont, for the primary object in cgs (dimensions (nr\_cs1, ntheta\_cs1, nphi\_cs1)).
+    \item[cs1\_rho3d] Density, $\rho$, for the primary object in cgs (dimensions (nr\_cs1, ntheta\_cs1, nphi\_cs1)).
+    \item[cs1\_t3d] Gas temperature, $T_{\rm gas}$, for the primary object in cgs (dimensions (nr\_cs1, ntheta\_cs1, nphi\_cs1)).
+    \item[cs1\_opac3d] Continuum opacity, $\chi_{\rm C}$ for the primary object in $1/R_\ast^{(1)}$ (dimensions (nr\_cs1, ntheta\_cs1, nphi\_cs1)).
+    \item[cs1\_opalbar3d] Frequency integrated line opacity, $\chibar$ for the primary object in ${\rm Hz}/R_\ast^{(1)}$ (dimensions (nr\_cs1, ntheta\_cs1, nphi\_cs1)).      
+    \item[cs1\_velx3d] $x$-component of the velocity field for the primary object in cgs, measured in the rest-frame of the primary object (dimensions (nr\_cs1, ntheta\_cs1, nphi\_cs1)).
+    \item[cs1\_vely3d] $y$-component of the velocity field for the primary object in cgs, measured in the rest-frame of the primary object (dimensions (nr\_cs1, ntheta\_cs1, nphi\_cs1)).
+    \item[cs1\_velz3d] $z$-component of the velocity field for the primary object in cgs, measured in the rest-frame of the primary object (dimensions (nr\_cs1, ntheta\_cs1, nphi\_cs1)).
+    \item[]
+    \item[cs2\_nr] Number of radial grid points for the secondary object's coordinate system $\Sigma_{\rm spc}^{(2)}$.
+    \item[cs2\_ntheta] Number of $\clatitude$ grid points for the secondary object's coordinate system $\Sigma_{\rm spc}^{(2)}$.
+    \item[cs2\_nphi] Number of $\azimuth$ grid points for the secondary object's coordinate system $\Sigma_{\rm spc}^{(2)}$.
+    \item[cs2\_r] Radial grid for the secondary object in $R_\ast^{(2)}$.
+    \item[cs2\_theta] $\clatitude$ grid for the secondary object in the range $[0,\pi]$.
+    \item[cs2\_phi] $\azimuth$ grid for the secondary object in the range $[0,2\pi]$.
+    \item[cs2\_sline3d] Line source function, \sline, for the secondary object in cgs (dimensions (nr\_cs2, ntheta\_cs2, nphi\_cs2)).
+    \item[cs2\_scont3d] Continuum source function, \scont, for the secondary object in cgs (dimensions (nr\_cs2, ntheta\_cs2, nphi\_cs2)).
+    \item[cs2\_rho3d] Density, $\rho$, for the secondary object in cgs (dimensions (nr\_cs2, ntheta\_cs2, nphi\_cs2)).
+    \item[cs2\_t3d] Gas temperature, $T_{\rm gas}$, for the secondary object in cgs (dimensions (nr\_cs2, ntheta\_cs2, nphi\_cs2)).
+    \item[cs2\_opac3d] Continuum opacity, $\chi_{\rm C}$ for the secondary object in $2/R_\ast^{(2)}$ (dimensions (nr\_cs2, ntheta\_cs2, nphi\_cs2)).
+    \item[cs2\_opalbar3d] Frequency integrated line opacity, $\chibar$ for the secondary object in ${\rm Hz}/R_\ast^{(2)}$ (dimensions (nr\_cs2, ntheta\_cs2, nphi\_cs2)).      
+    \item[cs2\_velx3d] $x$-component of the velocity field for the secondary object in cgs, measured in the rest-frame of the secondary object (dimensions (nr\_cs2, ntheta\_cs2, nphi\_cs2)).
+    \item[cs2\_vely3d] $y$-component of the velocity field for the secondary object in cgs, measured in the rest-frame of the secondary object (dimensions (nr\_cs2, ntheta\_cs2, nphi\_cs2)).
+    \item[cs2\_velz3d] $z$-component of the velocity field for the secondary object in cgs, measured in the rest-frame of the secondary object (dimensions (nr\_cs2, ntheta\_cs2, nphi\_cs2)).
+      \end{description}
+
+\end{enumerate}
+%
+To display the resulting model, we can use the plotting routines
+\textit{plotFILES/modelspec\_vbin.py} or
+\textit{plotFILES/modelspec\_vbin.pro}.
+%
 \begin{footnotesize}
 \begin{longtable}[h]{p{0.24\linewidth}p{0.07\linewidth}p{0.69\linewidth}}
 \caption{\normalsize Input namelist for the program \textit{modelspec\_vbin.eo}, \ie~for the binary version.}
@@ -861,6 +911,21 @@ vth\_fiducial = 1.0d2 & float & Fiducial thermal velocity \vthfid. \\\hline
 %
 \end{longtable}
 \end{footnotesize}
+%
+\subsubsection{Program spec\_vbin.eo}
+The source files for this program can be found in the directory
+\textit{line3D/src\_spec\_vbin}, with corresponding input namelist
+options summarized here in Table~\ref{tab:namelist_spec_vbin}. The
+output of this program is organized the same way as for
+\textit{spec.eo} (see Sect.~\ref{subsubsec:spec}), with
+surface-brightnesses stored on a triangulated surface though.
+For plotting the output data, one can use the programs
+\textit{plotFILES/plot\_fluxem.py} or
+\textit{plotFILES/plot\_fluxem.pro} to display line profiles,
+\textit{plotFILES/plot\_dynspec.py} for displaying the dynamical line
+profiles, and \textit{plotFILES/plot\_surfb\_vbin.py} or
+\textit{plotFILES/plot\_surfb\_vbin.pro} for displaying the surface
+brightness.
 %
 %
 %

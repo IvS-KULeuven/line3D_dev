@@ -3957,6 +3957,7 @@ write(*,*)
 !
 !
 !
+!vmax=0.d0
 do i=1, cs2_nr
    do j=1, cs2_ntheta
       do k=1, cs2_nphi
@@ -4050,6 +4051,10 @@ do i=1, cs2_nr
             velth = velr_cyc*cost2 - velz_cyc*sint2
             velphi = velphi  !try counter-rotation
 
+!            if(velr_cyc**2.gt.vmax) then
+!               vmax = velr_cyc**2
+!            endif
+
             !write(*,*) velr_cyc**2 + velz_cyc**2 + velphi**2, velr**2+velth**2+velphi**2            
 !
 !departure coefficients (here: LTE)
@@ -4097,6 +4102,8 @@ do i=1, cs2_nr
    enddo
 enddo
 !
+!write(*,*) 'vmax', sqrt(vmax)
+!stop 'go on olivier'
 !do j=1, cs2_ntheta
 !   write(*,*) j, cs2_theta(j)*180./pi
 !enddo
@@ -5668,7 +5675,7 @@ call h5open_f(err)
                   call h5dwrite_f(dset_id, h5t_native_double, cs1_phi, dims_phi, err)
                call h5dclose_f(dset_id, err)
             call h5sclose_f(dspace_id, err)
-        call h5gclose_f(group_id, err)
+            call h5gclose_f(group_id, err)
 !
 !----------------------------3d solution--------------------------------
 !

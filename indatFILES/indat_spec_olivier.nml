@@ -1,7 +1,7 @@
 &input_options
 input_mod=2
-input_file = '/lhome/levin/Postdoc/line3D/outputFILES/models_olivier/photprof0_sline0_vmicro20_kline1d0_ecc0_single/modspec_model00.h5'
-output_dir = '/lhome/levin/Postdoc/line3D/outputFILES/models_olivier/photprof0_sline0_vmicro20_kline1d0_ecc0_single'
+input_file = '/lhome/levin/Postdoc/line3D/outputFILES/models_olivier/test2/modspec_model00.h5'
+output_dir = '/lhome/levin/Postdoc/line3D/outputFILES/models_olivier/test2'
 opt_photprof1=0 
 opt_photprof2=0 
 opt_obsdir_read=t

@@ -69,13 +69,13 @@ def copy_to_directory(dir_base,
     os.system(command01)
     os.system(command02)
     os.system(command03)
-    os.system(command04)    
+#    os.system(command04)
 #
 #---------------------------------------------------------------------
 #
 def calc_all(y_mass=1.):
 
-    dir_base='/lhome/levin/Postdoc/line3D/lte_tables'
+    dir_base='../../lte_tables'
 
     z_mass=0.02
     #same as for OPAL tables

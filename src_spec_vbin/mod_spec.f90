@@ -66,6 +66,10 @@ integer(i4b), parameter :: cs1_np_c=100, cs1_np_nc=20, cs1_np=cs1_np_nc+cs1_np_c
 integer(i4b), parameter :: cs1_nr=20
 integer(i4b), parameter :: cs2_np_c=40, cs2_np_nc=160, cs2_np=cs2_np_nc+cs2_np_c-1, cs2_nzeta=81
 integer(i4b), parameter :: cs2_nr=400
+!integer(i4b), parameter :: cs1_np_c=400, cs1_np_nc=20, cs1_np=cs1_np_nc+cs1_np_c-1, cs1_nzeta=181
+!integer(i4b), parameter :: cs1_nr=20
+!integer(i4b), parameter :: cs2_np_c=40, cs2_np_nc=160, cs2_np=cs2_np_nc+cs2_np_c-1, cs2_nzeta=81
+!integer(i4b), parameter :: cs2_nr=800
 !
 !standard resolution star 1 and star 2
 !integer(i4b), parameter :: cs1_np_c=40, cs1_np_nc=160, cs1_np=cs1_np_nc+cs1_np_c-1, cs1_nzeta=81
