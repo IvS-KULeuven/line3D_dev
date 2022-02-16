@@ -303,7 +303,13 @@ real(dp) :: dbdr, dbdt, dtdr
 real(dp) :: bnue
 !
 xic1 = bnue(xnue, t_ii)
-dtdr = (t_iim1 - t_iip1)/(r_iip1-r_iim1)
+!
+!central differences
+!!dtdr = (t_iim1 - t_iip1)/(r_iip1-r_iim1)
+!dtdr = 0.5*( (t_iip1-t_ii)/(r_iip1-r_ii) + (t_ii-t_iim1)/(r_ii-r_iim1))
+!forward euler
+dtdr = (t_iip1-t_ii)/(r_iip1-r_ii)
+!
 dbdt = xic1 * cgs_planck*xnue / (1.d0-exp(-1.d0*cgs_planck*xnue/cgs_kb/t_ii)) / cgs_kb / t_ii**2
 dbdr = dbdt * dtdr
 xic2 = dbdr

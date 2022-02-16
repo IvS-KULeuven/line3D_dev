@@ -10,7 +10,7 @@ use fund_const
 use options_spec, only: input_file, opt_incl_gdark, opt_incl_sdist
 use dime_model3d, only: nr_spc, ntheta_spc, nphi_spc, r_spc, theta_spc, phi_spc, t3d, vth3d, velx3d, vely3d, velz3d, &
                         opac3d, opalbar3d, scont3d, sline3d, imask3d
-use params_spec, only: teff, trad, tmin, xnue0, rstar, xic1, vth_fiducial, sr, na, vmax, xlogg, yhe, vmin, lstar, vrot
+use params_spec, only: teff, trad, tmin, xnue0, rstar, xic1, xic2, vth_fiducial, sr, na, vmax, xlogg, yhe, vmin, lstar, vrot
 use params_model, only: vth_fiducial_model, vmicro_model, vmax_model
 use hdf5
 !
@@ -27,7 +27,7 @@ real(dp) :: x1, xp, x2, y1, yp, y2, z1, zp, z2, &
 real(dp) :: velr, velth, velphi, rho
 !
 ! ... local logicals
-logical :: linfo_phot, linfo_max, expol, llogx, llogy, llogz, llogf, lr2
+logical :: linfo_phot, linfo_max, expol, llogx, llogy, llogz, llogf, lr2, lcheck
 !
 ! ... for hdf5
 integer(hid_t) :: file_id, dspace_id, dset_id, aspace_id, attr_id, group_id
@@ -133,7 +133,15 @@ call h5open_f(err)
          call h5aopen_f(group_id, 'xic1', attr_id, err)
             call h5aread_f(attr_id, h5t_native_double, xic1, dims_scalars, err)
          call h5aclose_f(attr_id, err)
-      call h5gclose_f(group_id, err)
+         call h5aexists_f(group_id, 'xic2', lcheck, err)
+         if(lcheck) then
+            call h5aopen_f(group_id, 'xic2', attr_id, err)
+            call h5aread_f(attr_id, h5t_native_double, xic2, dims_scalars, err)
+            call h5aclose_f(attr_id, err)
+         else
+            xic2=zero
+         endif
+         call h5gclose_f(group_id, err)
 !
 !-----------------------coordinates-------------------------------------
 !

@@ -1,4 +1,4 @@
-HOME = './'
+HOME = './lib_gdl/'
 
 !PATH = '.:' + $
         HOME+'cmsvlib' + ':' + $        

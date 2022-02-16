@@ -64,7 +64,7 @@ select case(input_mod)
       call calc_model3d_nicowr3d
       call output3d_spc
    case(20)
-      call calc_model3d_js_lh
+      call calc_test_model_js_lh
       call output3d_spc
    case default
       stop 'error in modspec: input_mod not specified'
@@ -89,7 +89,7 @@ use fund_const, only: rsu
 use options_modspec, only: indat_file, input_file, input_file2, output_file, input_mod
 use params_modspec, only: teff, trad, tmin, xlogg, rstar, rmax, tmin, xmloss, vmin, &
                           vmax, beta, yhe, yhe_mass, hei, vrot, vmicro, vth_fiducial, &
-                          sr, rmin, eps_line, unit_length
+                          sr, rmin, eps_line, unit_length, xic2
 use fund_const, only: rsu, pi, cgs_grav, xmsu
 use mod_opal
 use mod_lte
@@ -163,6 +163,9 @@ if(iline.eq.0) then
    call get_lte_table(yhe_mass)
 endif
 !
+!
+!default xic2
+xic2=zero
 !
 end subroutine read_input
 !
@@ -3795,7 +3798,7 @@ subroutine output1d
 use prog_type
 use fund_const
 use dime_modspec, only: n1d, r1d, velr1d, opalbar1d, opac1d, t1d, sline1d, scont1d
-use params_modspec, only: teff, trad, xic1, vth_fiducial, rstar, vmicro, vrot, vmax, yhe, xlogg, vmin, lstar
+use params_modspec, only: teff, trad, xic1, xic2, vth_fiducial, rstar, vmicro, vrot, vmax, yhe, xlogg, vmin, lstar
 use options_modspec, only: output_file
 use hdf5
 use mod_iline, only: xnue0, na
@@ -3982,6 +3985,7 @@ write(*,'(a20,es20.8)') 'yhe', yhe
 write(*,'(a20,es20.8)') 'logg', xlogg
 write(*,'(a20,i20)') 'na', na
 write(*,'(a20,es20.8)') 'xic1', xic1
+write(*,'(a20,es20.8)') 'xic2', xic2
 write(*,*)
 write(*,*)
 write(*,'(7a20)') 'r', 'T', 'opac', 'opalbar', 'velr', 'sline', 'scont'
@@ -4003,7 +4007,7 @@ use prog_type
 use fund_const
 use dime_modspec, only: ndxmax, ndymax, ndzmax, x, y, z, t3d, opac3d, opalbar3d, &
                         velx3d, vely3d, velz3d, sline3d, scont3d, imask3d
-use params_modspec, only: teff, trad, xic1, vth_fiducial, rstar, vmicro, vmax, xlogg, vrot, lstar
+use params_modspec, only: teff, trad, xic1, xic2, vth_fiducial, rstar, vmicro, vmax, xlogg, vrot, lstar
 use options_modspec, only: output_file
 use mod_iline, only: xnue0, na
 use hdf5
@@ -4218,6 +4222,7 @@ write(*,'(a20,es20.8)') 'vmicro', vmicro
 write(*,'(a20,es20.8)') 'vrot', vrot
 write(*,'(a20,i20)') 'na', na
 write(*,'(a20,es20.8)') 'xic1', xic1
+write(*,'(a20,es20.8)') 'xic2', xic2
 write(*,*)
 write(*,*)
 write(*,'(10a16)') 'x(y=0,z=0)', 'T(x,y=0,z=0)', 'opac(x,y=0,z=0)', 'opalbar(x,y=0,z=0)', 'kappa', &
@@ -4243,7 +4248,7 @@ use prog_type
 use fund_const
 use dime_modspec, only: nr, ntheta, nphi, r, theta, phi, t3d, opac3d, opalbar3d, &
                         velx3d, vely3d, velz3d, sline3d, scont3d, imask3d
-use params_modspec, only: teff, trad, xic1, vth_fiducial, rstar, vmicro, vmax, sr, xlogg, yhe, vmin, lstar, vrot
+use params_modspec, only: teff, trad, xic1, xic2, vth_fiducial, rstar, vmicro, vmax, sr, xlogg, yhe, vmin, lstar, vrot
 use options_modspec, only: output_file
 use mod_iline, only: xnue0, na
 use hdf5
@@ -4369,6 +4374,10 @@ call h5open_f(err)
                              attr_id, err)
                call h5awrite_f(attr_id, h5t_native_double, xic1, dims_scalars, err)
             call h5aclose_f(attr_id, err)
+            call h5acreate_f(group_id, 'xic2', h5t_native_double, aspace_id, &
+                             attr_id, err)
+               call h5awrite_f(attr_id, h5t_native_double, xic2, dims_scalars, err)
+            call h5aclose_f(attr_id, err)               
          call h5sclose_f(aspace_id, err)
      call h5gclose_f(group_id, err)
 !
@@ -4467,6 +4476,7 @@ write(*,'(a20,es20.8)') 'vmicro', vmicro
 write(*,'(a20,es20.8)') 'vrot', vrot
 write(*,'(a20,i20)') 'na', na
 write(*,'(a20,es20.8)') 'xic1', xic1
+write(*,'(a20,es20.8)') 'xic2', xic2
 write(*,*)
 write(*,*)
 !
@@ -4817,51 +4827,116 @@ end subroutine calc_model3d_nicowr3d
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-subroutine calc_model3d_js_lh
-!
-use prog_type
-use fund_const, only: cgs_planck, cgs_clight, cgs_kb, rsu, xmsu, pi, zero, one, half
-use options_modspec, only: indat_file, input_file, input_file2, input_mod
-use dime_modspec, only: nr, ntheta, nphi, r, theta, phi, velx3d, vely3d, velz3d, opac3d, &
-                        opalbar3d, sline3d, scont3d, imask3d, t3d, trad3d
-use params_modspec, only: teff, trad, xic1, vth_fiducial, sr, rstar, vmax, vmicro, &
-                          opt_opal, eps_line, lstar, xlogg, vrot, yhe, yhe_mass, hei, xmloss, unit_length, rmax
-use mod_opal
-use mod_lte
-use hdf5
-use mod_opacities
-use mod_iline, only: alpha, kappa0, kline, xnue0, na, gl, flu, na, iline
-use mod_grid
-!
-implicit none
-!
-! ... local scalars
-integer(i4b) :: i, j, k, err
-real(dp) :: b2, b3, bb, beta, mdot, rmin, vmin
-real(dp) :: sint, cost, sinp, cosp
-real(dp) :: velr, velth, velphi, rho
-!
-! ... local arrays
-!
-! ... local characters
-character(len=500) :: cdum
-!
-! ... local functions
-real(dp) :: dilfac, bnue, sline_depcoeff
-!
-! ... for hdf5 file
-!
-! ... namelists
-!
-!
-write(*,*) '--------------------test model js_lh-------------------------------------------'
-write(*,*)
-!
+subroutine calc_test_model_js_lh
+
+  !First read in model created in the model-step
+
+  use options_modspec
+  use dime_modspec
+  use params_modspec
+  use hdf5
+  use mod_opacities
+  use mod_iline
+  implicit none
+  
+  real(dp), dimension(:), allocatable :: r_modext, theta_modext, phi_modext
+  real(dp), dimension(:,:,:), allocatable :: velr3d_modext, velth3d_modext, velphi3d_modext,rho3d_modext, t3d_modext  
+  integer(i4b) :: nr_modext, ntheta_modext, nphi_modext, err, i,j,k
+  real(dp) :: sint,cost,sinp,cosp
+  
+  !The below is for hdf5 format 
+  integer(hid_t) :: file_id, dspace_id, dset_id, aspace_id, attr_id, group_id
+  integer(hsize_t), dimension(1) :: dims_scalars = (/1/)
+  integer(hsize_t), dimension(1) :: dims_x, dims_y, dims_z, dims_rad, dims_theta, dims_phi
+  integer(hsize_t), dimension(3) :: dims3d_cac, dims3d_spc
+
+  real(dp) :: bnue,dilfac,b2,b3 
+    
 !-----------------------------------------------------------------------
 !
-nr=101
-ntheta=41
-nphi=81
+write(*,*) '------------reading 3d atmospheric structure in spherical coordinates----------'
+write(*,*) 'input_file: ', trim(input_file2)
+write(*,*)
+!
+dims_scalars=(/ 1 /)
+!
+call h5open_f(err)
+call h5fopen_f(trim(input_file2), h5f_acc_rdonly_f, file_id, err)
+!
+!read dimensions
+call h5gopen_f(file_id, 'dimensions', group_id, err)
+   call h5aopen_f(group_id, 'nr', attr_id, err)
+      call h5aread_f(attr_id, h5t_native_integer, nr_modext, dims_scalars, err)
+   call h5aclose_f(attr_id, err)
+   call h5aopen_f(group_id, 'ntheta', attr_id, err)
+      call h5aread_f(attr_id, h5t_native_integer, ntheta_modext, dims_scalars, err)
+   call h5aclose_f(attr_id, err)
+   call h5aopen_f(group_id, 'nphi', attr_id, err)
+      call h5aread_f(attr_id, h5t_native_integer, nphi_modext, dims_scalars, err)
+   call h5aclose_f(attr_id, err)
+
+call h5gclose_f(group_id, err)
+!
+!read coordinates
+dims_rad=(/nr_modext/)
+dims_theta=(/ntheta_modext/)
+dims_phi=(/nphi_modext/)
+dims3d_spc=(/ nr_modext, ntheta_modext, nphi_modext /)
+!
+allocate(r_modext(nr_modext), stat=err)
+   if(err.ne.0) stop 'error in calc_model3d_spc3d: allocation'
+allocate(theta_modext(ntheta_modext), stat=err)
+   if(err.ne.0) stop 'error in calc_model3d_spc3d: allocation'
+allocate(phi_modext(nphi_modext), stat=err)
+   if(err.ne.0) stop 'error in calc_model3d_spc3d: allocation'
+allocate(rho3d_modext(nr_modext, ntheta_modext, nphi_modext), stat=err)
+   if(err.ne.0) stop 'error in calc_model3d_spc3d: allocation'
+allocate(t3d_modext(nr_modext, ntheta_modext, nphi_modext), stat=err)
+   if(err.ne.0) stop 'error in calc_model3d_spc3d: allocation'
+allocate(velr3d_modext(nr_modext, ntheta_modext, nphi_modext), stat=err)
+   if(err.ne.0) stop 'error in calc_model3d_spc3d: allocation'
+allocate(velth3d_modext(nr_modext, ntheta_modext, nphi_modext), stat=err)
+   if(err.ne.0) stop 'error in calc_model3d_spc3d: allocation'
+allocate(velphi3d_modext(nr_modext, ntheta_modext, nphi_modext), stat=err)
+   if(err.ne.0) stop 'error in calc_model3d_spc3d: allocation'
+!
+call h5gopen_f(file_id, 'coordinates', group_id, err)
+   call h5dopen_f(group_id, 'r', dset_id, err)
+      call h5dread_f(dset_id, h5t_native_double, r_modext, dims_rad, err)
+!normalize radius to radius 1
+      r_modext=r_modext/r_modext(1) 
+   call h5dclose_f(dset_id, err)
+   call h5dopen_f(group_id, 'theta', dset_id, err)
+      call h5dread_f(dset_id, h5t_native_double, theta_modext, dims_theta, err)
+   call h5dclose_f(dset_id, err)
+   call h5dopen_f(group_id, 'phi', dset_id, err)
+      call h5dread_f(dset_id, h5t_native_double, phi_modext, dims_phi, err)
+   call h5dclose_f(dset_id, err)
+call h5gclose_f(group_id, err)
+!
+call h5gopen_f(file_id, 'model', group_id, err)
+   call h5dopen_f(group_id, 'rho', dset_id, err)
+      call h5dread_f(dset_id, h5t_native_double, rho3d_modext, dims3d_spc, err)
+   call h5dclose_f(dset_id, err)
+   call h5dopen_f(group_id, 'velr', dset_id, err)
+      call h5dread_f(dset_id, h5t_native_double, velr3d_modext, dims3d_spc, err)
+   call h5dclose_f(dset_id, err)
+   call h5dopen_f(group_id, 'velth', dset_id, err)
+      call h5dread_f(dset_id, h5t_native_double, velth3d_modext, dims3d_spc, err)
+   call h5dclose_f(dset_id, err)
+   call h5dopen_f(group_id, 'velphi', dset_id, err)
+      call h5dread_f(dset_id, h5t_native_double, velphi3d_modext, dims3d_spc, err)
+   call h5dclose_f(dset_id, err)
+   call h5dopen_f(group_id, 'temperature', dset_id, err)
+      call h5dread_f(dset_id, h5t_native_double, t3d_modext, dims3d_spc, err)
+   call h5dclose_f(dset_id, err)
+call h5gclose_f(group_id, err)
+!  
+
+!What happens here below? aloocate r, th, etc arrays used for LINE calcs
+nr=nr_modext
+ntheta=ntheta_modext
+nphi=nphi_modext
 !
 !allocate arrays
 allocate(r(nr), stat=err)
@@ -4886,81 +4961,54 @@ allocate(velz3d(nr,ntheta,nphi), stat=err)
    if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
 allocate(t3d(nr,ntheta,nphi), stat=err)
    if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
-allocate(trad3d(nr,ntheta,nphi), stat=err)
-   if(err.ne.0) stop 'allocation error calc_model3d_spc3d'
+r=r_modext
+theta=theta_modext
+phi=phi_modext
 
-vmin=10.d5
-vmax=2000.d5
-beta=1.d0
-bb = one - (vmin/vmax)**(1./beta)
-mdot = 1.d-6*xmsu/yr
-!
-rmin=1.
-   
-call grid_log(rmin, rmax, nr, r)
-call grid_equi(zero, pi, ntheta, theta)
-call grid_equi(zero, two*pi, nphi, phi)
-!
-!
-!
-do i=1, nr
-   do j=1, ntheta
-      do k=1, nphi
-!        
-         sint=sin(theta(j))
-         cost=cos(theta(j))
-         sinp=sin(phi(k))
-         cosp=cos(phi(k))
-!
-!-----------------------------------------------------------------------
-!
-         velr = vmax*(1.-bb/r(i))**beta
-         velth = zero
-         velphi = zero
-
-         rho = mdot/4./pi/(r(i)*sr)**2/velr
-         
-         t3d(i,j,k) = 40.d3
-         trad3d(i,j,k) = 40.d3
-
-         velx3d(i,j,k) = velr*sint*cosp + velth*cost*cosp-velphi*sinp
-         vely3d(i,j,k) = velr*sint*sinp + velth*cost*sinp+velphi*cosp
-         velz3d(i,j,k) = velr*cost - velth*sint         
-
-         opac3d(i,j,k) = 0.34*rho*sr
-!        opac3d(i,j,k) = opac_opal(kcont, yhe_mass, hei, log10(rho),log10(t3d(i,j,k)), nrho_opal, ntemp_opal, rho_opal, temp_opal, kappa_opal)*unit_length
-!        opac3d(i,j,k) = opac_thomson(yhe,hei,rho,kcont)*unit_length
-!        
-         b2 = one
-         b3 = one
-         opalbar3d(i,j,k) = opalbar_model_kline(0.1d0, 2.d0, rho, kline)*sr         
-!         opalbar3d(i,j,k) = get_opalbar(iline, kline, unit_length, yhe, hei, t3d(i,j,k), vth_fiducial, xnue0, b2, b3, rho) !in 1/unit_length
-!         
-         scont3d(i,j,k) = zero
-         sline3d(i,j,k) = bnue(xnue0,t3d(i,j,k))*dilfac(r(i))
-!
-!
-      enddo
+!JS-NOTE: opac, are EXTINCITION coefficients (1/cm) 
+!BUT opalbar is NOT: it is FREQUENCY-INTEGRATED LINE EXTINCTION
+!COEFFICIENT, I.E.  Hz/cm  
+do k=1,nphi
+   do j=1,ntheta 
+      do i=1,nr
+         opac3d(i,j,k) = 0.d0 !sr*0.34d0*rho3d_modext(i,j,k) 
+         !opalbar(i,j,k) =
+         opalbar3d(i,j,k) = sr*opalbar_model_kline(0.1d0, 2.d0, rho3d_modext(i,j,k), kline)
+         !sscall opalbar_model_kline(yhe, hei, rho, kline)
+         !iline is the line-identifier -- in src/mode_iline.f90 (or something similar)  
+         !b2 = 1.d0
+         !b3 = 1.d0  !these are departire coefficients (something dummy, depends on iline)  
+         !opalbar3d(i,j,k) = get_opalbar(iline, kline, sr, yhe, hei, t3d_modext(i,j,k), &
+         !     vth_fiducial, xnue0, b2, b3, rho3d_modext(i,j,k))/sr   !in cgs
+         !This is a Levin-function for parameterised extinctions
+         scont3d(i,j,k) = 0.d0
+         sline3d(i,j,k) = bnue(xnue0,t3d_modext(i,j,k))*dilfac(r(i))
+         t3d(i,j,k) = t3d_modext(i,j,k)
+         !Express velocity vectors in x,y,z, NOT in input r,th,phi 
+         sint = sin(theta(j))
+         cost = cos(theta(j))
+         sinp = sin(phi(k)) 
+         cosp = cos(phi(k)) 
+         velx3d(i,j,k)=velr3d_modext(i,j,k)*sint*cosp + velth3d_modext(i,j,k)*cost*cosp-velphi3d_modext(i,j,k)*sinp
+         vely3d(i,j,k)=velr3d_modext(i,j,k)*sint*sinp + velth3d_modext(i,j,k)*cost*sinp+velphi3d_modext(i,j,k)*cosp
+         velz3d(i,j,k)=velr3d_modext(i,j,k)*cost - velth3d_modext(i,j,k)*sint
+!         print*,sr/rsu,r(i)
+      enddo      
+!      stop 'test...'
    enddo
 enddo
-!
-!stop 'go on here'
-!-----------------------------set velocities------------------------------
-!
-!need to set that here!!!
-xic1=bnue(xnue0,trad)
-!
-!maximum velocity in global system
-!vmax=zero
-!do i=1, nr
-!   do j=1, ntheta
-!      do k=1, nphi
-!         vel=sqrt((velx3d(i,j,k))**2+(vely3d(i,j,k))**2+(velz3d(i,j,k))**2)
-!         if(vel.gt.vmax) vmax=vel
-!      enddo
-!   enddo
-!enddo!
-!
-!stop 'go on in here'
-!
-end subroutine calc_model3d_js_lh
+
+!First lower boundary condition for intensity
+!xic1 = bnue(xnue0,40000.d0)
+!t3d(i,j,k) = t3d_modext(i,j,k)
+!call diffus(xnue0, t_iim1, t_ii, t_iip1, r_iim1, r_ii, r_iip1, xic1, xic2)
+call diffus(xnue0, t3d(1,1,1), t3d(1,1,1), t3d(2,1,1), r(1), r(1), r(2), xic1, xic2)  
+xic2 = -xic1 !xic2/opac3d(1,1,1)
+!print*,xic1,xic2,t3d(1,1,1),t3d(2,1,1),r(1),r(2),bnue(xnue0,40000.d0)
+!stop 'test...'
+!in spec.f90 there is option that places xic1 at an array in space and frequency
+!(no angle included yet)
+!there is a variable xic2, not yet really used though (or debugged etc)...  
+
+
+end subroutine calc_test_model_js_lh

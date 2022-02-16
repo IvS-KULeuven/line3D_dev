@@ -170,7 +170,13 @@ select case(input_mod)
       write(*,*) '---calculating 3D RHD model (from Nico)---'
       write(*,*)
       call calc_mod3d_nicowr3d
-      call output_mod3d      
+      call output_mod3d
+!
+   case(18)
+      write(*,*) '---calculating 3D test JS/LH--------------'
+      write(*,*)
+      call test_model_js_lh
+      call output_mod3d            
 !
     case default
        stop 'error: unvalid input-model specified, check input_mod'

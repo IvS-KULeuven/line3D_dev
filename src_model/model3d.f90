@@ -1732,3 +1732,71 @@ endif
 !
 !
 end subroutine calc_mod3d_nicowr3d
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+subroutine test_model_js_lh
+
+use model3d
+use prog_type
+use fund_const
+use dime_modext
+use params_input
+use params_stellar
+use mod_grid
+implicit none
+
+real(dp) :: bb,mdot
+integer(i4b) :: i,j,k
+
+nr_modext = 201
+ntheta_modext = 41
+nphi_modext = 81
+rmin = 1.d0
+rmax = 20.0d0 
+
+allocate(r_modext3d(nr_modext),theta_modext3d(ntheta_modext),&
+     phi_modext3d(nphi_modext))
+call grid_log(rmin,rmax,nr_modext,r_modext3d)
+call grid_equi(zero,pi,ntheta_modext,theta_modext3d)
+call grid_equi(zero,two*pi,nphi_modext,phi_modext3d)
+!also grid_log or grid_llog (e.g. good for radius) 
+
+allocate(rho_modext3d(nr_modext,ntheta_modext,nphi_modext))
+allocate(velr_modext3d(nr_modext,ntheta_modext,nphi_modext))
+allocate(velth_modext3d(nr_modext,ntheta_modext,nphi_modext))
+allocate(velphi_modext3d(nr_modext,ntheta_modext,nphi_modext))
+allocate(t_modext3d(nr_modext,ntheta_modext,nphi_modext))
+allocate(trad_modext3d(nr_modext,ntheta_modext,nphi_modext))
+allocate(vth_modext3d(nr_modext,ntheta_modext,nphi_modext))
+allocate(eps_cont_modext3d(nr_modext,ntheta_modext,nphi_modext))
+
+
+vmax = 2000.*1.d5 
+vmin = 0.01*vmax 
+beta = 1.0
+bb = 1.-(vmin/vmax)**(1./beta)
+mdot = 1.d-6*xmsu/yr 
+do i=1,nr_modext
+   do j=1,ntheta_modext
+      do k=1,nphi_modext
+         velr_modext3d(i,j,k) = vmax*(1.-bb/r_modext3d(i))**beta
+         velth_modext3d(i,j,k) = 0.d0
+         velphi_modext3d(i,j,k) = 0.d0
+         rho_modext3d(i,j,k) = mdot/(4.*pi*(r_modext3d(i)*sr)**2&
+              *velr_modext3d(i,j,k))
+         trad_modext3d(i,j,k) = 40000.
+         t_modext3d(i,j,k) = 40000.
+         vth_modext3d(i,j,k) = 100.*1.d5
+         eps_cont_modext3d(i,j,k) = 1.0 
+      enddo
+   enddo
+enddo
+!vthermal(vmicro*1.d5, teff, na)
+!
+!radius in cgs
+r_modext3d=r_modext3d*sr
+
+end subroutine test_model_js_lh

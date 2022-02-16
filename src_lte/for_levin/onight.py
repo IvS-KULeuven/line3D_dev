@@ -119,7 +119,7 @@ def calc_all(y_mass=1.):
 #calc_all(y_mass=0.61)
 
 #calc_all(y_mass=0.28)
-calc_all(y_mass=0.59)
-calc_all(y_mass=0.1)
+#calc_all(y_mass=0.59)
+#calc_all(y_mass=0.1)
 calc_all(y_mass=0.0999)
 

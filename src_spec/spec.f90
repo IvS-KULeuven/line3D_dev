@@ -126,7 +126,7 @@ use timing_spec, only: ts_tot, te_tot, t_tot, ts_obsdir, te_obsdir, ttot_obsdir,
                        t_hunt, t_hunt_tmp, t_trilin, t_trilin_tmp, ticks_obsdir, &
                        ticks_initial_obsdir, ticks_final_obsdir, ttot_obsdir_sys
 use mod_surfb, only: xobss_surface, alphas_surface, gammas_surface, nsurfb
-use mod_gdark, only: xic1_factor
+use mod_gdark, only: xic1_factor, xic2_factor 
 use omp_lib
 !
 implicit none
@@ -495,7 +495,7 @@ do indx_alpha=1, nalpha
 !
       !$omp parallel &
       !$omp private(indx_zeta, indx_p, indx_xobs, indx_zray, err1, err2), &
-      !$omp copyin(xic1_factor)
+      !$omp copyin(xic1_factor, xic2_factor)
 !
 !allocation of global (threadprivate) arrays
       call allocate_fluxes
@@ -2170,6 +2170,7 @@ subroutine setup_ray3d_spc(zeta, p, lcore)
 !        all physical quantities along ray
 !
 use prog_type
+use fund_const, only: zero  
 use dime_spec, only:  nr
 use dime_model3d, only: nr_spc, ntheta_spc, nphi_spc, r_spc, theta_spc, phi_spc, &
                         opac3d, scont3d, opalbar3d, sline3d, velx3d, vely3d, velz3d, vth3d
@@ -2181,6 +2182,7 @@ use timing_spec, only: ts_setup, te_setup, t_setup_tmp, ts_hunt, te_hunt, t_hunt
                        ts_trilin, te_trilin, t_trilin_tmp
 use mod_interp1d, only: interpol_yp, interpol_yp_spline
 use mod_interp3d, only: get_rtp_indx, get_rtp_values1, get_rtp_values2, trilin_complete
+use mod_gdark, only: xic2_factor
 !
 implicit none
 !
@@ -2268,12 +2270,15 @@ if(.not.lcore) then
       zdum_ray(iz+i)=-zdum_ray(iz-i)
    enddo
    iz=iz_dum
-   vphot_proj=0.d0
+   vphot_proj=zero
+   xic2_factor=zero
 else
 !calculation of photospheric velocity (only rotational velocity) projected onto ray
    radp=sqrt(vec_cac(1)**2 + vec_cac(2)**2 + vec_cac(3)**2)
    call vel_phot(vec_cac(1), vec_cac(2), vec_cac(3), radp, velx, vely, velz)
    vphot_proj=nhat(1)*velx + nhat(2)*vely + nhat(3)*velz
+   !JS-ADD: 2022, mu in diff approx. 
+   xic2_factor=(nhat(1)*vec_cac(1) + nhat(2)*vec_cac(2) + nhat(3)*vec_cac(3))/radp   
 endif
 !
 !-----------------------------------------------------------------------
@@ -3811,9 +3816,9 @@ use prog_type
 use fund_const, only: cgs_clight
 use options_spec, only: interp_photprof
 use dime_spec, only: nxobs_fs
-use params_spec, only: xnue0, xic1
+use params_spec, only: xnue0, xic1, xic2
 use mod_spectrum, only: xic_nue, xicc_nue, xobs, xnue, vphot_proj, acoeff_xic, bcoeff_xic, ccoeff_xic, dcoeff_xic
-use mod_gdark, only: xic1_factor
+use mod_gdark, only: xic1_factor, xic2_factor
 use omp_lib
 use mod_interp1d, only: find_index, interpol_yp, interpol_yp_spline
 !
@@ -3838,16 +3843,19 @@ if(lcore) then
    xcmf = xobs(indx_xobs) - vphot_proj
 !
 !constant continuum
-   iin_c=xic1*xic1_factor
+   iin_c=xic1*xic1_factor - xic2*xic2_factor        
 !
 !find index within xobs-grid, for which xcmf matches and interpolate
    call find_index(xcmf, xobs, nxobs_fs, iim2, iim1, ii, iip1)
 !   if(omp_get_thread_num().eq.1.and.indx_xobs.eq.1) write(*,'(i5,l5,5es20.8)') indx_xobs, lcore, xic1, xic1_factor, iin, iin_c
 !
    select case(interp_photprof)
-      case(0) 
-         iin=interpol_yp(xobs(iim1), xobs(ii), xic_nue(iim1), xic_nue(ii), xcmf) * xic1_factor
-         iin_c=interpol_yp(xobs(iim1), xobs(ii), xicc_nue(iim1), xicc_nue(ii), xcmf)  * xic1_factor !for frequency dependent continuum
+      case(0)
+         !JS-NOTE: xicc_nue = xic1, ALSO: case(0) always used  
+         iin=interpol_yp(xobs(iim1), xobs(ii), xic_nue(iim1), xic_nue(ii), xcmf) * xic1_factor & 
+              - xic2*xic2_factor        
+         iin_c=interpol_yp(xobs(iim1), xobs(ii), xicc_nue(iim1), xicc_nue(ii), xcmf)  * xic1_factor  & 
+              - xic2*xic2_factor        !for frequency dependent continuum
       case(1)
          iin=interpol_yp_spline(acoeff_xic(ii), bcoeff_xic(ii), &
                                 ccoeff_xic(ii), dcoeff_xic(ii), &
@@ -5057,7 +5065,7 @@ use mod_spectrum, only: alpha, gamma, xobs, zeta, p, vth_ray, velz_ray, z_ray, t
 use params_spec, only: vth_fiducial, xic1
 use mod_surfb, only: iem_surface, iemi_surface, iabs_surface, icont_surface
 use mod_interp1d, only: find_index, interpol_yp
-use mod_gdark, only: xic1_factor
+use mod_gdark, only: xic1_factor, xic2_factor
 !
 implicit none
 !
@@ -5127,7 +5135,7 @@ call calc_transmat
 !$omp private(indx_zeta, indx_p, indx_zray), &
 !$omp private(lcore, phinorm, iin, iin_c, iem1, iem_c1, iemi1, iabs1), &
 !$omp private(iem2, iem_c2, iemi2, iabs2), &
-!$omp copyin(xic1_factor)
+!$omp copyin(xic1_factor, xic2_factor)
 !
 !
 !$omp do schedule(static, 4)

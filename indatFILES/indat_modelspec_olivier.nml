@@ -1,0 +1,73 @@
+&input_options
+input_file = ''
+input_file2 = ''
+output_file = '/lhome/levin/Postdoc/line3D/outputFILES/models_olivier/photprof0_sline0_vmicro20_kline1d0_ecc0_single/modspec_model00.h5'
+input_mod = 9 /
+
+&input_model1
+rstar1 = 1.2681439655172415d2
+rmin1 = 1.d0
+rmax1 = 1.1d0
+teff1 = 6.0d3
+trad1 = 6.0d3
+logg1 = 1.d0
+yhe1  = 10.0d-2
+fehe1 = -1.d0
+aenh1 = 0.d0
+vrot1 = 1.236067977499734d1
+vmicro1 = 2.0d1
+p_object01 = -2.2300253195818405d0, -2.2300253195818396d0, 0.d0
+v_object01 = 1.1107992860859666d1, -1.110799286085967d1, 0.d0
+ex01 = 1.d0, 0.d0, 0.d0
+ey01 = 0.d0, 1.d0, 0.d0
+ez01 = 0.d0, 0.d0, 1.d0
+rot_axis01 = 0.d0, 0.d0, 1.d0
+/
+
+&input_model2
+rstar2 = 2.8754468919386458d0
+rmin2 = 1.d0
+rmax2 = 4.3d2
+teff2 = 1.0d2
+trad2 = 1.0d2
+logg2 = 3.0d0
+yhe2  = 0.d0
+fehe2 = -1.d0
+aenh2 = 0.d0
+vrot2 = 0.d0
+vmicro2 = 2.0d1
+p_object02 = 1.13535979998733d0, 1.1353597999873297d0, 0.d0
+v_object02 = -5.655347695841929d0, 5.6553476958419315d0, 0.d0
+ex02 = 1.d0, 0.d0, 0.d0
+ey02 = 0.d0, 1.d0, 0.d0
+ez02 = 0.d0, 0.d0, 1.d0
+rot_axis02 = 0.d0, 0.d0, 1.d0
+/
+
+&input_line
+iline=1
+eps_line = 0.d0
+kline = 1.d0
+/
+iline=1: halpha
+iline=2: hbeta
+iline=10: civ resonance line
+
+
+&input_units
+unit_length = 1.2681439655172415d2
+vth_fiducial = 1.0d2
+/
+
+&input_usr
+fname_model = 'models/olivier/model1143.h5'
+model_unitl = 1.49598d13
+model_unitd = 1.d0
+model_unitv = 1.0d5
+model_unitt = 1.d0
+cs2_nphi = 101
+tjet = 5.0d3
+/
+
+&dum
+/

@@ -153,13 +153,15 @@ vthfid=100.
 vinf=1.
 
 base_dir = 'photprof0_sline0/'
-base_dir = 'photprof0_sline0_highres2/'
-base_dir = 'reference_test/'
-base_dir = 'photprof5_sline1_vmicro20/'
-base_dir = 'photprof5_sline1_vmicro20_kline1d-2/'
-base_dir = 'photprof5_sline1_vmicro20_kline1d-5/'
-base_dir = 'photprof5_sline1_vmicro20_kline1d-3/'
-#base_dir = 'photprof0_sline0_vmicro20_kline1d0/'
+#base_dir = 'photprof0_sline0_highres2/'
+#base_dir = 'reference_test/'
+#base_dir = 'photprof5_sline1_vmicro20/'
+#base_dir = 'photprof5_sline1_vmicro20_kline1d-2/'
+#base_dir = 'photprof5_sline1_vmicro20_kline1d-5/'
+#base_dir = 'photprof5_sline1_vmicro20_kline1d-2/'
+base_dir = 'photprof0_sline0_vmicro20_kline1d0/'
+base_dir = 'photprof0_sline0_vmicro20_kline1d0_ecc0/'
+
 phases = np.linspace(np.pi/2, 3./2.*np.pi, 17)
 phases = np.linspace(3./2.*np.pi, 1./2.*np.pi, 17)
 
@@ -173,6 +175,7 @@ phases = phases*np.pi/180.
 
 phases_time = np.zeros(nd)
 eccentricity = 0.23
+eccentricity = 0.
 for i in range(0,nd):
    phases_time[i] = phase_to_time(phases[i], eccentricity)
 #phases = phases*180./np.pi
@@ -180,6 +183,7 @@ phases = phases_time
 
 #base_dir = 'photprof5_sline0/'
 #phases = np.linspace(0.,2.*np.pi, 17)*180./np.pi
+base_dir = 'photprof0_sline0_vmicro20_kline1d0_ecc0_single/'
 
 fnames=['../outputFILES/models_olivier/'+base_dir+'phase001/FLUXEM_00001.dat',
         '../outputFILES/models_olivier/'+base_dir+'phase002/FLUXEM_00001.dat',
@@ -215,7 +219,7 @@ fnames=['../outputFILES/models_olivier/'+base_dir+'phase001/FLUXEM_00001.dat',
         '../outputFILES/models_olivier/'+base_dir+'phase032/FLUXEM_00001.dat',
         '../outputFILES/models_olivier/'+base_dir+'phase033/FLUXEM_00001.dat']
 
-main(fnames=fnames, phase=phases, xscalefac=vthfid/vinf,xlim=[300.,-300.],xlim_wave=[6550.,6570.],clim=[0.,2.],ylim=[1.,0.], vth_fid=vthfid,windx=windx)
+main(fnames=fnames, phase=phases, xscalefac=vthfid/vinf,xlim=[300.,-300.],xlim_wave=[6550.,6570.],clim=[0.2,1.8],ylim=[0.,1.], vth_fid=vthfid,windx=windx)
 
 
 

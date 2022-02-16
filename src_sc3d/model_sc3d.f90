@@ -1365,7 +1365,8 @@ real(dp) :: getr
 !-----------------------------------------------------------------------
 !
 !read 1d photospheric model
-call read_phot1d
+!not required anymore
+!call read_phot1d
 !
 !-----------------------------------------------------------------------
 !
@@ -1648,10 +1649,10 @@ enddo
 !
 !***debug end
 !
-!deallocate external model structure
-deallocate(r_modphot)
-deallocate(rho_modphot1d)
-deallocate(t_modphot1d)
+!deallocate external model structure (not required anymore)
+!deallocate(r_modphot)
+!deallocate(rho_modphot1d)
+!deallocate(t_modphot1d)
 !
 !
 !

@@ -251,6 +251,7 @@ fname2='../inputFILES/model3d.h5'
 
 
 fname='../outputFILES/output_model00.h5'
+fname='../outputFILES/test_js_lh/output_model00.h5'
 
 windx = 1
 main(fname=fname,windx=windx)

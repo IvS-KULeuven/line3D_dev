@@ -4048,6 +4048,7 @@ do i=1, cs2_nr
 
             velr = velr_cyc*sint2 + velz_cyc*cost2
             velth = velr_cyc*cost2 - velz_cyc*sint2
+            velphi = velphi  !try counter-rotation
 
             !write(*,*) velr_cyc**2 + velz_cyc**2 + velphi**2, velr**2+velth**2+velphi**2            
 !
@@ -4058,7 +4059,7 @@ do i=1, cs2_nr
                opac = zero
                opalbar = get_opalbar2(iline, kline, sr2, yhe2, hei2, temp, vth_fiducial, xnue0, b2, b3, rho)/sr2   !in cgs     
                scont = zero
-               sline = sline_depcoeff(xnue0, temp, b2, b3)
+               sline = zero !sline_depcoeff(xnue0, temp, b2, b3)
                
 !
          endif

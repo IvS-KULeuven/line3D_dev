@@ -366,8 +366,8 @@ integer(i4b), parameter :: ntheta_gdark=51
 real(dp), dimension(ntheta_gdark) :: theta_gdark, xic1_gdark, teff_gdark
 real(dp) :: smajorax_a, smajorax_b, smajorax_c
 !
-real(dp) :: xic1_factor
-!$omp threadprivate(xic1_factor)
+real(dp) :: xic1_factor, xic2_factor
+!$omp threadprivate(xic1_factor, xic2_factor)
 end module mod_gdark
 !
 !-----------------------------------------------------------------------
@@ -403,14 +403,12 @@ implicit none
 real(dp) :: xlogg, rstar, lstar, rmax, xmloss, &
             yhe, hei, sr, mstar
 
-real(dp) :: teff, tmin, t_inf, xic1, trad
+real(dp) :: teff, tmin, t_inf, xic1, xic2, trad
 
 real(dp) :: vmin, vmax, vrot, vth_fiducial, vmicro, beta, b, vth_min, v_esc, v_inf
 
 real(dp) :: eps_line, kline, alpha, kappa0
 !
-!real(dp) :: teff, trad, xic1
-!real(dp) :: vth_fiducial, vmicro, vrot
 real(dp) :: xnue0
 !transition frequency of considered line-transition
 !

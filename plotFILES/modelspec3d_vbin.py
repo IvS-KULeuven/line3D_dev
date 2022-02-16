@@ -1370,13 +1370,14 @@ def main_test(fname=None, version=None, clim_sline=None, clim_rho=None, clim_opa
 
 
 
-fnames=['../outputFILES/models_olivier/photprof0_sline0/phase001/modspec_model00.h5']
+fnames=['../outputFILES/models_olivier/photprof0_sline0_/phase001/modspec_model00.h5']
+fnames=['../outputFILES/models_olivier/photprof0_sline0_vmicro20_kline1d0_ecc0_single/modspec_model00.h5']
 versions=['v01']
 windx = 1
 
-main_test(fname=fnames[0], version=versions[0], clim_sline=[-6.,-5.], clim_rho=[-16.,-9.], clim_opalbar=[-18.,-6.], clim_temp=[2.e3,1.e4], clim_velr=[-300.,300.], clim_velphi=[0.,100.], clim_velth=[0.,100.])
+#main_test(fname=fnames[0], version=versions[0], clim_sline=[-6.,-5.], clim_rho=[-16.,-9.], clim_opalbar=[-18.,-6.], clim_temp=[2.e3,1.e4], clim_velr=[-300.,300.], clim_velphi=[0.,100.], clim_velth=[0.,100.])
 
-#main(fnames=fnames,versions=versions,windx=windx,thetac=90.*np.pi/180.,phic=90.*np.pi/180., clim_sline=[-6.,-5.], clim_rho=[-16.,-9.], clim_opalbar=[-18.,-6.], clim_temp=[2.e3,1.e4], clim_velr=[0.,300.], offset=0.)
+main(fnames=fnames,versions=versions,windx=windx,thetac=90.*np.pi/180.,phic=90.*np.pi/180., clim_sline=[-6.,-5.], clim_rho=[-16.,-9.], clim_opalbar=[-18.,-6.], clim_temp=[2.e3,1.e4], clim_velr=[0.,300.], offset=0.)
 
 
 sdum = input("Press [q] to exit.")

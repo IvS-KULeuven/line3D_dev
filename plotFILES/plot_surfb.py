@@ -17,7 +17,7 @@ import os
 #
 #
 def main(fname='../outputFILES/spec_surface.h5', oname2='./ps_files/surfb',
-         oname3='./ps_files/surfbc',
+         oname3='./ps_files/surfbc', xlim=None, ylim=None, clim=None,
          windx=1):
 #+
 # NAME:
@@ -34,12 +34,14 @@ def main(fname='../outputFILES/spec_surface.h5', oname2='./ps_files/surfb',
       np_surfb, nzeta_surfb, p_surfb, zeta_surfb, \
       iem2d_surfb, iemi2d_surfb, iabs2d_surfb, icont2d_surfb = read_surfb(fname)
 
+
    xp_surfb = np.zeros(shape=(nzeta_surfb,np_surfb))
    yp_surfb = np.zeros(shape=(nzeta_surfb,np_surfb))                        
    for i in range(0,np_surfb):
       for j in range(0,nzeta_surfb):
          xp_surfb[j][i] = p_surfb[i]*np.sin(zeta_surfb[j])
-         yp_surfb[j][i] = p_surfb[i]*np.cos(zeta_surfb[j])            
+         yp_surfb[j][i] = p_surfb[i]*np.cos(zeta_surfb[j])
+
 #
 #-----------------------plotting----------------------------------------
 #
@@ -61,15 +63,19 @@ def main(fname='../outputFILES/spec_surface.h5', oname2='./ps_files/surfb',
    iemi2d_surfb = iemi2d_surfb/icont2d_surfb
    iabs2d_surfb = iabs2d_surfb/icont2d_surfb
 
-   clevels, ticks = get_clevels(clim=[0.,1.000001])
+#
+   if not clim: clim=[0.,1.000001]
+   clevels, ticks = get_clevels(clim=clim)
    cmap_lev = get_cmap('jet')
    titlestr=r'$x[v_t^\ast]=${xobs:.2f}'.format(xobs=xobs)
    ax2.set_title(titlestr)
    ax2.set_xlabel(r'$x_p$')
    ax2.set_ylabel(r'$y_p$')
    ax2.axis('equal') #isotropic
-   ax2.set_xlim(-np.max(p_surfb),np.max(p_surfb))
-   ax2.set_ylim(-np.max(p_surfb),np.max(p_surfb))
+   if not xlim: xlim = [-np.max(p_surfb),np.max(p_surfb)]
+   if not ylim: ylim = [-np.max(p_surfb),np.max(p_surfb)]
+   ax2.set_xlim(xlim)
+   ax2.set_ylim(ylim)
    contourplot = ax2.contourf(xp_surfb, yp_surfb, iem2d_surfb,
                               levels=clevels,
                               extend='both',
@@ -100,22 +106,21 @@ def main(fname='../outputFILES/spec_surface.h5', oname2='./ps_files/surfb',
 #
    ax3 = fig3.subplots(1,2)
 
-   icont2d_surfb
    icont2d_surfb = icont2d_surfb/xic1
 
 #   indx=np.where(iem2d_surfb > 1.0000001)
 #   print(indx)
 #   exit()
 
-   clevels, ticks = get_clevels(clim=[0.2,0.7])
+   clevels, ticks = get_clevels(clim=clim)
    cmap_lev = get_cmap('Blues')   
 #   titlestr=r'$x[v_t^\ast]=${xobs:.2f}'.format(xobs=xobs_surfb[i])
 #   ax3[0].set_title(titlestr)
    ax3[0].set_xlabel(r'$x_p$')
    ax3[0].set_ylabel(r'$y_p$')
    ax3[0].axis('equal') #isotropic
-   ax3[0].set_xlim(-np.max(p_surfb),np.max(p_surfb))
-   ax3[0].set_ylim(-np.max(p_surfb),np.max(p_surfb))
+   ax3[0].set_xlim(xlim)
+   ax3[0].set_ylim(ylim)
    contourplot = ax3[0].contourf(xp_surfb, yp_surfb, icont2d_surfb,
                               levels=clevels,
                               extend='both',
@@ -133,7 +138,7 @@ def main(fname='../outputFILES/spec_surface.h5', oname2='./ps_files/surfb',
 #   ax3[0].plot(xc,yc,color='black', zorder=1)
    
 
-   clevels, ticks = get_clevels(clim=[0.,1.000001])
+   clevels, ticks = get_clevels(clim=clim)
 #   clevels, ticks = get_clevels(clim=[0.,0.2])   
    
    cmap_lev = get_cmap('jet')   
@@ -142,8 +147,8 @@ def main(fname='../outputFILES/spec_surface.h5', oname2='./ps_files/surfb',
    ax3[1].set_xlabel(r'$x_p$')
    ax3[1].set_ylabel(r'$y_p$')
    ax3[1].axis('equal') #isotropic
-   ax3[1].set_xlim(-np.max(p_surfb),np.max(p_surfb))
-   ax3[1].set_ylim(-np.max(p_surfb),np.max(p_surfb))
+   ax3[1].set_xlim(xlim)
+   ax3[1].set_ylim(ylim)
    contourplot = ax3[1].contourf(xp_surfb, yp_surfb, iem2d_surfb,
                                  levels=clevels,
                                  extend='both',
@@ -174,9 +179,10 @@ def main(fname='../outputFILES/spec_surface.h5', oname2='./ps_files/surfb',
 
 fname='../outputFILES/nico_wr3d/spec_surface_00001.h5'
 fname='../outputFILES/spec_surface_00001.h5'
+fname='../outputFILES/test_js_lh/spec_surface_00001.h5'
 
 windx = 1
-main(fname=fname,windx=windx)
+main(fname=fname,windx=windx, xlim=[-2.,2.], ylim=[-2.,2.], clim=[0.,2.])
 
 
 

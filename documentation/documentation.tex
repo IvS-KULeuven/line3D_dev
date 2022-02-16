@@ -139,7 +139,7 @@ mean intensity, Eddington flux, and second moment are trivially
 related to the radiation energy density $E_\nu$, the radiation flux
 $\vecown{F}_\nu$, and the radiation pressure tensor $\matown{P}_\nu$.
 
-For all code modules, we are considering the radiation quantities
+For all code modules, we are typically considering the radiation quantities
 $I_\nu$, $J_\nu$, $\vecown{H}_\nu$, $\matown{K}_\nu$, and not the
 corresponding `physical' quantities. In general there are three
 operating modes for calculating these quantities:
@@ -217,6 +217,7 @@ The code requires the following packages:
   \\
   ifort: inquire(directory=trim(directory), exist=my\_boolean)
 \item[\textsc{HDF5}:] The HDF5 library is required (version 1.10.5 or higher). This library needs to be compiled with the same compiler as used for the main programs (\ie~gfortran or ifort). See Sect.~\ref{subsec:hdf5} on how to install HDF5 on your system
+  \item[\textsc{PYTHON, IDL, GDL}] The code comes with an IDL/GDL or PYTHON library for reading and plotting all output files.
 \end{description}  
 \subsection{Getting the code}
 You can get the code from github:
@@ -278,7 +279,29 @@ On the MAC, the installation is essentially performed the same way. For the gfor
   the MAC *.dylib extension.
 \end{enumerate}
 
+\subsection{Importing the plotting routines}
+All plotting routines are stored in the directory
+\textit{line3D/plotFILES} or \textit{cont3Dslab/plotFILES}, with
+corresponding libraries named \textit{levpy}, \textit{lib\_gdl} and
+\textit{lib\_idl} for \textsc{PYTHON}, \textsc{GDL}, and \textsc{IDL},
+respectively.
+%
+\paragraph{GDL/IDL}
+The required libraries can be simply read in by typing in your IDL/GDL terminal:\\
+@idl\_lib/startup.pro \\
+@gdl\_lib/startup.pro \\
 
+We emphasize that some of the routines might be outdated (for
+instance, variable names stored within the individual *.h5 files might
+have changed). It should be straight forward though to adapt the
+corresponding reading routines (in \textit{idl\_lib/proLEV/getall}).
+%
+\paragraph{PYTHON}
+The following python packages are required: \\
+h5py, imageio, matplotlib, numpy, os, scipy, sys
+%
+%
+%
 \section{Main code modules}
 \subsection{line3D}
 \label{subsec:line3d}
@@ -313,13 +336,51 @@ requires a specific input file organized by namelists.
   Table~\ref{tab:namelist_spec}.
 \end{description}
 
-\subsubsection{The namelist files}
-The namelist options for the programs \textit{model.eo} and
-\textit{sc3d.eo} are summarized in Table~\ref{tab:namelist_sc3d}, and
-the namelist options for the programs \textit{modelspec.eo},
-\textit{spec.eo} are shown in Tables
-Tables~\ref{tab:namelist_modelspec}, \ref{tab:namelist_spec},
-respectively.
+\subsubsection{Program model.eo}
+All source files for this program are stored in the directory
+\textit{src\_model}, and the corresponding namelist file is summarized
+in Table~\ref{tab:namelist_sc3d}. Within this namelist, there are many
+input parameters that are actually not required. For consistency
+reasons and to avoid potential error sources, we decided to use the
+same namelist file also for the program \textit{sc3d.eo}.
+
+To register a new model, we recommend to follow the following steps:
+\begin{enumerate}
+\item In \textit{src\_model/model.f90}, add a new model identifier as
+  a case for the variable input\_mod. This identifier should be used
+  also in the namelist file to call this particular model.
+  The subroutine to create the model still needs to be developed by
+  the user, \eg~\textit{calc\_my\_model}, and needs to be called within the case
+  of the new model identifier. Further, depending on the
+  dimensionality of the new model, we need to save it as an h5 file by
+  calling the (already existing) subroutines \textit{output\_mod*d}.
+  
+\item In \textit{src\_model/model*d.f90}, we create our new subroutine
+  \textit{calc\_my\_model}. Depending on the dimension of the new
+  model, different global variables have to be set (see
+  \textit{src\_model/output\_model.f90} for more details). For a 3D
+  model in spherical coordinates $(r,\clatitude,\azimuth)$, we would require the following:
+  \begin{description}
+  \item[nr\_modext] describes the number of radial grid points for our model.
+  \item[ntheta\_modext] describes the number of $\clatitude$ grid points for our model.
+  \item[nphi\_modext] describes the number of $\azimuth$ grid points for our model.
+  \item[r\_modext3d] describes the radial grid (array of length nr\_modext) in cgs.
+  \item[theta\_modext3d] describes the $\clatitude$ grid (array of length ntheta\_modext) from $[0,\pi]$.
+  \item[phi\_modext3d] describes the $\azimuth$ grid (array of length nphi\_modext) from $[0,2\pi]$.
+  \item[velr\_modext3d] describes the radial velocity component (array of length nr\_modext, ntheta\_modext, nphi\_modext) in cgs.
+  \item[velth\_modext3d] describes the $\clatitude$ velocity component (array of length nr\_modext, ntheta\_modext, nphi\_modext) in cgs.
+  \item[velphi\_modext3d] describes the $\azimuth$ velocity component (array of length nr\_modext, ntheta\_modext, nphi\_modext) in cgs.
+  \item[rho\_modext3d] describes the density (array of length nr\_modext, ntheta\_modext, nphi\_modext) in cgs.
+  \item[t\_modext3d] describes the gas temperature (array of length nr\_modext, ntheta\_modext, nphi\_modext) in cgs.
+  \item[trad\_modext3d] describes the radiation temperature (array of length nr\_modext, ntheta\_modext, nphi\_modext) in cgs. Often used only as a dummy array.
+  \item[vth\_modext3d] describes the thermal velocity (array of length nr\_modext, ntheta\_modext, nphi\_modext) in cgs. Often used only as a dummy array.
+  \item[eps\_cont\_modext3d] describes the thermalization parameter (array of length nr\_modext, ntheta\_modext, nphi\_modext).
+    \end{description}
+\end{enumerate}
+%
+To plot the resulting model, you can use the programs
+\textit{plotFILES/model*d.py} or \textit{plotFILES/model*d.pro} for
+PYTHON or IDL/GDL, respectively.
 %
 \begin{footnotesize}
 \begin{longtable}[h]{p{0.24\linewidth}p{0.07\linewidth}p{0.69\linewidth}}
@@ -380,7 +441,9 @@ opt\_sol2d = f & logical & Logical to decide whether 2D solution scheme shall be
 %
 opt\_ltec = 0 & integer & Identifier to decide on the continuum wavelength/frequency model \\
  & & opt\_ltec = 0 if single continuum frequency \\
- & & opt\_ltec = 1 if grey approximation for continuum (frequency integrated) \\
+& & opt\_ltec = 1 if grey approximation for continuum (frequency
+integrated). If this option is set, the temperature will be updated
+after the radiation-transfer calculations assuming radiative equilibrium (\ie~from $J=S=B=\sigmab/\pi \,T^4$). \\
 %
 opt\_incl\_cont = t & logical & Set to true (false) if continuum shall be included (or not) \\
 opt\_start\_cont = t & logical  & Set to true (false) if continuum iteration shall start from the beginning (or from intermediate steps) \\
@@ -471,7 +534,90 @@ n\_y = 0.d0 & float & see benchmark subroutines \\
 n\_z = 0.707107d0 & float & see benchmark subroutines
 \end{longtable}
 \end{footnotesize}
+
+\subsubsection{Program sc3d.eo}
+This program solves the non-linear coupling of the radiative transfer equation with the source function of the form:
+\beqa
+\scont &=& \left(1 - \epsc \right) \Jnu + \epsc \Bnu \\
+\sline &=& \left(1 - \epsl \right) \Jbar + \epsl B_{\nu_0} \,,
+\eeqa
+\ie~for a continuum consisting of thermal and scattering terms, and
+for a resonance-line transition approximated as a two-level atom.
+To this end, we are discretizing the equation of radiative transfer in
+Cartesian coordinates, and rely on the accelerated $\Lambda$-iteration (ALI)
+using non-local approximate $\Lambda$ operators (ALO). The
+corresponding source files can be found in \textit{src\_sc3d}.
+
+There are various different methods for solving the radiative transfer
+equation (\eg~via the finite-volume method or the
+short-characteristics method), as well as for performing the
+source-function updates (using different ALO's).
+All available options required for the input namelist are summarized
+in Table~\ref{tab:namelist_sc3d}. As output and depending on the
+chosen options, the *.h5 file generated by \textit{sc3d.eo} provides
+among other data:
+\begin{description}
+\item[scont3d] The continuum source function \scont~in cgs (3d array with dimensions (nx,ny,nz)).
+\item[mint3d] The mean intensity \Jnu~in cgs (3d array with dimensions (nx,ny,nz)).
+\item[fcontx3d, fconty3d, fcontz3d] The Eddington flux components in Cartesian coordinates, $\vecown{H}_\nu = (H_x, H_y, H_z)$, in cgs (3d array with dimensions (nx,ny,nz)).
+\item[kcontxx3d, kcontyy3d, kcontzz3d, kcontxy3d, kcontxz3d,
+  kcontyz3d] The tensor components of the $\matown{K}_\nu$-tensor (3d arrays with dimensions (nx,ny,nz)). We
+  emphasize that this is a symmetric tensor, and only six components need to be saved to deduce the complete tensor.
+\item[mintbar3d] The frequency integrated and profile weighted mean intensity, \Jbar~in cgs (3d array with dimensions (nx,ny,nz)).
+\item[sline3d] The line source function, \sline~in cgs (3d array with dimensions (nx,ny,nz)).
+\end{description}
+
+To plot the resulting model, we provide the PYTHON and GDL/IDL
+programs \textit{plotFILES/plot\_sc3d.py} and
+\textit{plotFILES/plot\_sc3d.pro}.
 %
+
+\subsubsection{Program modelspec.eo}
+This program prepares data to be used for calculating spectral
+features and/or surface brightnesses of our simulations.
+We can either calculate a line profile from the output (\ie~source
+functions) of the \textit{sc3d.eo} program, or create a completely new
+semi-analytic model. All source files can be found in the
+\textit{src\_modelspec/} directory, with the available namelist options summarized in Table~\ref{tab:namelist_modelspec}.
+
+To create a new model here, we essentially follow the same philosophy
+as for the \textit{model.eo} program, and recommend the following two steps:
+\begin{itemize}
+\item In \textit{src\_modelspec/modelspec.f90}, we can add a new model identifier as a case for the namelist variable inuput\_mod.
+  As before, we can then create and call a new subroutine describing our model.
+  \item In \textit{src\_modelspec/modelspec.f90}, we also create the
+    new subroutine, \eg~\textit{subroutine my\_model}. Within this
+    subroutine (or in the input namelist), we need to specify the following global variables (here for a
+    standard 3D model in spherical coordinates).
+    \begin{description}
+    \item[nr] Number of radial grid points.
+    \item[ntheta] Number of $\clatitude$ grid points.
+    \item[nphi] Number of $\azimuth$ grid points.
+    \item[r] The radial grid in \Rstar.
+    \item[theta] The $\clatitude$ grid in the range $[0,\pi]$.
+    \item[phi] The $\phi$ grid in the range $[0,2\pi]$.
+    \item[sline3d] The line source function in cgs (3d array with dimensions (nr,ntheta,nphi)).
+    \item[scont3d] The continuum source function in cgs (3d array with dimensions (nr,ntheta,nphi)).
+    \item[t3d] The gas temperature in cgs (3d array with dimensions (nr,ntheta,nphi)).
+    \item[opac3d] The continuum opacity in $[1/\Rstar]$ (3d array with dimensions (nr,ntheta,nphi)).
+    \item[oplbar3d] The frequency integrated line opacity in $[1/s\Rstar]$ (3d array with dimensions (nr,ntheta,nphi)).
+    \item[velx3d] The x-component of the velocity field in cgs (3d array with dimensions (nr,ntheta,nphi)).
+    \item[vely3d] The y-component of the velocity field in cgs (3d array with dimensions (nr,ntheta,nphi)).
+    \item[velz3d] The z-component of the velocity field in cgs (3d array with dimensions (nr,ntheta,nphi)).
+    \item[xic1, xic2] The anchor for the inner boundary condition of the specific intensity, which should follow the form for core rays:
+      \beq
+      \Inu = xic1\cdot q_1 - xic2 \cdot q_2 \,,
+      \eeq
+      where $q_1$ and $q_2$ are scaling factors to be calculated during the formal solution (\eg~$q_1$ can be set to account for gravity darkening). A reasonable choice, for instance might be:
+      \beq
+      xic1 = \Bnu\left(\Teff\right) \qquad \qquad xic2 = \dfrac{\dd B\nu}{\chi_\nu \dd z} \,.
+      \eeq
+      \end{description}
+  \end{itemize}
+%
+Again, we can display the resulting model by using the programs
+\textit{plotFILES/modelspec3d.py} or
+\textit{plotFILES/modelspec3d.pro}.
 %
 %
 \begin{footnotesize}
@@ -485,7 +631,11 @@ n\_z = 0.707107d0 & float & see benchmark subroutines
  string & Name of the input file generated by \textit{sc3d.eo}, if source funtions and opacities are to be read in from the solution of \textit{sc3d.eo} \\
 \specialcell[t]{input\_file2 = \\ './inputFILES/model3d.h5'} & string & Name of the input model file generated by \textit{model.eo}. Depending on the input\_mod options, all opacities and source  functions are either interpolated from the \textit{sc3d.eo} output onto this grid, or calculated from a semi-analytical model. This procedure allows us to use a low-resolution grid for the computationally challenging ALI iteration, while still using a high-resolution grid of the wind's density and velocity structure. \\
 \specialcell[t]{output\_file = \\ './outputFILES/modspec\_model00.h5'} & string & Output file \\
-input\_mod = 19 & integer & Identifier for the model to be calculated (see in ./src\_modelspec/modelspec.f90). \\\hline
+input\_mod = 19 & integer & Identifier for the model to be calculated (see in ./src\_modelspec/modelspec.f90). There are a few standard options to communicate with the output from the program \textit{sc3d.eo}, such as:\\
+& & input\_mod=11  3d model: standard ouput from sc3c.eo (3d cartesian model) \\
+& & input\_mod=12  3d model: standard ouput from sc3c.eo (3d cartesian model) interpolated onto the spherical grid from the model.eo output \\
+
+\\\hline
 %
 \&input\_model & & Parameters of the input model \\
 teff = 258390.7d0 & float & Effective temperature of the star. Only required to get the correct photospheric line profile later on. \\
@@ -517,8 +667,48 @@ alpha = 0.d0 & float & \cite{Hamann80} parameterization \\\hline
 %
 \end{longtable}
 \end{footnotesize}
-%
-%
+
+
+\subsubsection{Program spec.eo}
+This program calculates synthetic line profiles and surface
+brigthnesses for a given model obtained by the program
+\textit{modelspec.eo}. To this end, we rely on a cylindric coordiante
+system $(p,\zeta,z)$ (see also \cite{Hennicker2021}).
+When calculating surface brightnesses the output will be stored as
+*.h5 file giving:
+\begin{description}
+\item[p] The array of impact parameters.
+\item[zeta] The array of angles of the cylindrical coordinate system
+  \item[iem\_surface] The (total) emergent intensity at each
+    $p,\zeta$ in cgs.
+  \item[iemi\_surface] The emission part of the total intensity at each
+    $p,\zeta$ in cgs.
+  \item[iabs\_surface] The absorption part of the total intensity at each
+    $p,\zeta$ in cgs.
+  \item[icont\_surface] The continuum intensity only (if there was no line) at each
+    $p,\zeta$ in cgs.
+\end{description}
+
+When calculating emergent flux profiles, the output will be stored as ASCII files in \textit{FLUXEM\_*.dat}.
+The output is organized in columns giving:
+\begin{description}
+\item[xobs] The frequency shift from line center in units of the fiducial velocity \vthfid.
+\item[flux\_tot] The total emergent flux-like (or rather
+  luminosity-like) quantity at this frequency. Following,
+  \eg~\citet[Sect. 3.7]{Hennicker2020}, the flux is given by:
+  \beq
+  \Fnu = \dfrac{1}{d^2} \underbrace{\int_0^{2\pi} \int_0^{\Rmax} \Inu\left(p, \zeta, z=\Rmax \right) p \dd p \dd \zeta}_{=: \textrm{flux\_tot}}\,.
+  \eeq
+  Since we have been integrating over the impact parameter $p$ (which internally is measured in \Rstar), we can translate the quantity flux\_tot to a luminosity in cgs:
+  \beq
+  \Lnu = \textrm{flux\_tot} \cdot \Rstar^2 \cdot 4 \pi\,.
+  \eeq
+
+\end{description}
+
+
+
+The namelist options for the program \textit{spec.eo} are summarized in Table~\ref{tab:namelist_spec}.
 %
 \begin{footnotesize}
 \begin{longtable}[h]{p{0.24\linewidth}p{0.07\linewidth}p{0.69\linewidth}}
@@ -573,17 +763,17 @@ nsurfb = 2 & integer & Number of surface brightnesses to be calculated. \\
 %
 %
 %
-\subsection{cont3Dslab}
-\label{subsec:cont3d}
-%
-%
 %
 \subsection{boss3D}
 \label{subsec:boss3d}
-The BOSS-3D package (also within the \textit{line3D} folder) contains modules for running global (star-in-a-box)
-radiative transfer simulations of binary systems. There are two different
-code modules further described in the following. Each code module
-requires a specific input file organized by namelists.
+The BOSS-3D package (also within the \textit{line3D} folder with
+corresponding programs \textit{line3D/modelspec\_vbin.eo} and
+\textit{line3D/spec\_vbin.eo}, the extension \textit{vbin}
+abbreviating `version binary') contains modules for running global
+(star-in-a-box) radiative transfer simulations of binary
+systems. There are two different code modules further described in the
+following. Each code module requires a specific input file organized
+by namelists.
 %
 \begin{description}
 \item[modelspec\_vbin.eo] Prepares the data to be used for the
@@ -730,6 +920,10 @@ xobs\_surface = 0.d0 & float & The shift from line center in units of $\vthfid$ 
 
 
 
+%
+\subsection{cont3Dslab}
+\label{subsec:cont3d}
+%
 
 
 \section{Getting started}
@@ -788,6 +982,12 @@ Below, you can find a list of known problems and (possible) solutions:
 \section{Acknowledgements}
 We like to thank B. Joe and J. Burkardt for providing the GEOMPACK2 libraries.
 Further, we thank the developers of the EISPACK library.
+
+The development of all code modules has been funded by the German
+Research Foundation, DFG, under grant PU 117/9-1, and by the Odysseus
+program of the Belgian Research Foundation Flanders (FWO) under grant
+G0H9218N.
+
 %\begin{figure}[ht]
 %\resizebox{\hsize}{!}{
 %   \begin{minipage}{0.5\hsize}

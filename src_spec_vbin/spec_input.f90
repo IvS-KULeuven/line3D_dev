@@ -452,6 +452,9 @@ xic2=bnue(xnue0,trad2)
 !cs2_opac3d=0.d0
 !cs2_scont3d=0.d0
 
+
+!write(*,*) cs2_r_spc
+
 !stop 'warning: dont forget to put on again'
 !
 end subroutine read_model3d_spc

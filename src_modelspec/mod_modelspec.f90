@@ -95,7 +95,7 @@ real(dp) :: unit_length
 real(dp) :: xlogg, lstar, rstar, mstar, rmin, rmax, xmloss, yhe, yhe_mass, hei, sr
 !yhe = n_He/n_H, yhe_mass = m_He/m_tot
 !
-real(dp) :: teff, tmin, trad, xic1
+real(dp) :: teff, tmin, trad, xic1, xic2
 !
 real(dp) :: vrot, vmin, vmax, vmicro, beta, vth_fiducial
 !
