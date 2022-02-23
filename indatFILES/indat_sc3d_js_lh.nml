@@ -1,3 +1,5 @@
+----------------------short characteristics test for JS/LH model----------------
+
 &input_options
 model_dir = 'inputFILES'                     ! Name of the output directory 
 output_file = 'test_js_lh/output_model00.h5'  ! name of the output model file 
@@ -11,11 +13,11 @@ opt_angint_method = 9
 opt_method = 1
 opt_sol2d = f
 opt_ltec = 0
-opt_incl_cont = f
+opt_incl_cont = t
 opt_start_cont = t
 opt_ng_cont = t
 opt_ait_cont = f
-opt_incl_line = t
+opt_incl_line = f
 opt_start_line = t
 opt_ng_line = t
 opt_ait_line = f
@@ -57,7 +59,7 @@ kcont = 1.d0
 
 &input_line
 eps_line = 0.d0
-kline = 1.d2
+kline = 1.d-5
 kappa0 = 5.d-1
 alpha = 0.d0 
 /
@@ -71,12 +73,12 @@ delv = 0.3333333d0
 /
 
 &dimensions_3d
-ncx=19
-ncy=19
-ncz=19
-delx_max=1.d0
-dely_max=1.d0
-delz_max=1.d0
+ncx=9
+ncy=9
+ncz=9
+delx_max=1.7d0
+dely_max=1.7d0
+delz_max=1.7d0
 /
 
 &dimensions_freq
@@ -85,7 +87,7 @@ xcmf_max = 3.d0
 /
 
 &dimensions_angles
-n_theta = 9
+n_theta = 3
 /
 
 &benchmark

@@ -17,7 +17,7 @@ use mod_directories, only: indat_file
 implicit none
 !
 ! ... local scalars
-integer(i4b), parameter :: nr_2da=380, ntheta_2da=72
+integer(i4b) ::  nr, ntheta
 integer(i4b) :: i, j
 integer(i4b) :: err
 !
@@ -42,12 +42,15 @@ character(len=8), parameter :: lat_name='Latitude'
 !
 ! ... namelist
 character(len=500) :: fname_model
-namelist / input_usr / fname_model
+namelist / input_usr / fname_model, nr, ntheta
 
 !default values
 fname_model='tuebingen/test_tau1000.h5'
 !fname_model='tuebingen/test_tau10.h5'
 !
+nr=380
+ntheta=72
+
 write(*,*) 'reading input from file: ', trim(indat_file)
 write(*,*)
 !
@@ -58,8 +61,8 @@ close(1)
 !
 !-----------------------allocate arrays---------------------------------
 !
-nr_modext=nr_2da
-ntheta_modext=2*ntheta_2da
+nr_modext=nr
+ntheta_modext=2*ntheta
 
 !
 allocate(r_modext2d(nr_modext), stat=err)
@@ -82,11 +85,11 @@ allocate(vth_modext2d(nr_modext, ntheta_modext), stat=err)
 allocate(eps_cont_modext2d(nr_modext, ntheta_modext), stat=err)
    if(err.ne.0) stop 'error: allocation in calc_mod2d_abla'
 !
-allocate(theta_dum(ntheta_2da), stat=err)
+allocate(theta_dum(ntheta), stat=err)
    if(err.ne.0) stop 'error: allocation in calc_mod2d_abla'
-allocate(rho_dum(ntheta_2da, nr_modext), stat=err)
+allocate(rho_dum(ntheta, nr_modext), stat=err)
    if(err.ne.0) stop 'error: allocation in calc_mod2d_abla'
-allocate(t_dum(ntheta_2da, nr_modext), stat=err)
+allocate(t_dum(ntheta, nr_modext), stat=err)
    if(err.ne.0) stop 'error: allocation in calc_mod2d_abla'
 !
 !---------------read everything from dylans files-----------------------
@@ -96,8 +99,8 @@ write(*,*) 'file name: ', trim(fname_model)
 write(*,*)
 !
 dims_rad= (/ nr_modext /)
-dims_lat= (/ ntheta_2da /)
-dims=(/ ntheta_2da, nr_modext /)
+dims_lat= (/ ntheta /)
+dims=(/ ntheta, nr_modext /)
 !
 call h5open_f(err)
 call h5fopen_f(trim(fname_model), h5f_acc_rdonly_f, file_id, err)
@@ -129,13 +132,13 @@ call h5close_f(err)
 t_dum=t_dum*9.95d-9/1.38d0/rho_dum
 !
 !now mirror grids and store everything in own arrays
-do i=1, ntheta_2da
+do i=1, ntheta
    theta_modext2d(i) = theta_dum(i)
-   theta_modext2d(ntheta_2da+i) = pi - theta_dum(ntheta_2da+1-i)
+   theta_modext2d(ntheta+i) = pi - theta_dum(ntheta+1-i)
 enddo
 !
 do i=1, nr_modext
-   do j=1, ntheta_2da
+   do j=1, ntheta
       rho_modext2d(i,j) = rho_dum(j,i)
       rho_modext2d(i,ntheta_modext+1-j) = rho_dum(j,i)
       t_modext2d(i,j) = t_dum(j,i)
@@ -150,7 +153,8 @@ velr_modext2d=0.d0
 velth_modext2d=0.d0
 velphi_modext2d=0.d0
 !
-r_modext2d=r_modext2d/sr
+!radius in cgs
+!r_modext2d=r_modext2d/sr
 !
 !
 end subroutine calc_mod2d_abla
@@ -324,7 +328,8 @@ do i=1, nr_modext
 enddo
 !
 !
-!r_modext2d=r_modext2d*sr
+!need output in cgs units
+r_modext2d=r_modext2d*sr
 !
 end subroutine calc_mod2d_ablb
 !

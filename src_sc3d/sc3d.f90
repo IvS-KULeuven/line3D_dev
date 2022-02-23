@@ -179,7 +179,7 @@
 !          (stellar surface is approximated by ellipsoid!!!)
 !          -> dist_surface_rot
 !          -> info_region_rot
-!       including opt_ltec to calculate grey temperature stratification in lte
+!       including opt_ltec to calculate grey temperature stratification in radiative equilibrium
 !       including opt_opac to define the opacity law
 !
 !v12    including opt_method=2 for quadratic bezier SC method within contiinuum transport
@@ -1172,7 +1172,6 @@ select case(opt_ltec)
       lfreqint = .false.
    case(1)
       lfreqint = .true.
-      eps_cont=0.d0 !for grey atmosphere, only eps_cont=0 makes sense
    case default
       stop 'error in read_input: opt_ltec not properly specified'
 end select

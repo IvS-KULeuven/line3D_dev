@@ -1,3 +1,5 @@
+----------------------nicos 3d wr simulations (short-characteristics test)------
+
 &input_options
 model_dir = 'inputFILES'                     ! Name of the output directory 
 output_file = 'nico_wr3d/output_model00.h5'  ! name of the output model file 

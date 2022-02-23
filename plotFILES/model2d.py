@@ -390,7 +390,7 @@ def main(dir='../inputFILES', oname1d='./ps_files/model2d_rad',
    
 dir='../inputFILES'
 windx = 1
-main(dir=dir,windx=windx, xlim=[0.,6.], ylim=[-3.,3.], clim_rho=[-16.,-10.], clim_velr=[0.,6000.])
+main(dir=dir,windx=windx, xlim=[0.,6.], ylim=[-3.,3.], clim_rho=[-16.,-10.], clim_velr=[0.,2500.])
 
 
 sdum = input("Press [q] to exit.")

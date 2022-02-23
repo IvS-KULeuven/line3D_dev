@@ -1117,7 +1117,7 @@ subroutine setup_temperatures1
 use prog_type
 use fund_const
 use dime3d, only: ndxmax, ndymax, ndzmax, imask3d, &
-                  t3d, scont3d, x
+                  t3d, scont3d, x, mint3d
 use params_input, only: tmin
 !
 implicit none
@@ -1129,7 +1129,7 @@ integer(i4b) :: i, j, k
 !
 ! ... local functions
 !
-write(*,*) 'using LTE temperatures'
+write(*,*) 'calculating RE temperatures'
 write(*,*)
 !
 t3d=tmin
@@ -1141,7 +1141,10 @@ do i=1, ndxmax
             case(0) !outside of calculation volume
                t3d(i,j,k)=tmin
             case(1,2,3,4) !standard points, near boundary points, boundary points
-               t3d(i,j,k)=(pi*scont3d(i,j,k)/cgs_sb)**0.25d0
+               !using source function
+               !t3d(i,j,k)=(pi*scont3d(i,j,k)/cgs_sb)**0.25d0
+               !using mean intensity
+               t3d(i,j,k)=(pi*mint3d(i,j,k)/cgs_sb)**0.25d0                
             case default
          end select
       enddo

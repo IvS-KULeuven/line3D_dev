@@ -23,22 +23,45 @@ COMPILER = gfortran
 
 #DEBUG = true
 
+###########################HDF5 ENVIRONMENT VARIABLE#####################
+
+ifndef DIR_HDF5
+   $(info DIR_HDF5  Not found)
+   $(error Undefined variable DIR_HDF5: export DIR_HDF5=<location of hdf5 lib>)
+endif
+
+#########################################################################
+
+#operating system
+UNAME := $(shell uname)
+
+.SUFFIXES: .f90
+
 #####################GFORTRAN COMPILER OPTIONS ETC#######################
 
 ifeq ($(COMPILER),gfortran)
    F90 = gfortran
    LD = gfortran
 
-#replace your hdf5 path here
-   DIR_HDF5=$(HOME)/Postdoc/hdf5_lib/version1.10.5
-
-#for MAC users: replace *.so with *.dylib
-   DIR_MOD_HDF5=$(DIR_HDF5)/include
-   DIR_LIB_HDF5=$(DIR_HDF5)/lib                      \
-                $(DIR_HDF5)/lib/libhdf5_fortran.so   \
-                $(DIR_HDF5)/lib/libhdf5.so           \
-                $(DIR_HDF5)/lib/libhdf5_hl.so        \
-                $(DIR_HDF5)/lib/libhdf5hl_fortran.so
+   ifeq ($(UNAME), Linux)
+      $(info OS detected: Linux)
+      DIR_MOD_HDF5=$(DIR_HDF5)/include
+      DIR_LIB_HDF5=$(DIR_HDF5)/lib                      \
+                   $(DIR_HDF5)/lib/libhdf5_fortran.so   \
+                   $(DIR_HDF5)/lib/libhdf5.so           \
+                   $(DIR_HDF5)/lib/libhdf5_hl.so        \
+                   $(DIR_HDF5)/lib/libhdf5hl_fortran.so
+   else ifeq ($(UNAME), Darwin)
+      $(info OS detected: MAC)
+      DIR_MOD_HDF5=$(DIR_HDF5)/include
+      DIR_LIB_HDF5=$(DIR_HDF5)/lib                         \
+                   $(DIR_HDF5)/lib/libhdf5_fortran.dylib   \
+                   $(DIR_HDF5)/lib/libhdf5.dylib           \
+                   $(DIR_HDF5)/lib/libhdf5_hl.dylib        \
+                   $(DIR_HDF5)/lib/libhdf5hl_fortran.dylib
+   else
+      $(error No OS detected, please have a look into the Makefile)
+   endif
 
    OMP_FLAG=-fopenmp
 #
@@ -62,17 +85,28 @@ ifeq ($(COMPILER),ifort)
    F90 = ifort
    LD = ifort
 
-   DIR_HDF5=$(HOME)/hdf5_lib/ifort_build
 
-#for MAC users: replace *.so with *.dylib
-   DIR_MOD_HDF5=$(DIR_HDF5)/include
-   DIR_LIB_HDF5=$(DIR_HDF5)/lib                      \
-                $(DIR_HDF5)/lib/libhdf5_fortran.so   \
-                $(DIR_HDF5)/lib/libhdf5.so           \
-                $(DIR_HDF5)/lib/libhdf5_hl.so        \
-                $(DIR_HDF5)/lib/libhdf5hl_fortran.so
 
-   HDF5_FLAG = -I$(DIR_MOD) -L$(DIR_LIB)
+   ifeq ($(UNAME), Linux)
+      $(info OS detected: Linux)
+      DIR_MOD_HDF5=$(DIR_HDF5)/include
+      DIR_LIB_HDF5=$(DIR_HDF5)/lib                      \
+                   $(DIR_HDF5)/lib/libhdf5_fortran.so   \
+                   $(DIR_HDF5)/lib/libhdf5.so           \
+                   $(DIR_HDF5)/lib/libhdf5_hl.so        \
+                   $(DIR_HDF5)/lib/libhdf5hl_fortran.so
+   else ifeq ($(UNAME), Darwin)
+      $(info OS detected: MAC)
+      DIR_MOD_HDF5=$(DIR_HDF5)/include
+      DIR_LIB_HDF5=$(DIR_HDF5)/lib                         \
+                   $(DIR_HDF5)/lib/libhdf5_fortran.dylib   \
+                   $(DIR_HDF5)/lib/libhdf5.dylib           \
+                   $(DIR_HDF5)/lib/libhdf5_hl.dylib        \
+                   $(DIR_HDF5)/lib/libhdf5hl_fortran.dylib
+   else
+      $(error No OS detected, please have a look into the Makefile)
+   endif
+
 
    OMP_FLAG=-fopenmp
 
@@ -95,15 +129,25 @@ ifeq ($(COMPILER),mpif90)
    F90 = mpif90
    LD = mpif90
 
-   DIR_HDF5=$(HOME)/hdf5_lib/gfortran_build
-
-#for MAC users: replace *.so with *.dylib
-   DIR_MOD_HDF5=$(DIR_HDF5)/include
-   DIR_LIB_HDF5=$(DIR_HDF5)/lib                      \
-                $(DIR_HDF5)/lib/libhdf5_fortran.so   \
-                $(DIR_HDF5)/lib/libhdf5.so           \
-                $(DIR_HDF5)/lib/libhdf5_hl.so        \
-                $(DIR_HDF5)/lib/libhdf5hl_fortran.so
+   ifeq ($(UNAME), Linux)
+      $(info OS detected: Linux)
+      DIR_MOD_HDF5=$(DIR_HDF5)/include
+      DIR_LIB_HDF5=$(DIR_HDF5)/lib                      \
+                   $(DIR_HDF5)/lib/libhdf5_fortran.so   \
+                   $(DIR_HDF5)/lib/libhdf5.so           \
+                   $(DIR_HDF5)/lib/libhdf5_hl.so        \
+                   $(DIR_HDF5)/lib/libhdf5hl_fortran.so
+   else ifeq ($(UNAME), Darwin)
+      $(info OS detected: MAC)
+      DIR_MOD_HDF5=$(DIR_HDF5)/include
+      DIR_LIB_HDF5=$(DIR_HDF5)/lib                         \
+                   $(DIR_HDF5)/lib/libhdf5_fortran.dylib   \
+                   $(DIR_HDF5)/lib/libhdf5.dylib           \
+                   $(DIR_HDF5)/lib/libhdf5_hl.dylib        \
+                   $(DIR_HDF5)/lib/libhdf5hl_fortran.dylib
+   else
+      $(error No OS detected, please have a look into the Makefile)
+   endif
 
    OMP_FLAG=-fopenmp
 #

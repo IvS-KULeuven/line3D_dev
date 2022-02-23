@@ -37,6 +37,7 @@
 \usepackage[T1]{fontenc}
 
 
+
 \usepackage[tableposition=t]{caption}
 %
 %----------------------hypersetup-------------------------------------------------
@@ -61,6 +62,62 @@
   bottom=2cm,
   bindingoffset=5mm
 }
+%
+%-----------------------forest layout-----------------------------------
+%
+\usepackage{forest}
+\forestset{
+  default preamble={
+    for tree={
+%      font=\footnotesize,
+    grow'=0, 
+    l=0pt,
+    inner sep=0.075cm,
+    s sep=0.1mm,
+    child anchor=west,
+    parent anchor=south,
+    anchor=west,
+    calign=first,
+%    edge path={
+%      noexpandpath [draw, forestoption{edge}]
+%      (!u.south west) +(7.5pt,0) |- node{} (.child anchor)forestoption{edge label};
+    %    },
+    edge path={
+      \noexpand\path [draw, \forestoption{edge}]
+      (!u.south west) +(7.5pt,0) |- node[fill,inner sep=1.25pt] {} (.child anchor)\forestoption{edge label};
+    },    
+    before typesetting nodes={
+      if n=1
+        {insert before={[,phantom]}}
+        {}
+    },
+    fit=band,
+    before computing xy={l=15pt},
+  }
+  }
+  }
+%  for tree={
+%    font=\ttfamily,
+%    grow'=0,
+%    child anchor=west,
+%    parent anchor=south,
+%    anchor=west,
+%    calign=first,
+%    edge path={
+%      \noexpand\path [draw, \forestoption{edge}]
+%      (!u.south west) +(7.5pt,0) |- node[fill,inner sep=1.25pt] {} (.child anchor)\forestoption{edge label};
+%    },
+%    before typesetting nodes={
+%      if n=1
+%        {insert before={[,phantom]}}
+%        {}
+%    },
+%    fit=band,
+%    before computing xy={l=15pt},
+%  }    
+%  }% end of forestset
+%  }
+%-------------------------------------------------------------
 %
 %---------------------------definitions---------------------------------
 %
@@ -225,7 +282,7 @@ You can get the code from github:
 \item Global star-in-a-box simulations:\\
   git clone https://github.com/levin-h/line3D
 \item Local box-in-a-star simulations:\\
-  git clone https://github.com/levin-h/cont3D
+  git clone https://github.com/levin-h/cont3Dslab
 \end{itemize}
 %
 %
@@ -256,10 +313,13 @@ I recommend to create a local build for your HDF5 libraries. To this end, please
   make check   (and verify that all tests return a `pass') \\
   make install
 \item Include the library path in the Makefile of the main code (\eg~line3D/Makefile)
-\item Update your .bashrc file to add the library path to your LD environment variable:\\
+\item Update your .bashrc file to add the library path to your LD environment variable, and define a new environment variable that will be used in the Makefiles:\\
     HDF5\_PATH=\$HOME/hdf5\_gfortran\_build/hdf5\_lib/lib \\
     LD\_LIBRARY\_PATH=\$LD\_LIBRARY\_PATH:\$ADD\_LIB\_PATH \\
-    export LD\_LIBRARY\_PATH
+    export LD\_LIBRARY\_PATH \\
+    \\
+    DIR\_HDF5=\$HOME/hdf5\_gfortran\_build/hdf5\_lib \\
+    export DIR\_HDF5    
 \end{enumerate}
 
 \paragraph{MAC}
@@ -276,7 +336,7 @@ On the MAC, the installation is essentially performed the same way. For the gfor
   brew install gcc
 \item Install HDF5 as for UNIX systems. When updating the Makefile of
   the main code (\eg~line3D/Makefile), replace all *.so libraries with
-  the MAC *.dylib extension.
+  the MAC *.dylib extension (depending on the version of the Makefile, not required anymore).
 \end{enumerate}
 
 \subsection{Importing the plotting routines}
@@ -335,7 +395,9 @@ requires a specific input file organized by namelists.
   corresponding namelist files is described in
   Table~\ref{tab:namelist_spec}.
 \end{description}
-
+%
+%
+%
 \subsubsection{Program model.eo}
 All source files for this program are stored in the directory
 \textit{src\_model}, and the corresponding namelist file is summarized
@@ -772,7 +834,7 @@ corresponding programs \textit{line3D/modelspec\_vbin.eo} and
 \textit{line3D/spec\_vbin.eo}, the extension \textit{vbin}
 abbreviating `version binary') contains modules for running global
 (star-in-a-box) radiative transfer simulations of binary
-systems. There are two different code modules further described in the
+systems (see also \citealt{Hennicker2021}). There are two different code modules further described in the
 following. Each code module requires a specific input file organized
 by namelists.
 %
@@ -925,7 +987,9 @@ For plotting the output data, one can use the programs
 \textit{plotFILES/plot\_dynspec.py} for displaying the dynamical line
 profiles, and \textit{plotFILES/plot\_surfb\_vbin.py} or
 \textit{plotFILES/plot\_surfb\_vbin.pro} for displaying the surface
-brightness.
+brightness. Further, one can use the
+\textit{plotFILES/plot\_triangles.py} for displaying the
+triangulation.
 %
 %
 %
@@ -989,6 +1053,368 @@ xobs\_surface = 0.d0 & float & The shift from line center in units of $\vthfid$ 
 \subsection{cont3Dslab}
 \label{subsec:cont3d}
 %
+This folder contains code modules for running \textit{box-in-a-star}
+simulations for calculating the energy density, radiation flux, and
+radiation pressure tensor components to be used in the future within
+radiation-hydrodynamic simulations. Since the computational domain is
+defined as a box within the stellar envelope, all code modules assume
+periodic boundary conditions for the specific intensity at the lateral
+($xz$, $yz$) planes, the $z$ axis defined from inside to outside the
+envelope. Thus, a big warning should be stated here: If the
+computational domain in the $z$-direction is large, \textbf{curvature terms
+are intrinsically neglected} which might have a large impact
+particularly for rays propagating almost horizontally. There are five different codes that can be used:
+\begin{description}
+\item[model.eo] Prepares the data to be used for the actual radiative
+  transfer calculations by transforming any input data or calculating
+  semi-analytic models. A new model can be simply registered in src\_model.
+  Essentially, we set up the state of the gas in 3d Cartesian coordinates, described by the density $\rho$, the
+  velocity field $\vecown{v}=(v_x, v_y, v_z)$, and the gas and radiation temperatures,
+  $\Tgas$ and $\Trad$. Currently hardcoded, the model will be saved with the file name model3d.h5.
+  
+\item[diff1d.eo] Solution of the 1D plane-parallel diffusion equation
+  using a two-stream approximation for a $\beta$-velocity model,
+  compared to the solution of the 1D short-characteristics or
+  finite-volume-method solution schemes (see Table~\ref{tab:namelist_diff1d} for a summary of the namelist file).
+  All output is stored by default in \textit{outputFILES/diff1d}.
+\item[sc1d.eo] 1D short-characteristics solution scheme for a
+  plane-parallel model $\beta$-velocity model. Similar as in
+  \textit{diff1d.eo}, however allowing for more than two rays.
+\item[sc2d.eo] 2D short-characteristics solution scheme.
+\item[sc3d.eo] 3D short-characteristics solution scheme.
+\item[surfb.eo] Calculating surface brightness.
+\end{description}
+
+
+\subsubsection{Program diff1d.eo}
+The source files of this code are stored in \textit{cont3Dslab/src\_diff1d}.
+By default, we are only considering Thomson scattering opacities.
+%
+As a benchmark for the full scattering problem, we can consider the source function given by
+\beq
+\label{eq:scont}
+S=(1-\epsc)J+\epsc B \,,
+\eeq
+within a plane-parallel atmosphere. Defining $\dd\tau=-\chi\dd z$, the EQRT reads:
+\beq
+\mu \dfrac{\dd I}{\dd \tau} = I -S \,.
+\eeq
+When assuming that the intensity depends only linearly on $\mu$ (Eddington approximation), \ie:
+\beq
+I(\tau,\mu) = a(\tau) + b(\tau) \mu \,,
+\eeq
+one easily finds $K=J/3$, with $K=1/2\int I \mu^2 \dd \mu$ the second moment of the specific intensity.
+The 0th and 1st moment of the EQRT can then be combined with Eq.\eqref{eq:scont}, to obtain the diffusion equation:
+\beq
+\dfrac{1}{3} \dfrac{\dd^2 J}{\dd \tau^2} = \epsc \left(J-B\right) \,.
+\eeq
+With appropriate boundary conditions, we solve this equation within this code module.
+
+Now, considering a two-stream approximation with directions
+$\mu_{\pm}=\pm 1/\sqrt{3}$, we can calculate the moments of the
+specific intensity also from a direct solution to the EQRT:
+\beqa
+J&=&\dfrac{1}{2}\left[\int_{-1}^0 I_- \dd \mu + \int_0^1 I_+ \dd \mu \right] = \dfrac{1}{2} \left(I_+ + I_-\right)\\
+K&=&\dfrac{1}{2}\left[\int_{-1}^0 \mu^2 I_- \dd \mu + \int_0^1 I_+ \dd \mu \right] = \dfrac{1}{6} \left(I_+ + I_-\right)=\dfrac{J}{3} \,.
+\eeqa
+Thus, the Eddington approximation and the two-stream-approximation are
+equivalent. As a benchmark of our solution schemes, we can `simply'
+calculate $I_\pm$ using finite-volume methods, short-characteristics
+methods, or finite differences, then iterate the
+source-functions to convergence, and compare the solution with the
+corresponding solution of the diffusion equation.
+%
+The corresponding namelist file is summarized in Table~\ref{tab:namelist_diff1d}.
+%
+\begin{footnotesize}
+\begin{longtable}[h]{p{0.24\linewidth}p{0.07\linewidth}p{0.69\linewidth}}
+\caption{\normalsize Input namelist for the program \textit{diff1d.eo}}
+\label{tab:namelist_diff1d}
+\\\hline\hline
+ Example & Data type & Description \\\hline
+\&input\_options & & Main options \\
+opt\_ng\_cont = t & logical &  Option for switching Ng extrapolation on or off \\
+opt\_ait\_cont = f & logical &  Option for switching Aitkens extrapolation on or off\\
+opt\_alo\_cont = 1 & integer & Option for the approximate $\Lambda$ operator to be used.\\
+& & opt\_alo\_cont = 0 -- classical $\Lambda$ iteration \\
+& & opt\_alo\_cont = 1 -- ALI with diagonal ALO \\
+& & opt\_alo\_cont = 2 -- ALI with tri-diagonal ALO \\\hline
+%
+\&input\_model & & Parameters of the input model \\
+teff = 40.d3 & float & Effective temperature of the star. Only required to get the correct photospheric line profile later on. \\
+trad = 40.d3 & float & Radiation temperature of the star. Only used to set the inner boundary condition for the specific intensity. \\
+rstar = 20.d0 & float & $\Rstar$ in $\rsun$ \\
+tmin = 0.8d0  & float & Minimum temperature of the wind in [$\Teff$]. \\
+xmloss = 1.d-6 & float & Mass-loss rate $\mdot$ in [\msunyr]. \\
+vmin = 10.d0  & float & Minimum velocity \vmin~of a $\beta$-velocity law in [\kms]. \\
+vmax = 2.d3  & float & Terminal velocity \vinf~of a $\beta$-velocity law in [\kms]. \\
+beta = 1.d0  & float & $\beta$ parameter of a $\beta$-velocity law in [\kms]. Only used for very specific test routines \\
+yhe = 0.1d0 & float & Helium number abundance, $\yhe=\nhe/\nh$. \\
+hei = 2.d0  & float & Number of free electrons per helium atom. \\
+xnue0 = 1.03798d15  & float & Frequency at which radiation transfer equation will be solved. \\\hline
+%
+\&input\_cont & & Continuum parameters \\
+eps\_cont = 0.d0 & float & Thermalization parameter \\
+kcont = 1.d0 & float & Scaling factor for continuum opacity \\\hline
+%
+\&dimensions\_3dz & & Dimension and definition of the computational domain ($z$-axis) \\
+nz = 101 & integer & Number of grid points. \\
+zmin = 1.d0 & float & Minimum $z$ in \Rstar. \\
+zmax = 10.d0 & float & Maximum  $z$ in \Rstar. \\\hline
+%
+\&dimensions\_freq & & Frequency grid definition \\
+nnue = 1 & integer & Number of frequency points (only for future code updates, until now, only one frequency point implemented). \\\hline
+%
+\&input\_diff1d & & Options to set the two-stream solution method \\
+opt\_method = 4 & integer & Option to set the two-stream solution method to be compared with. \\
+& & opt\_method = 0 -- 1st order finite-volume method \\
+& & opt\_method = 1 -- 2nd order finite-volume method \\
+& & opt\_method = 2 -- 1st order finite-differences method \\
+& & opt\_method = 3 -- 2nd order finite-differences method \\
+& & opt\_method = 4 -- 1st order short-characteristics method \\
+& & opt\_method = 5 -- 2nd order short-characteristics method \\
+%
+\end{longtable}
+\end{footnotesize}
+%
+\subsubsection{Program sc1d.eo}
+The source files of this code are stored in
+\textit{cont3Dslab/src\_sc1d}. This program essentially considers the
+same input model as \textit{diff1d.eo}, however relaxing the
+two-stream approximation to investigate the effects of multiple angles
+in the RT solution scheme. Thus, the namelist file is organized as
+summarized in Table~\ref{tab:namelist_diff1d}, with additional inputs
+described in Table~\ref{tab:namelist_sc1d}.
+%
+\begin{footnotesize}
+\begin{longtable}[h]{p{0.24\linewidth}p{0.07\linewidth}p{0.69\linewidth}}
+\caption{\normalsize Input namelist for the program \textit{sc1d.eo}, additionally to the one shown in Table~\ref{tab:namelist_diff1d}.}
+\label{tab:namelist_sc1d}
+\\\hline\hline
+ Example & Data type & Description \\\hline
+\&input\_options & & Main options \\
+opt\_angint\_method = 0 & integer & Identifier to decide which angular integration method to be used (currently not used) \\
+& & opt\_angint\_method = 0 -- Simpson's rule in $\mu$. \\\hline
+%
+%
+\&dimensions\_angles & & Angular grid definition \\
+ntheta = 5 & integer & Number of $\theta$ points for the angular integration \\\hline
+\&input\_sc1d & & Options to set up the short-characteristics method \\
+opt\_method = 4 & integer & Option to set the order of the SC interpolation scheme. \\
+& & opt\_method = 4 -- 1st order short-characteristics method \\
+& & opt\_method = 5 -- 2nd order short-characteristics method \\
+%
+\end{longtable}
+\end{footnotesize}
+%
+All output data is then saved in the directory \textit{outputFILES/sc1d/},
+with plotting routines to display the data (additionally to the data
+from \textit{diff1d.eo}) in \textit{outputFILES/plot\_sc1d.pro}.
+%
+%
+%
+\subsubsection{Program sc2d.eo}
+Same as program \textit{sc1d.eo}, however solving the EQRT in two
+dimensions.  The source files of this code are stored in
+\textit{cont3Dslab/src\_sc2d}, and the namelist file is summarized (in
+addition to the input from Table~\ref{tab:namelist_sc1d}) in
+Table~\ref{tab:namelist_sc2d}.
+%
+\begin{footnotesize}
+\begin{longtable}[h]{p{0.24\linewidth}p{0.07\linewidth}p{0.69\linewidth}}
+\caption{\normalsize Input namelist for the program \textit{sc2d.eo}, additionally to the one shown in Table~\ref{tab:namelist_sc1d}.}
+\label{tab:namelist_sc2d}
+\\\hline\hline
+Example & Data type & Description \\\hline
+%
+\&dimensions\_3dx & & Dimension and definition of the computational domain ($x$-axis) \\
+nx = 51 & integer & Number of grid points. \\
+xmin = -0.25d0 & float & Minimum $x$ in \Rstar. \\
+xmax = +0.25d0 & float & Maximum  $x$ in \Rstar. \\\hline
+%
+\&input\_sc2d & & Options to set up the 2D short-characteristics method \\
+opt\_method = 4 & integer & Option to set the order of the SC interpolation scheme. \\
+& & opt\_method = 4 -- 1st order short-characteristics method \\
+& & opt\_method = 5 -- 2nd order short-characteristics method \\\hline
+%
+\&benchmark & & Options to set up benchmarking models \\
+benchmark\_mod = 0 & integer & Identifier for the benchmark model. \\
+& & benchmark\_mod = 1 -- Pseudo searchlight-beam test: iterating periodic boundary conditions. \\
+theta = 3.14 & float & $\theta$ angle for considered searchlight beam. \\
+phi = 0.d0 & float & Not used here \\
+%
+\end{longtable}
+\end{footnotesize}
+%
+All output data is then saved in the directory \textit{outputFILES/sc2d/},
+with plotting routines to display the data in \textit{outputFILES/plot\_sc2d.pro} and \textit{outputFILES/plot\_searchlight2d.pro}.
+%
+%
+%
+\subsubsection{Program sc3d.eo}
+This program calculates the radiation quantities for actual
+hydrodynamical simulations, and thus is not only meant for
+$pp$-benchmarking as the previous (1d and 2d) programs.
+As such, the indat file (see Table~\ref{tab:namelist_sc3d}) is
+organized somewhat differently.
+Further, this program always needs a model to be specified by running
+\textit{model.eo} beforehand (or by directly coupling to the hydro code).
+The source files of this code are stored in
+\textit{cont3Dslab/src\_sc3d}.
+%
+\begin{footnotesize}
+\begin{longtable}[h]{p{0.24\linewidth}p{0.07\linewidth}p{0.69\linewidth}}
+\caption{\normalsize Input namelist for the program \textit{sc3d.eo}.}
+\label{tab:namelist_sc3d}
+\\\hline\hline
+Example & Data type & Description \\\hline
+\&input\_options & & Main options \\
+opt\_ng\_cont = t & logical &  Option for switching Ng extrapolation on or off \\
+opt\_ait\_cont = f & logical &  Option for switching Aitkens extrapolation on or off\\
+opt\_alo\_cont = 1 & integer & Option for the approximate $\Lambda$ operator to be used.\\
+& & opt\_alo\_cont = 0 -- classical $\Lambda$ iteration \\
+& & opt\_alo\_cont = 1 -- ALI with diagonal ALO \\
+& & opt\_alo\_cont = 2 -- ALI with direct-neighbour ALO (7 elements) \\
+& & opt\_alo\_cont = 3 -- ALI with nearest-neighbour ALO (27 elements)  \\
+opt\_angint\_method = 0 & integer & Identifier to decide which angular integration method to be used (currently not used) \\
+& & opt\_angint\_method = 0 -- Trapezoidal rule with equidistant $\theta$, $\phi$ spacing. \\
+& & opt\_angint\_method = 1 -- Trapezoidal rule with $\theta$, $\phi$ spacing following \cite{Lobel08}. \\
+opt\_grey=2 & integer & Option to set up the frequency grid \\
+& & opt\_grey = 0 -- Perform RT according to a grid of frequencies (to be implemented) \\
+& & opt\_grey = 1 -- Perform RT at a single frequency bin \\
+& & opt\_grey = 2 -- Perform RT in grey approximation with frequency integrated variables \\
+opt\_opac=1 & integer & Define the opacity law to be used \\
+& & opt\_opac = 0  -- Use Thomson scattering opacity \\
+& & opt\_opac = 1 -- Use OPAL opacities \\
+opt\_epsc = 0 & & Define the 3D thermalization parameter \\
+& & opt\_epsc = 0 -- 3D thermalization parameter is constant and specified by input below \\
+& & opt\_epsc = 1 -- 3D thermalization parameter calculated from $(\chi_{\rm tot}-\chi_{\rm Thomson})/\chi_{\rm tot}$  \\
+opt\_gridxyz = 1 & integer & Define the grid spacing \\
+& & opt\_gridxyz = 0 -- linear spacing in $x$, $y$, $z$ \\
+& & opt\_gridxyz = 1 -- linear spacing in $x$, $y$, and logarithmic spacing in $x$ \\
+verbose = t & logical & Set to true/false to print information in the terminal during runtime \\
+\specialcell[t]{model\_dir = \\'./inputFILES} & string & Directory where the input model is stored \\
+\specialcell[t]{opal\_dir = \\ './opal\_tables'} & string & Directory where the OPAL tables are stored \\\hline
+%
+\&input\_model & & Options to set the input model \\
+input\_mod=2 & integer & Identifier to decide which model to calculate (in \textit{model.eo}) \\
+yhe = 0.98d0 & float & Helium number abundance \\
+hei = 2.d0 & float & Number of free electrons per Helium atom \\\hline
+%
+\&input\_cont & & Continuum parameters \\
+eps\_cont = 0.d0 & float & Thermalization parameter (not used if opt\_epsc neq 0)\\
+kcont = 1.d0 & float & Scaling factor for continuum opacity \\\hline
+%
+\&input\_units & & Definition of units to be used \\
+unit\_length = 1.d0 & float & Unit of length in \rsun.\\
+unit\_density = 5.d-8 & float & Unit of density in cgs.\\
+unit\_velocity = 1.d8 & float & Unit of velocity in cgs.\\
+unit\_temperature = 1.d0 & float & Unit of temperature in cgs.\\\hline
+%
+\&dimensions\_3dx & & Dimension and definition of the computational domain ($x$-axis) \\
+nx = 41 & integer & Number of grid points. \\
+xmin = -0.25d0 & float & Minimum $x$ in unit\_length (see above). \\
+xmax = 0.25d0 & float & Maximum  $x$ in unit\_length (see above). \\\hline
+%
+\&dimensions\_3dy & & Dimension and definition of the computational domain ($y$-axis) \\
+ny = 41 & integer & Number of grid points. \\
+ymin = -0.25d0 & float & Minimum $y$ in unit\_length (see above). \\
+ymax = 0.25d0 & float & Maximum  $y$ in unit\_length (see above). \\\hline
+%
+\&dimensions\_3dz & & Dimension and definition of the computational domain ($z$-axis) \\
+nz = 101 & integer & Number of grid points. \\
+zmin = 1.d0 & float & Minimum $z$ in unit\_length (see above). \\
+zmax = 10.d0 & float & Maximum  $z$ in unit\_length (see above). \\\hline
+%
+\&dimensions\_freq & & Frequency grid definition \\
+nnue = 1 & integer & Number of frequency points (only for future code updates. Thus far, only set to 1). \\
+xnue0 = 1.93798d15 & float & Frequency to be used for single-bin and non-grey RT model \\\hline
+%
+\&dimensions\_angles & & Angular grid definition \\
+ntheta = 1 & integer & Number of $\theta$ points for the angular integration for each quadrant/octant. \\\hline
+%
+\&input\_sc3d & & Options to set the solution method \\
+opt\_method = 4 & integer & Option to set the two-stream solution method to be compared with. \\
+& & opt\_method = 4 -- 1st order short-characteristics method \\
+& & opt\_method = 5 -- 2nd order short-characteristics method \\
+& & opt\_method = 6 -- 1st order long-characteristics method \\
+& & opt\_method = 7 -- 2nd order ling-characteristics method \\
+& & opt\_method = 14 -- 1st order short-characteristics method without ALI (set S=B) \\
+& & opt\_method = 15 -- 2nd order short-characteristics method without ALI (set S=B)  \\
+& & opt\_method = 16 -- 1st order long-characteristics method without ALI (set S=B)  \\
+& & opt\_method = 17 -- 2nd order ling-characteristics method without ALI (set S=B)  \\hline
+%
+\&input\_bcondition & & Options to set the inner boundary condition for the specific intensity \\
+opt\_bcondition = 0 & integer & Identifier to decide which inner boundary condition to be used \\
+& & Core intensity will be of the form $I_{\rm core} = {\rm xic1} - \mu \cdot {\rm xic2}$ \\
+& & opt\_bcondition=0 -- Use xic1 and xic2 as specified in this namelist file \\
+& & opt\_bcondition=1 -- For future code updates: ${\rm xic1} = \left(1-\epsc\right)\cdot B\left(\Trad\right) + \epsc \cdot B\left(\Tgas\right)$ and ${\rm xic2} = \dfrac{\dd B}{\chi \dd z}$ \\
+& & opt\_bcondition=1 -- Read xic1 and xic2 from user specified routine (not implemented yet) \\
+xic1\_nue = 1.35d17 & float & xic1 parameter \\
+xic2\_nue = -6.5395257d15 & float & xic2 parameter \\\hline
+%
+\&benchmark & & Options to set up benchmarking models \\
+benchmark\_mod = 0 & integer & Identifier for the benchmark model. \\
+& & benchmark\_mod = 1 -- Pseudo searchlight-beam test: iterating periodic boundary conditions. \\
+theta = 3.14 & float & $\theta$ angle for considered searchlight beam. \\
+phi = 0.d0 & float & $\phi$ angle for considered searchlight beam. \\
+%
+\end{longtable}
+\end{footnotesize}
+%
+All output data is then saved in the directory \textit{outputFILES/sc3d/},
+with plotting routines to display the data in
+\textit{outputFILES/plot\_sc3d.pro} and
+\textit{outputFILES/plot\_searchlight3d.pro} for pp test problems, and
+in \textit{plotFILES/sc3d.py} otherwise.
+%
+%
+%
+\subsection{Organization of directories}
+In the following, we briefly summarize the organization of all directories and subdirectories.
+
+\begin{forest}
+  [line3D/ \qquad -- all files for star-in-a-box simulations
+    [in\_alpha.dat \qquad -- inclination angles for line-profile calculations]
+    [in\_gamma.dat \qquad -- phase angles for line-profile calculations]
+    [in\_linelist.dat \qquad -- linelist for line-profile calculations]
+    [documentation/ \qquad -- documentation files]
+    [indatFILES/ \qquad -- example namelist files]
+    [inputFILES/ \qquad -- default folder where models from \textit{model.eo} are stored]
+    [lte\_tables/ \qquad -- default folder where tables for LTE level populations are stored]
+    [models/ \qquad -- default folder where hydrodynamic simulations can be stored]
+    [modules/ \qquad -- module files from compilation]
+    [objects/ \qquad -- object files from compilation]
+    [onightFILES/ \qquad -- example scripts for running a grid of models (`over night')]
+    [opal\_tables/ \qquad -- opacity tables from the OPAL project (\citealt{iglesias96})]
+    [outputFILES/ \qquad -- default folder where all output is stored]
+    [outputFILES\_TEMP/ \qquad -- default folder for temporary output]
+    [outputFILES\_TEST/ \qquad -- default folder for benchmark models]
+    [phot\_flux/ \qquad -- default folder for photospheric line profiles
+      [blend/ \qquad -- \Ha~line profiles and continuum levels from A. Herrero including He blend]
+      [sym/ \qquad -- \Ha~line profiles and continuum levels from A. Herrero excluding He blend]
+      [s\_coelho05/ \qquad -- \cite{Coelho2005} line profiles (not uploaded to github due to storage limits)]
+      [s\_coelho14\_hrplc/ \qquad \cite{Coelho2014} line profiles (not uploaded to github due to storage limits)]
+      [s\_coelho14\_sed/ \qquad \cite{Coelho2014} SEDs  (not uploaded to github due to storage limits)]
+    ]
+    [plotFILES/ \qquad -- plotting routines and libraries
+      [ps\_files/ \qquad -- default folder for saving ps/png files]
+      [animation\_files/ \qquad -- default folder for saving gif files]
+    ]
+    [src/ \qquad -- source codes for general modules and routines]
+    [src\_lte/ \qquad -- source code for communication between RT and LTE routines
+      [for\_levin \qquad -- source code for calculating LTE level populations (\citealt{Poniatowski2022})]
+    ]
+    [src\_model/ \qquad -- source code for setting up a general single-star model (\textit{model.eo})]
+    [src\_modelspec/ \qquad -- source code for setting up the model for line-profile calculations (\textit{modelspec.eo})]
+    [src\_modelspec\_vbin/ \qquad -- source code for setting up the model for line-profile calculations of binary systems (\textit{modelspec\_vbin.eo})]
+    [src\_opal/ \qquad --  -- source code for reading OPAL opacities]
+    [src\_photprof/ \qquad -- source code for reading photospheric line profiles]
+    [src\_sc3d/ \qquad --  -- source code for the short-characteristics solution and ALI scheme (\textit{sc3d.eo})]
+    [src\_spec/ \qquad -- source code for calculating synthetic line profiles (\textit{spec.eo})]
+    [src\_spec\_vbin/ \qquad -- source code for calculating synthetic line profiles of binary systems (\textit{spec\_vbin.eo})]    
+    ]
+\end{forest}
 
 
 \section{Getting started}
@@ -1002,7 +1428,7 @@ Depending on the code modules you are using, we would kindly ask you to cite one
 \item For the ALI scheme using the short-characteristics method, please cite \cite{Hennicker2020}.
 \item For the formal solution calculating emergent flux profiles or surface brightnesses of single stars, please cite \cite{Hennicker2018} and/or \cite{Hennicker2021}.
 \item For the formal solution calculating emergent flux profiles or surface brightnesses of binary systems, please cite \cite{Hennicker2021}.
-\item For LTE tabulations of occupation numbers, please cite \cite{Poniatowski2021} (ToDo Luka).
+\item For LTE tabulations of occupation numbers, please cite \cite{Poniatowski2022}.
 \end{itemize}
 Thank you very much. \\
 For further reading on the ALI method, we refer to \cite{Hennicker2020b}.

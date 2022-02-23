@@ -1,3 +1,5 @@
+----------------------Cis's O-dwarf LDI simulations-----------------------------
+
 &input_options
 input_mod=2
 input_file='outputFILES/spc/modspec_model00.h5'

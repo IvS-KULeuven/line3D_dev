@@ -1,3 +1,5 @@
+----------------------short-characteristics for Florians LDI sims (2D)----------
+
 &input_options
 model_dir = 'inputFILES'                     ! Name of the output directory 
 output_file = 'output_model00.h5'  ! name of the output model file 

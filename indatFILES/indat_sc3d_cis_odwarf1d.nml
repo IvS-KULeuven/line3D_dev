@@ -1,3 +1,5 @@
+---------------------short characteristics for Cis's LDI sims (1D mapping)------
+
 &input_options
 model_dir = 'inputFILES'
 output_file = 'output_model00.h5'

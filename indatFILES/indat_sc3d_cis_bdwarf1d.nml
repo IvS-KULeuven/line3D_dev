@@ -1,3 +1,5 @@
+---------------------short characteristics for Cis's B-dwarf models (1d mapping)---------
+
 &input_options
 model_dir = 'inputFILES'
 output_file = 'output_model00.h5'

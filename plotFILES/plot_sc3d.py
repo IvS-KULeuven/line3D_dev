@@ -17,7 +17,7 @@ from lev_contour import *
    
 def main(fname='../outputFILES/output_model00.h5', oname='./ps_files/sc3d', windx=1):
 #
-#plots contours of searchlight along a direction
+#plots conergence behaviour of ALI method and source functions
 #
 #------------------read all information from hdf5-file------------------
 #
@@ -179,10 +179,11 @@ def main(fname='../outputFILES/output_model00.h5', oname='./ps_files/sc3d', wind
       xmin=0.
       xmax=1
    else:
+      xmax = np.max(xmax)      
       ymin = epsmaxc_arr[xmax]
       ymax=np.max(epsmaxc_arr)
       xmin = 0.
-      xmax = np.max(xmax)
+
    ylim=[ymin,ymax]
    xlim=[xmin,xmax]
    ax0[1,0].set_xlabel(r'# iterations')
@@ -200,10 +201,10 @@ def main(fname='../outputFILES/output_model00.h5', oname='./ps_files/sc3d', wind
       xmin=0.
       xmax=1
    else:
+      xmax = np.max(xmax)      
       ymin = np.min(epsmaxl_arr[xmax])
       ymax=np.max(epsmaxl_arr)
       xmin = 0.
-      xmax = np.max(xmax)
    ylim=[ymin,ymax]
    xlim=[xmin,xmax]
    ax0[1,1].set_xlabel(r'# iterations')
@@ -252,6 +253,7 @@ fname2='../inputFILES/model3d.h5'
 
 fname='../outputFILES/output_model00.h5'
 fname='../outputFILES/test_js_lh/output_model00.h5'
+fname='../outputFILES/ablation/output_model00.h5'
 
 windx = 1
 main(fname=fname,windx=windx)

@@ -1,3 +1,5 @@
+---------------------short characteristics for Christi's magnetic models-----------------
+
 &input_options
 model_dir = 'inputFILES'
 output_file = 'output_model00.h5'

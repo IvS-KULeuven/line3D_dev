@@ -57,7 +57,11 @@ def main(fnames=['../outputFILES/FLUXEM_00001.dat'], xlim=[1.2,-1.2], xlim_wave=
 
    if llegend:
       ax1.legend(ncol=2)
-      ax2.legend(ncol=2)   
+      ax2.legend(ncol=2)
+
+
+   #add a line at 50 km/s
+   ax1.plot([-50.,-50.],ylim, color='black')
 #
    oname1 = oname+'.png'
    oname2 = oname+'.ps'
@@ -160,6 +164,9 @@ base_dir2 = 'test2/'
 base_dir3 = 'photprof0_sline0_vmicro20_kline1d0_ecc0_single/'
 fnames=['../outputFILES/models_olivier/'+base_dir1+'FLUXEM_00001.dat',
         '../outputFILES/models_olivier/'+base_dir2+'FLUXEM_00001.dat',
+        '../outputFILES/models_olivier/'+base_dir3+'phase019/FLUXEM_00001.dat']
+
+fnames=['../outputFILES/models_olivier/'+base_dir2+'FLUXEM_00001.dat',
         '../outputFILES/models_olivier/'+base_dir3+'phase019/FLUXEM_00001.dat']
 
 

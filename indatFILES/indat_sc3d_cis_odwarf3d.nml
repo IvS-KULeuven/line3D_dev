@@ -1,3 +1,5 @@
+----------------------short characteristics for Cis's O-dwarf LDI simulations (3d mapping)----------------
+
 &input_options
 model_dir = 'inputFILES'
 output_file = 'output_model00.h5'
