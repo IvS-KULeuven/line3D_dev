@@ -35,7 +35,7 @@
 %the second language defines main language used for contents and bibliography
 \usepackage[ngerman,english]{babel}
 \usepackage[T1]{fontenc}
-
+\usepackage{xcolor}
 
 
 \usepackage[tableposition=t]{caption}
@@ -279,10 +279,12 @@ The code requires the following packages:
 \subsection{Getting the code}
 You can get the code from github:
 \begin{itemize}
-\item Global star-in-a-box simulations:\\
-  git clone https://github.com/levin-h/line3D
-\item Local box-in-a-star simulations:\\
-  git clone https://github.com/levin-h/cont3Dslab
+  \item Develpopment version of Global star-in-a-box simulations:\\
+    \verb|    git clone https://github.com/IvS-KULeuven/line3D_dev|
+  \item Global star-in-a-box simulations:\\
+    \verb|    git clone https://github.com/levin-h/line3D|
+  \item Local box-in-a-star simulations:\\
+    \verb|    git clone https://github.com/levin-h/cont3Dslab|
 \end{itemize}
 %
 %
@@ -296,47 +298,65 @@ I recommend to create a local build for your HDF5 libraries. To this end, please
 \paragraph{UNIX systems}
 \begin{enumerate}
 \item Download the package \textbf{hdf5-1.10.6.tar.gz}, unzip it, and change to the corresponding folder: \\
-  tar -zxvf hdf5-1.10.6.tar.gz\\
-  cd hdf5-1.10.6
+  \verb|    tar -zxvf hdf5-1.10.6.tar.gz|\\
+  \verb|    cd hdf5-1.10.6|
 \item Export some required environment variables:\\
     \begin{tabular}{ll}
       \textbf{gfortran}  & \textbf{ifort} \\
-      export FC=gfortran & export FC=ifort \\
-      export CC=gcc & export CC=icc \\
-      export F9X=gfortran & export F9X=ifort \\
-      export CXX=g++ & export CXX=icpc
+      \verb|export FC=gfortran| & \verb|export FC=ifort| \\
+      \verb|export CC=gcc| & export \verb|CC=icc| \\
+      \verb|export F9X=gfortran| & \verb|export F9X=ifort| \\
+      \verb|export CXX=g++| & \verb|export CXX=icpc|
     \end{tabular}
-\item Configure your installation with a local path where you want to install the package (\eg~\$HOME/hdf5\_gfortran\_build):\\
-  ./configure -{}-prefix=\$HOME/hdf5\_gfortran\_build -{}-enable-fortran (and if required -{}-enable-cxx)
+\item Configure your installation with a local path where you want to install the package (\eg~\verb|.../hdf5_lib|):\\
+  \verb| ./configure --prefix=.../hdf5_lib --enable-fortran| (and if required \verb|--enable-cxx|)
 \item Installation \\
-  make (and watch for fatal errors)\\
-  make check   (and verify that all tests return a `pass') \\
-  make install
-\item Include the library path in the Makefile of the main code (\eg~line3D/Makefile)
+  \verb|    make|\\ 
+   watch for fatal errors\\
+  \verb|    make check|\\
+  verify that all tests return a `pass' \\
+  \verb|    make install|\\
+   all done
+\item Include the library path in the Makefile of the main code (\eg~\verb|line3D/Makefile|)
 \item Update your .bashrc file to add the library path to your LD environment variable, and define a new environment variable that will be used in the Makefiles:\\
-    HDF5\_PATH=\$HOME/hdf5\_gfortran\_build/hdf5\_lib/lib \\
-    LD\_LIBRARY\_PATH=\$LD\_LIBRARY\_PATH:\$ADD\_LIB\_PATH \\
-    export LD\_LIBRARY\_PATH \\
-    \\
-    DIR\_HDF5=\$HOME/hdf5\_gfortran\_build/hdf5\_lib \\
-    export DIR\_HDF5    
+  \begin{verbatim}
+    HDF5_PATH=<.../hdf5_lib/lib>
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ADD_LIB_PATH|
+    export LD_LIBRARY_PATH
+
+    LIB_HDF5=<.../hdf5_lib>
+    export LIB_HDF5
+    COMPILER=<.../gfortran>
+    export COMPILER
+  \end{verbatim}
+    % {\color{red} NOTE. This commants may need to be modified for the new MACs with M1 chip (see instalation instractions below)}
 \end{enumerate}
 
 \paragraph{MAC}
 On the MAC, the installation is essentially performed the same way. For the gfortran compiler, you might need
 \begin{enumerate}
-\item Install the CommandLineTools
-\item Install homebrew:\\
-  mkdir homebrew \&\& curl -L https://github.com/Homebrew/brew/tarball/master | tar xz -{}-strip 1 -C homebrew \\
-  eval "\$(homebrew/bin/brew shellenv)" \\
-  brew update -{}-force -{}-quiet \\
-  chmod -R go-w "\$(brew -{}-prefix)/share/zsh"  \\
-  export PATH=\$HOME/homebrew/bin:\$PATH
+\item Install the CommandLineTools \\
+  \verb|    xcode-select --install|
+\item Install homebrew \href{https://docs.brew.sh/Installation}{https://docs.brew.sh/Installation}:\\
+  \begin{verbatim}
+    mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master \
+    | tar xz --strip 1 -C homebrew 
+
+    eval "$(homebrew/bin/brew shellenv)"
+    brew update --force --quiet
+    chmod -R go-w "$(brew --prefix)/share/zsh"
+    export PATH=\$HOME/homebrew/bin:\$PATH
+  \end{verbatim}
 \item Install gfortran:\\
-  brew install gcc
+  \verb|    brew install gcc|
 \item Install HDF5 as for UNIX systems. When updating the Makefile of
-  the main code (\eg~line3D/Makefile), replace all *.so libraries with
-  the MAC *.dylib extension (depending on the version of the Makefile, not required anymore).
+  the main code (\eg~\verb|line3D/Makefile|), replace all *.so libraries with
+  the MAC *.dylib extension (depending on the version of the Makefile, not required anymore).\\
+  {\color{red} NOTE. For new MAC on M1 chip gfortran provided by Xcode and by Homebrow are incompatible.
+  As such HDF5 should be compiled with the same fortran compiler as the main code will be.
+  Best will be si install HDF5 library from Homebrew 
+  \\
+  \verb|    brew install hdf5|}
 \end{enumerate}
 
 \subsection{Importing the plotting routines}

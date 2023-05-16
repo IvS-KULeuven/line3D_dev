@@ -1,0 +1,71 @@
+\begin{thebibliography}{12}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[{{Coelho} {{et~al.}}(2005){Coelho}, {Barbuy}, {Mel{\'e}ndez},
+  {Schiavon}, \& {Castilho}}]{Coelho2005}
+{Coelho}, P., {Barbuy}, B., {Mel{\'e}ndez}, J., {Schiavon}, R.~P., \&
+  {Castilho}, B.~V. 2005: \textit{{A library of high resolution synthetic
+  stellar spectra from 300 nm to 1.8 {\ensuremath{\mu}}m with solar and
+  {\ensuremath{\alpha}}-enhanced composition}}, \aap, 443, 735
+
+\bibitem[{{Coelho}(2014)}]{Coelho2014}
+{Coelho}, P.~R.~T. 2014: \textit{{A new library of theoretical stellar spectra
+  with scaled-solar and {\ensuremath{\alpha}}-enhanced mixtures}}, \mnras, 440,
+  1027
+
+\bibitem[{{Hamann}(1980)}]{Hamann80}
+{Hamann}, W.-R. 1980: \textit{{The expanding envelope of Zeta Puppis - A
+  detailed UV-line fit}}, \aap, 84, 342
+
+\bibitem[{{Hennicker}(2020)}]{Hennicker2020b}
+{Hennicker}, L. 2020: \textit{{3D radiative transfer – continuum and line
+  formation in hot star winds}}, PhD thesis, Ludwig-Maximilians-Universit\"at
+  M\"unchen
+
+\bibitem[{{Hennicker} {{et~al.}}(2021){Hennicker}, {Kee}, {Shenar},
+  {Bodensteiner}, {Abdul-Masih}, {El Mellah}, {Sana}, \&
+  {Sundqvist}}]{Hennicker2021}
+{Hennicker}, L., {Kee}, N.~D., {Shenar}, T., {Bodensteiner}, J., {Abdul-Masih},
+  M., {El Mellah}, I., {Sana}, H., \& {Sundqvist}, J.~O. 2021:
+  \textit{{Binary-object spectral-synthesis in 3D (BOSS-3D) -- Modelling
+  H-alpha emission in the enigmatic multiple system LB-1}}, arXiv e-prints,
+  arXiv:2111.15345
+
+\bibitem[{{Hennicker} {{et~al.}}(2018){Hennicker}, {Puls}, {Kee}, \&
+  {Sundqvist}}]{Hennicker2018}
+{Hennicker}, L., {Puls}, J., {Kee}, N.~D., \& {Sundqvist}, J.~O. 2018:
+  \textit{{3D radiative transfer: Continuum and line scattering in
+  non-spherical winds from OB stars}}, \aap, 616, A140
+
+\bibitem[{{Hennicker} {{et~al.}}(2020){Hennicker}, {Puls}, {Kee}, \&
+  {Sundqvist}}]{Hennicker2020}
+{Hennicker}, L., {Puls}, J., {Kee}, N.~D., \& {Sundqvist}, J.~O. 2020:
+  \textit{{A 3D short-characteristics method for continuum and line scattering
+  problems in the winds of hot stars}}, \aap, 633, A16
+
+\bibitem[{{Iglesias} \& {Rogers}(1996)}]{iglesias96}
+{Iglesias}, C.~A. \& {Rogers}, F.~J. 1996: \textit{{Updated Opal Opacities}},
+  \apj, 464, 943
+
+\bibitem[{Joe(1991)}]{Joe1991}
+Joe, B. 1991: \textit{GEOMPACK — a software package for the generation of
+  meshes using geometric algorithms}, Advances in Engineering Software and
+  Workstations, 13, 325
+
+\bibitem[{{Lobel} \& {Blomme}(2008)}]{Lobel08}
+{Lobel}, A. \& {Blomme}, R. 2008: \textit{{Modeling Ultraviolet Wind Line
+  Variability in Massive Hot Stars}}, \apj, 678, 408
+
+\bibitem[{{Poniatowski} {{et~al.}}(2022){Poniatowski}, {Kee}, {Sundqvist},
+  {Driessen}, {Owocki}, {Gayley}, {Decin}, {de Koter}, \&
+  {Sana}}]{Poniatowski2022}
+{Poniatowski}, L.~G., {Kee}, N.~D., {Sundqvist}, J.~O., {Driessen}, F.~A.,
+  {Owocki}, S.~P., {Gayley}, K.~G., {Decin}, L., {de Koter}, A., \& {Sana}, H.
+  2022: \textit{{Method and new tabulations for flux-weighted line-opacity and
+  radiation line-force in supersonic media}}, \aap, submitted
+
+\bibitem[{{von Zeipel}(1924)}]{Zeipel24}
+{von Zeipel}, H. 1924: \textit{{The radiative equilibrium of a rotating system
+  of gaseous masses}}, \mnras, 84, 665
+
+\end{thebibliography}
