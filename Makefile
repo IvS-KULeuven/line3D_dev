@@ -1,33 +1,18 @@
-# make all: compiles all
-# clean: removes all .o and .mod files, all ~files etc.
-# cleanall: removes also .eo files
-
-
-#COMMENTS BEGIN
-#NOTE: SINCE /usr/include/hdf5.mod WAS COMPILED WITH GFORTRAN, IFORT NEEDS A LOCAL LIBRARY!!!!
-#FURTHER, NEED TO EXPORT LIBRARY PATH THE LIBRARY PATH:
-#ADD_LIB_PATH=/home/moon/levin/lib64
-#LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$NEW_LIB_PATH"
-#export LD_LIBRARY_PATH
-#COMMENTS END
-
-.SUFFIXES: .f90
-
-
-#################USER INPUT: CHOOSE COMPILER AND DEBUG OPTION############
-
-#for now in shell script
-COMPILER = gfortran
-#COMPILER = ifort
-#COMPILER = mpif90
-
-#DEBUG = true
+# MakeFile written by Luka Poniatowski 
+# for line 3D based on Levin Heneckers original script
 
 ###########################HDF5 ENVIRONMENT VARIABLE#####################
 
-ifndef DIR_HDF5
-   $(info DIR_HDF5  Not found)
-   $(error Undefined variable DIR_HDF5: export DIR_HDF5=<location of hdf5 lib>)
+ifndef LIB_HDF5
+   $(info LIB_HDF5 Not found)
+   $(error Undefined variable LIB_HDF5: export LIB_HDF5=<location of hdf5 lib>)
+endif
+
+#########################COMPILER ENVIRONMENT VARIABLE###################
+
+ifndef COMPILER
+   $(info COMPILER  Not defined)
+   $(error Please define environment variable COMPILER: export COMPILER=<location of sutable compiler>)
 endif
 
 #########################################################################
@@ -39,32 +24,32 @@ UNAME := $(shell uname)
 
 #####################GFORTRAN COMPILER OPTIONS ETC#######################
 
-ifeq ($(COMPILER),gfortran)
-   F90 = gfortran
-   LD = gfortran
+ifneq (,$(findstring gfortran,$(COMPILER)))
+   F90 = COMPILER
+   LD = COMPILER
 
    ifeq ($(UNAME), Linux)
       $(info OS detected: Linux)
-      DIR_MOD_HDF5=$(DIR_HDF5)/include
-      DIR_LIB_HDF5=$(DIR_HDF5)/lib                      \
-                   $(DIR_HDF5)/lib/libhdf5_fortran.so   \
-                   $(DIR_HDF5)/lib/libhdf5.so           \
-                   $(DIR_HDF5)/lib/libhdf5_hl.so        \
-                   $(DIR_HDF5)/lib/libhdf5hl_fortran.so
+      DIR_MOD_HDF5=$(LIB_HDF5)/include
+      DIR_LIB_HDF5=$(LIB_HDF5)/lib                      \
+                   $(LIB_HDF5)/lib/libhdf5_fortran.so   \
+                   $(LIB_HDF5)/lib/libhdf5.so           \
+                   $(LIB_HDF5)/lib/libhdf5_hl.so        \
+                   $(LIB_HDF5)/lib/libhdf5hl_fortran.so
    else ifeq ($(UNAME), Darwin)
       $(info OS detected: MAC)
-      DIR_MOD_HDF5=$(DIR_HDF5)/include
-      DIR_LIB_HDF5=$(DIR_HDF5)/lib                         \
-                   $(DIR_HDF5)/lib/libhdf5_fortran.dylib   \
-                   $(DIR_HDF5)/lib/libhdf5.dylib           \
-                   $(DIR_HDF5)/lib/libhdf5_hl.dylib        \
-                   $(DIR_HDF5)/lib/libhdf5hl_fortran.dylib
+      DIR_MOD_HDF5=$(LIB_HDF5)/include
+      DIR_LIB_HDF5=$(LIB_HDF5)/lib                         \
+                   $(LIB_HDF5)/lib/libhdf5_fortran.dylib   \
+                   $(LIB_HDF5)/lib/libhdf5.dylib           \
+                   $(LIB_HDF5)/lib/libhdf5_hl.dylib        \
+                   $(LIB_HDF5)/lib/libhdf5hl_fortran.dylib
    else
       $(error No OS detected, please have a look into the Makefile)
    endif
 
    OMP_FLAG=-fopenmp
-#
+
    ifeq ($(DEBUG),true)
       DEBUG_FLAGS = -Og -Wall -Wextra -Warray-temporaries -Wconversion -pedantic-errors -fcheck=all -fbacktrace
    else
@@ -80,33 +65,30 @@ endif
 
 #####################IFORT COMPILER OPTIONS ETC#########################
 
-ifeq ($(COMPILER),ifort)
+ifneq (,$(findstring ifort,$(COMPILER)))
 
-   F90 = ifort
-   LD = ifort
-
-
+   F90 = COMPILER
+   LD = COMPILER
 
    ifeq ($(UNAME), Linux)
       $(info OS detected: Linux)
-      DIR_MOD_HDF5=$(DIR_HDF5)/include
-      DIR_LIB_HDF5=$(DIR_HDF5)/lib                      \
-                   $(DIR_HDF5)/lib/libhdf5_fortran.so   \
-                   $(DIR_HDF5)/lib/libhdf5.so           \
-                   $(DIR_HDF5)/lib/libhdf5_hl.so        \
-                   $(DIR_HDF5)/lib/libhdf5hl_fortran.so
+      DIR_MOD_HDF5=$(LIB_HDF5)/include
+      DIR_LIB_HDF5=$(LIB_HDF5)/lib                      \
+                   $(LIB_HDF5)/lib/libhdf5_fortran.so   \
+                   $(LIB_HDF5)/lib/libhdf5.so           \
+                   $(LIB_HDF5)/lib/libhdf5_hl.so        \
+                   $(LIB_HDF5)/lib/libhdf5hl_fortran.so
    else ifeq ($(UNAME), Darwin)
       $(info OS detected: MAC)
-      DIR_MOD_HDF5=$(DIR_HDF5)/include
-      DIR_LIB_HDF5=$(DIR_HDF5)/lib                         \
-                   $(DIR_HDF5)/lib/libhdf5_fortran.dylib   \
-                   $(DIR_HDF5)/lib/libhdf5.dylib           \
-                   $(DIR_HDF5)/lib/libhdf5_hl.dylib        \
-                   $(DIR_HDF5)/lib/libhdf5hl_fortran.dylib
+      DIR_MOD_HDF5=$(LIB_HDF5)/include
+      DIR_LIB_HDF5=$(LIB_HDF5)/lib                         \
+                   $(LIB_HDF5)/lib/libhdf5_fortran.dylib   \
+                   $(LIB_HDF5)/lib/libhdf5.dylib           \
+                   $(LIB_HDF5)/lib/libhdf5_hl.dylib        \
+                   $(LIB_HDF5)/lib/libhdf5hl_fortran.dylib
    else
       $(error No OS detected, please have a look into the Makefile)
    endif
-
 
    OMP_FLAG=-fopenmp
 
@@ -125,32 +107,33 @@ endif
 
 #####################MPIF909 COMPILER OPTIONS ETC########################
 
-ifeq ($(COMPILER),mpif90)
-   F90 = mpif90
-   LD = mpif90
+ifneq (,$(findstring mpif90,$(COMPILER)))
+
+   F90 = COMPILER
+   LD = COMPILER
 
    ifeq ($(UNAME), Linux)
       $(info OS detected: Linux)
-      DIR_MOD_HDF5=$(DIR_HDF5)/include
-      DIR_LIB_HDF5=$(DIR_HDF5)/lib                      \
-                   $(DIR_HDF5)/lib/libhdf5_fortran.so   \
-                   $(DIR_HDF5)/lib/libhdf5.so           \
-                   $(DIR_HDF5)/lib/libhdf5_hl.so        \
-                   $(DIR_HDF5)/lib/libhdf5hl_fortran.so
+      DIR_MOD_HDF5=$(LIB_HDF5)/include
+      DIR_LIB_HDF5=$(LIB_HDF5)/lib                      \
+                   $(LIB_HDF5)/lib/libhdf5_fortran.so   \
+                   $(LIB_HDF5)/lib/libhdf5.so           \
+                   $(LIB_HDF5)/lib/libhdf5_hl.so        \
+                   $(LIB_HDF5)/lib/libhdf5hl_fortran.so
    else ifeq ($(UNAME), Darwin)
       $(info OS detected: MAC)
-      DIR_MOD_HDF5=$(DIR_HDF5)/include
-      DIR_LIB_HDF5=$(DIR_HDF5)/lib                         \
-                   $(DIR_HDF5)/lib/libhdf5_fortran.dylib   \
-                   $(DIR_HDF5)/lib/libhdf5.dylib           \
-                   $(DIR_HDF5)/lib/libhdf5_hl.dylib        \
-                   $(DIR_HDF5)/lib/libhdf5hl_fortran.dylib
+      DIR_MOD_HDF5=$(LIB_HDF5)/include
+      DIR_LIB_HDF5=$(LIB_HDF5)/lib                         \
+                   $(LIB_HDF5)/lib/libhdf5_fortran.dylib   \
+                   $(LIB_HDF5)/lib/libhdf5.dylib           \
+                   $(LIB_HDF5)/lib/libhdf5_hl.dylib        \
+                   $(LIB_HDF5)/lib/libhdf5hl_fortran.dylib
    else
       $(error No OS detected, please have a look into the Makefile)
    endif
 
    OMP_FLAG=-fopenmp
-#
+
    ifeq ($(DEBUG),true)
       DEBUG_FLAGS = -Og -Wall -Wextra -Warray-temporaries -Wconversion -pedantic-errors -fcheck=all -fbacktrace
    else
@@ -219,84 +202,84 @@ DIR_MOD_LTE = modules/modules_lte
 #module files
 OBJSM_TYPE = $(DIR_OBJ)/mod_type.o
 
-OBJSM_MODEL = $(DIR_OBJ)/mod_type.o \
-              $(DIR_OBJ)/mod_sort.o \
-              $(DIR_OBJ)/mod_grid.o \
+OBJSM_MODEL = $(DIR_OBJ)/mod_type.o                   \
+              $(DIR_OBJ)/mod_sort.o                   \
+              $(DIR_OBJ)/mod_grid.o                   \
               $(DIR_OBJ)/mod_integ1d.o                \
               $(DIR_OBJ)/mod_interp1d.o               \
-              $(DIR_OBJ)/mod_interp2d.o                  \
+              $(DIR_OBJ)/mod_interp2d.o               \
               $(DIR_OBJ)/mod_interp3d.o               \
-              $(DIR_OBJ)/mod_opacities.o               \
-              $(DIR_OBJ)/mod_iline.o               \
+              $(DIR_OBJ)/mod_opacities.o              \
+              $(DIR_OBJ)/mod_iline.o                  \
               $(DIR_OBJ)/mod_amrvac_reader.o          \
-              $(DIR_OBJ_LTE)/mod_lte.o               \
+              $(DIR_OBJ_LTE)/mod_lte.o                \
               $(DIR_OBJ_MODEL)/mod_model.o
 
-OBJSM_PHOTPROF = $(DIR_OBJ)/mod_type.o                      \
-                 $(DIR_OBJ)/mod_grid.o \
-                 $(DIR_OBJ)/mod_interp1d.o               \
+OBJSM_PHOTPROF = $(DIR_OBJ)/mod_type.o                \
+                 $(DIR_OBJ)/mod_grid.o                \
+                 $(DIR_OBJ)/mod_interp1d.o            \
                  $(DIR_OBJ_PHOTPROF)/mod_photprof.o
 
-OBJSM_SC3D = $(DIR_OBJ)/mod_type.o                      \
-             $(DIR_OBJ)/mod_sort.o                      \
-             $(DIR_OBJ)/mod_grid.o \
-             $(DIR_OBJ)/mod_integ1d.o                \
-             $(DIR_OBJ)/mod_interp1d.o               \
-             $(DIR_OBJ)/mod_interp2d.o                  \
-             $(DIR_OBJ)/mod_interp3d.o               \
+OBJSM_SC3D = $(DIR_OBJ)/mod_type.o                    \
+             $(DIR_OBJ)/mod_sort.o                    \
+             $(DIR_OBJ)/mod_grid.o                    \
+             $(DIR_OBJ)/mod_integ1d.o                 \
+             $(DIR_OBJ)/mod_interp1d.o                \
+             $(DIR_OBJ)/mod_interp2d.o                \
+             $(DIR_OBJ)/mod_interp3d.o                \
              $(DIR_OBJ)/mod_opacities.o               \
-             $(DIR_OBJ)/mod_iline.o               \
-             $(DIR_OBJ_LTE)/mod_lte.o               \
+             $(DIR_OBJ)/mod_iline.o                   \
+             $(DIR_OBJ_LTE)/mod_lte.o                 \
              $(DIR_OBJ_SC3D)/mod_sc3d.o
 
-OBJSM_SPEC = $(DIR_OBJ)/mod_type.o                      \
-             $(DIR_OBJ)/mod_grid.o \
-             $(DIR_OBJ)/mod_sort.o                      \
-             $(DIR_OBJ)/mod_integ1d.o                \
-             $(DIR_OBJ)/mod_interp1d.o               \
-             $(DIR_OBJ)/mod_interp2d.o                  \
-             $(DIR_OBJ)/mod_interp3d.o               \
+OBJSM_SPEC = $(DIR_OBJ)/mod_type.o                    \
+             $(DIR_OBJ)/mod_grid.o                    \
+             $(DIR_OBJ)/mod_sort.o                    \
+             $(DIR_OBJ)/mod_integ1d.o                 \
+             $(DIR_OBJ)/mod_interp1d.o                \
+             $(DIR_OBJ)/mod_interp2d.o                \
+             $(DIR_OBJ)/mod_interp3d.o                \
              $(DIR_OBJ)/mod_opacities.o               \
-             $(DIR_OBJ)/mod_iline.o               \
-             $(DIR_OBJ_LTE)/mod_lte.o               \
-             $(DIR_OBJ_PHOTPROF)/mod_photprof.o         \
+             $(DIR_OBJ)/mod_iline.o                   \
+             $(DIR_OBJ_LTE)/mod_lte.o                 \
+             $(DIR_OBJ_PHOTPROF)/mod_photprof.o       \
              $(DIR_OBJ_SPEC)/mod_spec.o
 
-OBJSM_MODELSPEC = $(DIR_OBJ)/mod_type.o                      \
-                  $(DIR_OBJ)/mod_sort.o                      \
-                  $(DIR_OBJ)/mod_grid.o \
-                  $(DIR_OBJ)/mod_integ1d.o                \
-                  $(DIR_OBJ)/mod_interp1d.o               \
-                  $(DIR_OBJ)/mod_interp2d.o                  \
-                  $(DIR_OBJ)/mod_interp3d.o               \
-                  $(DIR_OBJ)/mod_opacities.o               \
-                  $(DIR_OBJ)/mod_iline.o               \
-                  $(DIR_OBJ_LTE)/mod_lte.o               \
+OBJSM_MODELSPEC = $(DIR_OBJ)/mod_type.o               \
+                  $(DIR_OBJ)/mod_sort.o               \
+                  $(DIR_OBJ)/mod_grid.o               \
+                  $(DIR_OBJ)/mod_integ1d.o            \
+                  $(DIR_OBJ)/mod_interp1d.o           \
+                  $(DIR_OBJ)/mod_interp2d.o           \
+                  $(DIR_OBJ)/mod_interp3d.o           \
+                  $(DIR_OBJ)/mod_opacities.o          \
+                  $(DIR_OBJ)/mod_iline.o              \
+                  $(DIR_OBJ_LTE)/mod_lte.o            \
                   $(DIR_OBJ_MODELSPEC)/mod_modelspec.o
 
-OBJSM_SPECVBIN = $(DIR_OBJ)/mod_type.o                      \
-                 $(DIR_OBJ)/mod_sort.o                      \
-                 $(DIR_OBJ)/mod_grid.o \
-                 $(DIR_OBJ)/mod_integ1d.o                \
-                 $(DIR_OBJ)/mod_interp1d.o               \
-                 $(DIR_OBJ)/mod_interp2d.o                  \
-                 $(DIR_OBJ)/mod_interp3d.o               \
-                 $(DIR_OBJ)/mod_opacities.o               \
+OBJSM_SPECVBIN = $(DIR_OBJ)/mod_type.o                \
+                 $(DIR_OBJ)/mod_sort.o                \
+                 $(DIR_OBJ)/mod_grid.o                \
+                 $(DIR_OBJ)/mod_integ1d.o             \
+                 $(DIR_OBJ)/mod_interp1d.o            \
+                 $(DIR_OBJ)/mod_interp2d.o            \
+                 $(DIR_OBJ)/mod_interp3d.o            \
+                 $(DIR_OBJ)/mod_opacities.o           \
                  $(DIR_OBJ)/mod_iline.o               \
-                 $(DIR_OBJ_LTE)/mod_lte.o               \
-                 $(DIR_OBJ_PHOTPROF)/mod_photprof.o         \
+                 $(DIR_OBJ_LTE)/mod_lte.o             \
+                 $(DIR_OBJ_PHOTPROF)/mod_photprof.o   \
                  $(DIR_OBJ_SPECVBIN)/mod_spec.o
 
-OBJSM_MODELSPECVBIN = $(DIR_OBJ)/mod_type.o                      \
-                      $(DIR_OBJ)/mod_sort.o                      \
-                      $(DIR_OBJ)/mod_grid.o \
-                      $(DIR_OBJ)/mod_integ1d.o                \
-                      $(DIR_OBJ)/mod_interp1d.o               \
-                      $(DIR_OBJ)/mod_interp2d.o                  \
-                      $(DIR_OBJ)/mod_interp3d.o               \
-                      $(DIR_OBJ)/mod_opacities.o               \
-                      $(DIR_OBJ)/mod_iline.o               \
-                      $(DIR_OBJ_LTE)/mod_lte.o               \
+OBJSM_MODELSPECVBIN = $(DIR_OBJ)/mod_type.o           \
+                      $(DIR_OBJ)/mod_sort.o           \
+                      $(DIR_OBJ)/mod_grid.o           \
+                      $(DIR_OBJ)/mod_integ1d.o        \
+                      $(DIR_OBJ)/mod_interp1d.o       \
+                      $(DIR_OBJ)/mod_interp2d.o       \
+                      $(DIR_OBJ)/mod_interp3d.o       \
+                      $(DIR_OBJ)/mod_opacities.o      \
+                      $(DIR_OBJ)/mod_iline.o          \
+                      $(DIR_OBJ_LTE)/mod_lte.o        \
                       $(DIR_OBJ_MODELSPECVBIN)/mod_modelspec.o
 
 OBJSM_OPAL = $(DIR_OBJ)/mod_type.o \
@@ -308,10 +291,10 @@ OBJSM_LTE = $(DIR_OBJ)/mod_type.o \
 ########################################################################
 
 #for creating atmospheric model as input to sc3d.eo
-OBJS1_MODEL = $(DIR_OBJ)/math.o                   \
-              $(DIR_OBJ)/eispackEV.o              \
-              $(DIR_OBJ)/model_laws.o             \
-              $(DIR_OBJ)/info_region.o                   \
+OBJS1_MODEL = $(DIR_OBJ)/math.o                         \
+              $(DIR_OBJ)/eispackEV.o                    \
+              $(DIR_OBJ)/model_laws.o                   \
+              $(DIR_OBJ)/info_region.o                  \
               $(DIR_OBJ_MODEL)/model1d.o                \
               $(DIR_OBJ_MODEL)/model2d.o                \
               $(DIR_OBJ_MODEL)/model3d.o                \

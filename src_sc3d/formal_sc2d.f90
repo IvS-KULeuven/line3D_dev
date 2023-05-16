@@ -10,121 +10,121 @@ subroutine fsc_cont2d(muindx)
 !---------------calculating intensties for given mu---------------------
 !-----------------------------------------------------------------------
 !
-use prog_type
+   use prog_type
 
-use fund_const
-use dime3d, only: ndxmax, ndzmax, ndymax, x, y, z
-use dime3d, only: int3d, opac3d, scont3d, alocont_nn3d, imask3d, imask_innreg3d
-use angles, only: nodes_mu
-use bcondition, only: xic1
-use mod_debug, only: indx1, indx2
-use mod_interp1d, only: interpol_yp, interpol_ypl, interpol_typ_quad2b, &
-                        interpol_typ_quad2b, interpol_typ_quad3b
-use mod_interp2d, only: interpol2d_4p_lin
+   use fund_const
+   use dime3d, only: ndxmax, ndzmax, ndymax, x, y, z
+   use dime3d, only: int3d, opac3d, scont3d, alocont_nn3d, imask3d, imask_innreg3d
+   use angles, only: nodes_mu
+   use bcondition, only: xic1
+   use mod_debug, only: indx1, indx2
+   use mod_interp1d, only: interpol_yp, interpol_ypl, interpol_typ_quad2b, &
+      interpol_typ_quad2b, interpol_typ_quad3b
+   use mod_interp2d, only: interpol2d_4p_lin
 !
-implicit none
+   implicit none
 !
 ! ... arguments
-integer(i4b), intent(in) :: muindx
-real(dp) :: n_x, n_z
+   integer(i4b), intent(in) :: muindx
+   real(dp) :: n_x, n_z
 !
 ! ... local scalars
-integer(i4b) :: i, j, k
-integer(i4b) :: alpha, gamma
-integer(i4b) :: startx, startz, endx, endz
-integer(i4b) :: iim2, iim1, ii, iip1
-real(dp) ::  mueff
-real(dp) :: opac_u, scont_u, dels_u, dels_xu, dels_zu, int_u, &
-            opac_d, scont_d, dels_d, dels_xd, dels_zd, &
-            opac_u1, opac_u2, scont_u1, scont_u2, &
-            opac_d1, opac_d2, scont_d1, scont_d2, &
-            opac_p, scont_p, dels_r
-real(dp) :: x_u, x_u1, x_u2, z_u, z_u1, z_u2, t_u1, t_u2, t_u, &
-            x_d, x_d1, x_d2, z_d, z_d1, z_d2, t_d1, t_d2, t_d
-real(dp) :: abs_sc, int_sc, contr_sc, alo_p, alo_u, alo_d
-real(dp) :: acoeff, bcoeff, ccoeff, dcoeff
-real(dp) :: ts1, te1, ts2, te2
+   integer(i4b) :: i, j, k
+   integer(i4b) :: alpha, gamma
+   integer(i4b) :: startx, startz, endx, endz
+   integer(i4b) :: iim2, iim1, ii, iip1
+   real(dp) ::  mueff
+   real(dp) :: opac_u, scont_u, dels_u, dels_xu, dels_zu, int_u, &
+      opac_d, scont_d, dels_d, dels_xd, dels_zd, &
+      opac_u1, opac_u2, scont_u1, scont_u2, &
+      opac_d1, opac_d2, scont_d1, scont_d2, &
+      opac_p, scont_p, dels_r
+   real(dp) :: x_u, x_u1, x_u2, z_u, z_u1, z_u2, t_u1, t_u2, t_u, &
+      x_d, x_d1, x_d2, z_d, z_d1, z_d2, t_d1, t_d2, t_d
+   real(dp) :: abs_sc, int_sc, contr_sc, alo_p, alo_u, alo_d
+   real(dp) :: acoeff, bcoeff, ccoeff, dcoeff
+   real(dp) :: ts1, te1, ts2, te2
 !
 ! ... for debugging
 !
 ! ... local arrays
 !
 ! ... local functions
-real(dp) :: dist_sphere
+   real(dp) :: dist_sphere
 !
 ! ... local characters
-character(len=50) :: enter
+   character(len=50) :: enter
 !
 ! ... local logicals
 !
-n_x=sqrt(1.d0 - nodes_mu(muindx)*nodes_mu(muindx))
-n_z=nodes_mu(muindx)
+   n_x=sqrt(1.d0 - nodes_mu(muindx)*nodes_mu(muindx))
+   n_z=nodes_mu(muindx)
 !
 !-----------------------------------------------------------------------
 !
 !set directional index-parameter (phantom points are excluded from calculation)
 !
 !index parameter:
-!         if n_x >= 0                 if n_x < 0                
-!                startx = 2                  startx = ndxmax-1  
-!                endx = ndxmax-1             endx = 2           
-!                alpha=  1                   alpha=-1                  
+!         if n_x >= 0                 if n_x < 0
+!                startx = 2                  startx = ndxmax-1
+!                endx = ndxmax-1             endx = 2
+!                alpha=  1                   alpha=-1
 !
-!         if n_z >= 0                 if n_z < 0                
-!                startz = 2                  startz = ndzmax-1  
-!                endz = ndzmax-1             endz = 2           
+!         if n_z >= 0                 if n_z < 0
+!                startz = 2                  startz = ndzmax-1
+!                endz = ndzmax-1             endz = 2
 !                gamma = 1                   gamma = -1
 !
 !could make an own array for this!!!
-if(n_x.gt.0.d0) then
-   startx = 3
-   endx = ndxmax-1
-   alpha=  1
-elseif(n_x.lt.0.d0) then
-   startx = ndxmax-2
-   endx = 2
-   alpha=-1
-else
-   stop 'error in fsc_cont2d: n_x = 0 not allowed'
-endif
+   if(n_x.gt.0.d0) then
+      startx = 3
+      endx = ndxmax-1
+      alpha=  1
+   elseif(n_x.lt.0.d0) then
+      startx = ndxmax-2
+      endx = 2
+      alpha=-1
+   else
+      stop 'error in fsc_cont2d: n_x = 0 not allowed'
+   endif
 !
-if(n_z.gt.0.d0) then
-   startz = 3
-   endz = ndzmax-1
-   gamma=  1
-elseif(n_z.lt.0.d0) then
-   startz = ndzmax-2
-   endz = 2
-   gamma=-1
-else
-   stop 'error in fsc_cont2d: n_z = 0 not allowed'
-endif
+   if(n_z.gt.0.d0) then
+      startz = 3
+      endz = ndzmax-1
+      gamma=  1
+   elseif(n_z.lt.0.d0) then
+      startz = ndzmax-2
+      endz = 2
+      gamma=-1
+   else
+      stop 'error in fsc_cont2d: n_z = 0 not allowed'
+   endif
 !
 !-----------------------reset the intensities---------------------------
 !
 !call cpu_time(ts1)
-call set_boundary2d(muindx)
+   call set_boundary2d(muindx)
 !call cpu_time(te1)
 !
 !-----------------------------------------------------------------------
 !
-alocont_nn3d=0.d0
+   alocont_nn3d=0.d0
 !
 !-----------------------------------------------------------------------
 !
-j=ndymax/2+1
+   j=ndymax/2+1
 
 !call cpu_time(ts2)
 !
-do k=startz, endz, gamma
-   do i=startx, endx, alpha
+   do k=startz, endz, gamma
+      do i=startx, endx, alpha
 
-      select case(imask3d(i,j,k))
+         select case(imask3d(i,j,k))
 
 !
 !*************************standard rt procedure*************************
 !
-         case(1)
+          case(1)
 !
 !calculate distance to intersection point with upwind x-grid-coordinate
             dels_xu=(x(i)-x(i-alpha))/n_x
@@ -153,7 +153,7 @@ do k=startz, endz, gamma
 !               scont_u = interpol_typ_quad3b(scont3d(i-alpha,j,k-2*gamma), scont3d(i-alpha,j,k-gamma), scont3d(i-alpha,j,k), &
 !                                             z(k-2*gamma), z(k-gamma), z(k), z_u)
                int_u = interpol_typ_quad2b(int3d(i-alpha,j,k-2*gamma), int3d(i-alpha,j,k-gamma), &
-                                             int3d(i-alpha,j,k), z(k-2*gamma), z(k-gamma), z(k), z_u)
+                  int3d(i-alpha,j,k), z(k-2*gamma), z(k-gamma), z(k), z_u)
                scont_u = interpol_yp(z(k), z(k-gamma), scont3d(i-alpha,j,k), scont3d(i-alpha,j,k-gamma), z_u)
 !               int_u = interpol_yp(z(k), z(k-gamma), int3d(i-alpha,j,k), int3d(i-alpha,j,k-gamma), z_u)
             else
@@ -165,7 +165,7 @@ do k=startz, endz, gamma
 !               scont_u = interpol_typ_quad3b(scont3d(i-2*alpha,j,k-gamma), scont3d(i-alpha,j,k-gamma), scont3d(i,j,k-gamma), &
 !                                             x(i-2*alpha), x(i-alpha), x(i), x_u)
                int_u = interpol_typ_quad2b(int3d(i-2*alpha,j,k-gamma), int3d(i-alpha,j,k-gamma), &
-                                           int3d(i,j,k-gamma), x(i-2*alpha), x(i-alpha), x(i), x_u)
+                  int3d(i,j,k-gamma), x(i-2*alpha), x(i-alpha), x(i), x_u)
                scont_u = interpol_yp(x(i), x(i-alpha), scont3d(i,j,k-gamma), scont3d(i-alpha,j,k-gamma), x_u)
 !               int_u = interpol_yp(x(i), x(i-alpha), int3d(i,j,k-gamma), int3d(i-alpha,j,k-gamma), x_u)
             endif
@@ -194,7 +194,7 @@ do k=startz, endz, gamma
 !-----------------------radiative transfer------------------------------
 !
             call fsc_cont(int_u, opac_u, opac_p, opac_d, scont_u, scont_p, scont_d, &
-                            dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_p, alo_u, alo_d)
+               dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_p, alo_u, alo_d)
 !            call fsc_cont_lin(int_u, opac_u, opac_p, opac_d, scont_u, scont_p, scont_d, &
 !                                dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_u, alo_p)
             int3d(i,j,k) = int_sc
@@ -202,7 +202,7 @@ do k=startz, endz, gamma
 !
 !***********special treatment: point is in vicinity of boundary*********
 !
-         case(2)
+          case(2)
 !
 !calculate distance to intersection point with upwind x-grid-coordinate
             dels_xu=(x(i)-x(i-alpha))/n_x
@@ -242,8 +242,8 @@ do k=startz, endz, gamma
 !               scont_u = acoeff*scont3d(i-alpha,j,k-gamma) + bcoeff*scont3d(i,j,k-gamma) + &
 !                         ccoeff*scont3d(i-alpha,j,k) + dcoeff*scont3d(i,j,k)
                opac_u = interpol2d_4p_lin(opac3d(i-alpha,j,k-gamma), opac3d(i,j,k-gamma), &
-                                        opac3d(i-alpha,j,k), opac3d(i,j,k), &
-                                        x(i-alpha), x(i), z(k-gamma), z(k), x_u, z_u)
+                  opac3d(i-alpha,j,k), opac3d(i,j,k), &
+                  x(i-alpha), x(i), z(k-gamma), z(k), x_u, z_u)
             elseif(dels_xu.eq.dels_u) then
 !               indx2=indx2+1
 !upwind point intersects on z-level
@@ -254,7 +254,7 @@ do k=startz, endz, gamma
 !               scont_u = interpol_typ_quad3b(scont3d(i-alpha,j,k-2*gamma), scont3d(i-alpha,j,k-gamma), scont3d(i-alpha,j,k), &
 !                                             z(k-2*gamma), z(k-gamma), z(k), z_u)
                int_u = interpol_typ_quad2b(int3d(i-alpha,j,k-2*gamma), int3d(i-alpha,j,k-gamma), &
-                                             int3d(i-alpha,j,k), z(k-2*gamma), z(k-gamma), z(k), z_u)
+                  int3d(i-alpha,j,k), z(k-2*gamma), z(k-gamma), z(k), z_u)
                scont_u = interpol_yp(z(k), z(k-gamma), scont3d(i-alpha,j,k), scont3d(i-alpha,j,k-gamma), z_u)
 !               int_u = interpol_yp(z(k), z(k-gamma), int3d(i-alpha,j,k), int3d(i-alpha,j,k-gamma), z_u)
                dcoeff=0.d0
@@ -291,7 +291,7 @@ do k=startz, endz, gamma
 !               scont_u = interpol_typ_quad3b(scont3d(i-2*alpha,j,k-gamma), scont3d(i-alpha,j,k-gamma), scont3d(i,j,k-gamma), &
 !                                             x(i-2*alpha), x(i-alpha), x(i), x_u)
                int_u = interpol_typ_quad2b(int3d(i-2*alpha,j,k-gamma), int3d(i-alpha,j,k-gamma), &
-                                           int3d(i,j,k-gamma), x(i-2*alpha), x(i-alpha), x(i), x_u)
+                  int3d(i,j,k-gamma), x(i-2*alpha), x(i-alpha), x(i), x_u)
                scont_u = interpol_yp(x(i), x(i-alpha), scont3d(i,j,k-gamma), scont3d(i-alpha,j,k-gamma), x_u)
 !               int_u = interpol_yp(x(i), x(i-alpha), int3d(i,j,k-gamma), int3d(i-alpha,j,k-gamma), x_u)
                dcoeff=0.d0
@@ -343,7 +343,7 @@ do k=startz, endz, gamma
 !-----------------------radiative transfer------------------------------
 !
             call fsc_cont(int_u, opac_u, opac_p, opac_d, scont_u, scont_p, scont_d, &
-                            dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_p, alo_u, alo_d)
+               dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_p, alo_u, alo_d)
 !            call fsc_cont_lin(int_u, opac_u, opac_p, opac_d, scont_u, scont_p, scont_d, &
 !                                dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_u, alo_p)
             int3d(i,j,k) = int_sc
@@ -352,7 +352,7 @@ do k=startz, endz, gamma
 !----------------------point lies directly on boundary------------------
 !***********special treatment: point lies directly on boundary**********
 !
-         case(3)
+          case(3)
             mueff=n_x*x(i)+n_z*z(k)
             if(mueff.ge.0.d0) then
                int3d(i,j,k)=xic1
@@ -387,7 +387,7 @@ do k=startz, endz, gamma
 !                  scont_u = interpol_typ_quad3b(scont3d(i-alpha,j,k-2*gamma), scont3d(i-alpha,j,k-gamma), scont3d(i-alpha,j,k), &
 !                                                z(k-2*gamma), z(k-gamma), z(k), z_u)
                   int_u = interpol_typ_quad2b(int3d(i-alpha,j,k-2*gamma), int3d(i-alpha,j,k-gamma), &
-                                              int3d(i-alpha,j,k), z(k-2*gamma), z(k-gamma), z(k), z_u)
+                     int3d(i-alpha,j,k), z(k-2*gamma), z(k-gamma), z(k), z_u)
                   scont_u = interpol_yp(z(k), z(k-gamma), scont3d(i-alpha,j,k), scont3d(i-alpha,j,k-gamma), z_u)
 !                  int_u = interpol_yp(z(k), z(k-gamma), int3d(i-alpha,j,k), int3d(i-alpha,j,k-gamma), z_u)
                else
@@ -399,7 +399,7 @@ do k=startz, endz, gamma
 !                  scont_u = interpol_typ_quad3b(scont3d(i-2*alpha,j,k-gamma), scont3d(i-alpha,j,k-gamma), scont3d(i,j,k-gamma), &
 !                                                x(i-2*alpha), x(i-alpha), x(i), x_u)
                   int_u = interpol_typ_quad2b(int3d(i-2*alpha,j,k-gamma), int3d(i-alpha,j,k-gamma), &
-                                           int3d(i,j,k-gamma), x(i-2*alpha), x(i-alpha), x(i), x_u)
+                     int3d(i,j,k-gamma), x(i-2*alpha), x(i-alpha), x(i), x_u)
                   scont_u = interpol_yp(x(i), x(i-alpha), scont3d(i,j,k-gamma), scont3d(i-alpha,j,k-gamma), x_u)
 !                  int_u = interpol_yp(x(i), x(i-alpha), int3d(i,j,k-gamma), int3d(i-alpha,j,k-gamma), x_u)
                endif
@@ -427,18 +427,18 @@ do k=startz, endz, gamma
 !-----------------------radiative transfer------------------------------
 !
                call fsc_cont(int_u, opac_u, opac_p, opac_d, scont_u, scont_p, scont_d, &
-                               dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_p, alo_u, alo_d)
+                  dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_p, alo_u, alo_d)
 !               call fsc_cont_lin(int_u, opac_u, opac_p, opac_d, scont_u, scont_p, scont_d, &
 !                                   dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_u, alo_p)
                int3d(i,j,k) = int_sc
                alocont_nn3d(i,j,k,14) = alo_p
             endif
 !
-         case default
+          case default
 !
-      end select
+         end select
+      enddo
    enddo
-enddo
 !
 !call cpu_time(te2)
 
@@ -457,120 +457,120 @@ subroutine fsc_cont2d_lin(muindx)
 !---------------calculating intensties for given mu---------------------
 !-----------------------------------------------------------------------
 !
-use prog_type
+   use prog_type
 
-use fund_const
-use dime3d, only: ndxmax, ndzmax, ndymax, x, y, z
-use dime3d, only: int3d, opac3d, scont3d, alocont_nn3d, imask3d, imask_innreg3d
-use angles, only: nodes_mu
-use bcondition, only: xic1
-use mod_debug, only: indx1, indx2
-use mod_interp1d, only: interpol_yp, interpol_ypl, interpol_typ_quad2b, interpol_typ_quad3b
-use mod_interp2d, only: interpol2d_4p_lin
+   use fund_const
+   use dime3d, only: ndxmax, ndzmax, ndymax, x, y, z
+   use dime3d, only: int3d, opac3d, scont3d, alocont_nn3d, imask3d, imask_innreg3d
+   use angles, only: nodes_mu
+   use bcondition, only: xic1
+   use mod_debug, only: indx1, indx2
+   use mod_interp1d, only: interpol_yp, interpol_ypl, interpol_typ_quad2b, interpol_typ_quad3b
+   use mod_interp2d, only: interpol2d_4p_lin
 !
-implicit none
+   implicit none
 !
 ! ... arguments
-integer(i4b), intent(in) :: muindx
-real(dp) :: n_x, n_z
+   integer(i4b), intent(in) :: muindx
+   real(dp) :: n_x, n_z
 !
 ! ... local scalars
-integer(i4b) :: i, j, k
-integer(i4b) :: alpha, gamma
-integer(i4b) :: startx, startz, endx, endz
-integer(i4b) :: iim2, iim1, ii, iip1
-real(dp) ::  mueff
-real(dp) :: opac_u, scont_u, dels_u, dels_xu, dels_zu, int_u, &
-            opac_d, scont_d, dels_d, dels_xd, dels_zd, &
-            opac_u1, opac_u2, scont_u1, scont_u2, &
-            opac_d1, opac_d2, scont_d1, scont_d2, &
-            opac_p, scont_p, dels_r
-real(dp) :: x_u, x_u1, x_u2, z_u, z_u1, z_u2, t_u1, t_u2, t_u, &
-            x_d, x_d1, x_d2, z_d, z_d1, z_d2, t_d1, t_d2, t_d
-real(dp) :: abs_sc, int_sc, contr_sc, alo_p, alo_u, alo_d
-real(dp) :: acoeff, bcoeff, ccoeff, dcoeff
-real(dp) :: ts1, te1, ts2, te2
+   integer(i4b) :: i, j, k
+   integer(i4b) :: alpha, gamma
+   integer(i4b) :: startx, startz, endx, endz
+   integer(i4b) :: iim2, iim1, ii, iip1
+   real(dp) ::  mueff
+   real(dp) :: opac_u, scont_u, dels_u, dels_xu, dels_zu, int_u, &
+      opac_d, scont_d, dels_d, dels_xd, dels_zd, &
+      opac_u1, opac_u2, scont_u1, scont_u2, &
+      opac_d1, opac_d2, scont_d1, scont_d2, &
+      opac_p, scont_p, dels_r
+   real(dp) :: x_u, x_u1, x_u2, z_u, z_u1, z_u2, t_u1, t_u2, t_u, &
+      x_d, x_d1, x_d2, z_d, z_d1, z_d2, t_d1, t_d2, t_d
+   real(dp) :: abs_sc, int_sc, contr_sc, alo_p, alo_u, alo_d
+   real(dp) :: acoeff, bcoeff, ccoeff, dcoeff
+   real(dp) :: ts1, te1, ts2, te2
 !
 ! ... for debugging
 !
 ! ... local arrays
 !
 ! ... local functions
-real(dp) :: dist_sphere
+   real(dp) :: dist_sphere
 !
 ! ... local characters
-character(len=50) :: enter
+   character(len=50) :: enter
 !
 ! ... local logicals
 !
-n_x=sqrt(1.d0 - nodes_mu(muindx)*nodes_mu(muindx))
-n_z=nodes_mu(muindx)
+   n_x=sqrt(1.d0 - nodes_mu(muindx)*nodes_mu(muindx))
+   n_z=nodes_mu(muindx)
 !
 !-----------------------------------------------------------------------
 !
 !set directional index-parameter (phantom points are excluded from calculation)
 !
 !index parameter:
-!         if n_x >= 0                 if n_x < 0                
-!                startx = 2                  startx = ndxmax-1  
-!                endx = ndxmax-1             endx = 2           
-!                alpha=  1                   alpha=-1                  
+!         if n_x >= 0                 if n_x < 0
+!                startx = 2                  startx = ndxmax-1
+!                endx = ndxmax-1             endx = 2
+!                alpha=  1                   alpha=-1
 !
-!         if n_z >= 0                 if n_z < 0                
-!                startz = 2                  startz = ndzmax-1  
-!                endz = ndzmax-1             endz = 2           
+!         if n_z >= 0                 if n_z < 0
+!                startz = 2                  startz = ndzmax-1
+!                endz = ndzmax-1             endz = 2
 !                gamma = 1                   gamma = -1
 !
 !could make an own array for this!!!
-if(n_x.gt.0.d0) then
-   startx = 3
-   endx = ndxmax-1
-   alpha=  1
-elseif(n_x.lt.0.d0) then
-   startx = ndxmax-2
-   endx = 2
-   alpha=-1
-else
-   stop 'error in fsc_cont2d: n_x = 0 not allowed'
-endif
+   if(n_x.gt.0.d0) then
+      startx = 3
+      endx = ndxmax-1
+      alpha=  1
+   elseif(n_x.lt.0.d0) then
+      startx = ndxmax-2
+      endx = 2
+      alpha=-1
+   else
+      stop 'error in fsc_cont2d: n_x = 0 not allowed'
+   endif
 !
-if(n_z.gt.0.d0) then
-   startz = 3
-   endz = ndzmax-1
-   gamma=  1
-elseif(n_z.lt.0.d0) then
-   startz = ndzmax-2
-   endz = 2
-   gamma=-1
-else
-   stop 'error in fsc_cont2d: n_z = 0 not allowed'
-endif
+   if(n_z.gt.0.d0) then
+      startz = 3
+      endz = ndzmax-1
+      gamma=  1
+   elseif(n_z.lt.0.d0) then
+      startz = ndzmax-2
+      endz = 2
+      gamma=-1
+   else
+      stop 'error in fsc_cont2d: n_z = 0 not allowed'
+   endif
 !
 !-----------------------reset the intensities---------------------------
 !
 !call cpu_time(ts1)
-call set_boundary2d(muindx)
+   call set_boundary2d(muindx)
 !call cpu_time(te1)
 !
 !-----------------------------------------------------------------------
 !
-alocont_nn3d=0.d0
+   alocont_nn3d=0.d0
 !
 !-----------------------------------------------------------------------
 !
-j=ndymax/2+1
+   j=ndymax/2+1
 
 !call cpu_time(ts2)
 !
-do k=startz, endz, gamma
-   do i=startx, endx, alpha
+   do k=startz, endz, gamma
+      do i=startx, endx, alpha
 
-      select case(imask3d(i,j,k))
+         select case(imask3d(i,j,k))
 
 !
 !*************************standard rt procedure*************************
 !
-         case(1)
+          case(1)
 !
 !calculate distance to intersection point with upwind x-grid-coordinate
             dels_xu=(x(i)-x(i-alpha))/n_x
@@ -599,7 +599,7 @@ do k=startz, endz, gamma
 !               scont_u = interpol_typ_quad3b(scont3d(i-alpha,j,k-2*gamma), scont3d(i-alpha,j,k-gamma), scont3d(i-alpha,j,k), &
 !                                             z(k-2*gamma), z(k-gamma), z(k), z_u)
                int_u = interpol_typ_quad2b(int3d(i-alpha,j,k-2*gamma), int3d(i-alpha,j,k-gamma), &
-                                             int3d(i-alpha,j,k), z(k-2*gamma), z(k-gamma), z(k), z_u)
+                  int3d(i-alpha,j,k), z(k-2*gamma), z(k-gamma), z(k), z_u)
                scont_u = interpol_yp(z(k), z(k-gamma), scont3d(i-alpha,j,k), scont3d(i-alpha,j,k-gamma), z_u)
 !               int_u = interpol_yp(z(k), z(k-gamma), int3d(i-alpha,j,k), int3d(i-alpha,j,k-gamma), z_u)
             else
@@ -611,7 +611,7 @@ do k=startz, endz, gamma
 !               scont_u = interpol_typ_quad3b(scont3d(i-2*alpha,j,k-gamma), scont3d(i-alpha,j,k-gamma), scont3d(i,j,k-gamma), &
 !                                             x(i-2*alpha), x(i-alpha), x(i), x_u)
                int_u = interpol_typ_quad2b(int3d(i-2*alpha,j,k-gamma), int3d(i-alpha,j,k-gamma), &
-                                           int3d(i,j,k-gamma), x(i-2*alpha), x(i-alpha), x(i), x_u)
+                  int3d(i,j,k-gamma), x(i-2*alpha), x(i-alpha), x(i), x_u)
                scont_u = interpol_yp(x(i), x(i-alpha), scont3d(i,j,k-gamma), scont3d(i-alpha,j,k-gamma), x_u)
 !               int_u = interpol_yp(x(i), x(i-alpha), int3d(i,j,k-gamma), int3d(i-alpha,j,k-gamma), x_u)
             endif
@@ -642,13 +642,13 @@ do k=startz, endz, gamma
 !            call fsc_cont(int_u, opac_u, opac_p, opac_d, scont_u, scont_p, scont_d, &
 !                            dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_p, alo_u, alo_d)
             call fsc_cont_lin(int_u, opac_u, opac_p, opac_d, scont_u, scont_p, scont_d, &
-                                dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_u, alo_p)
+               dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_u, alo_p)
             int3d(i,j,k) = int_sc
             alocont_nn3d(i,j,k,14) = alo_p
 !
 !***********special treatment: point is in vicinity of boundary*********
 !
-         case(2)
+          case(2)
 !
 !calculate distance to intersection point with upwind x-grid-coordinate
             dels_xu=(x(i)-x(i-alpha))/n_x
@@ -688,8 +688,8 @@ do k=startz, endz, gamma
 !               scont_u = acoeff*scont3d(i-alpha,j,k-gamma) + bcoeff*scont3d(i,j,k-gamma) + &
 !                         ccoeff*scont3d(i-alpha,j,k) + dcoeff*scont3d(i,j,k)
                opac_u = interpol2d_4p_lin(opac3d(i-alpha,j,k-gamma), opac3d(i,j,k-gamma), &
-                                        opac3d(i-alpha,j,k), opac3d(i,j,k), &
-                                        x(i-alpha), x(i), z(k-gamma), z(k), x_u, z_u)
+                  opac3d(i-alpha,j,k), opac3d(i,j,k), &
+                  x(i-alpha), x(i), z(k-gamma), z(k), x_u, z_u)
             elseif(dels_xu.eq.dels_u) then
 !               indx2=indx2+1
 !upwind point intersects on z-level
@@ -700,7 +700,7 @@ do k=startz, endz, gamma
 !               scont_u = interpol_typ_quad3b(scont3d(i-alpha,j,k-2*gamma), scont3d(i-alpha,j,k-gamma), scont3d(i-alpha,j,k), &
 !                                             z(k-2*gamma), z(k-gamma), z(k), z_u)
                int_u = interpol_typ_quad2b(int3d(i-alpha,j,k-2*gamma), int3d(i-alpha,j,k-gamma), &
-                                             int3d(i-alpha,j,k), z(k-2*gamma), z(k-gamma), z(k), z_u)
+                  int3d(i-alpha,j,k), z(k-2*gamma), z(k-gamma), z(k), z_u)
                scont_u = interpol_yp(z(k), z(k-gamma), scont3d(i-alpha,j,k), scont3d(i-alpha,j,k-gamma), z_u)
 !               int_u = interpol_yp(z(k), z(k-gamma), int3d(i-alpha,j,k), int3d(i-alpha,j,k-gamma), z_u)
                dcoeff=0.d0
@@ -737,7 +737,7 @@ do k=startz, endz, gamma
 !               scont_u = interpol_typ_quad3b(scont3d(i-2*alpha,j,k-gamma), scont3d(i-alpha,j,k-gamma), scont3d(i,j,k-gamma), &
 !                                             x(i-2*alpha), x(i-alpha), x(i), x_u)
                int_u = interpol_typ_quad2b(int3d(i-2*alpha,j,k-gamma), int3d(i-alpha,j,k-gamma), &
-                                           int3d(i,j,k-gamma), x(i-2*alpha), x(i-alpha), x(i), x_u)
+                  int3d(i,j,k-gamma), x(i-2*alpha), x(i-alpha), x(i), x_u)
                scont_u = interpol_yp(x(i), x(i-alpha), scont3d(i,j,k-gamma), scont3d(i-alpha,j,k-gamma), x_u)
 !               int_u = interpol_yp(x(i), x(i-alpha), int3d(i,j,k-gamma), int3d(i-alpha,j,k-gamma), x_u)
                dcoeff=0.d0
@@ -791,14 +791,14 @@ do k=startz, endz, gamma
 !            call fsc_cont(int_u, opac_u, opac_p, opac_d, scont_u, scont_p, scont_d, &
 !                            dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_p, alo_u, alo_d)
             call fsc_cont_lin(int_u, opac_u, opac_p, opac_d, scont_u, scont_p, scont_d, &
-                                dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_u, alo_p)
+               dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_u, alo_p)
             int3d(i,j,k) = int_sc
             alocont_nn3d(i,j,k,14) = alo_p! + dcoeff*alo_u
 !
 !----------------------point lies directly on boundary------------------
 !***********special treatment: point lies directly on boundary**********
 !
-         case(3)
+          case(3)
             mueff=n_x*x(i)+n_z*z(k)
             if(mueff.ge.0.d0) then
                int3d(i,j,k)=xic1
@@ -833,7 +833,7 @@ do k=startz, endz, gamma
 !                  scont_u = interpol_typ_quad3b(scont3d(i-alpha,j,k-2*gamma), scont3d(i-alpha,j,k-gamma), scont3d(i-alpha,j,k), &
 !                                                z(k-2*gamma), z(k-gamma), z(k), z_u)
                   int_u = interpol_typ_quad2b(int3d(i-alpha,j,k-2*gamma), int3d(i-alpha,j,k-gamma), &
-                                              int3d(i-alpha,j,k), z(k-2*gamma), z(k-gamma), z(k), z_u)
+                     int3d(i-alpha,j,k), z(k-2*gamma), z(k-gamma), z(k), z_u)
                   scont_u = interpol_yp(z(k), z(k-gamma), scont3d(i-alpha,j,k), scont3d(i-alpha,j,k-gamma), z_u)
 !                  int_u = interpol_yp(z(k), z(k-gamma), int3d(i-alpha,j,k), int3d(i-alpha,j,k-gamma), z_u)
                else
@@ -845,7 +845,7 @@ do k=startz, endz, gamma
 !                  scont_u = interpol_typ_quad3b(scont3d(i-2*alpha,j,k-gamma), scont3d(i-alpha,j,k-gamma), scont3d(i,j,k-gamma), &
 !                                                x(i-2*alpha), x(i-alpha), x(i), x_u)
                   int_u = interpol_typ_quad2b(int3d(i-2*alpha,j,k-gamma), int3d(i-alpha,j,k-gamma), &
-                                           int3d(i,j,k-gamma), x(i-2*alpha), x(i-alpha), x(i), x_u)
+                     int3d(i,j,k-gamma), x(i-2*alpha), x(i-alpha), x(i), x_u)
                   scont_u = interpol_yp(x(i), x(i-alpha), scont3d(i,j,k-gamma), scont3d(i-alpha,j,k-gamma), x_u)
 !                  int_u = interpol_yp(x(i), x(i-alpha), int3d(i,j,k-gamma), int3d(i-alpha,j,k-gamma), x_u)
                endif
@@ -875,16 +875,16 @@ do k=startz, endz, gamma
 !               call fsc_cont(int_u, opac_u, opac_p, opac_d, scont_u, scont_p, scont_d, &
 !                               dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_p, alo_u, alo_d)
                call fsc_cont_lin(int_u, opac_u, opac_p, opac_d, scont_u, scont_p, scont_d, &
-                                   dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_u, alo_p)
+                  dels_u, dels_d, abs_sc, contr_sc, int_sc, alo_u, alo_p)
                int3d(i,j,k) = int_sc
                alocont_nn3d(i,j,k,14) = alo_p
             endif
 !
-         case default
+          case default
 !
-      end select
+         end select
+      enddo
    enddo
-enddo
 !
 !call cpu_time(te2)
 
@@ -898,51 +898,51 @@ end subroutine fsc_cont2d_lin
 !
 subroutine set_boundary2d(muindx)
 !
-use prog_type
-use dime3d, only: ndxmax, ndymax, ndzmax, x, y, z, imask3d, imask_innreg3d, int3d
-use angles, only: nodes_mu
-use bcondition, only: xic1, int_inner, indx_xinner, indx_yinner, indx_zinner, n_inner
+   use prog_type
+   use dime3d, only: ndxmax, ndymax, ndzmax, x, y, z, imask3d, imask_innreg3d, int3d
+   use angles, only: nodes_mu
+   use bcondition, only: xic1, int_inner, indx_xinner, indx_yinner, indx_zinner, n_inner
 !
-implicit none
+   implicit none
 !
 ! ... arguments
-integer(i4b), intent(in) :: muindx
+   integer(i4b), intent(in) :: muindx
 !
 ! ... local scalars
-integer(i4b) :: i, j, k
-integer(i4b) :: phiindx
-real(dp) :: mueff
-real(dp) :: n_x, n_z
+   integer(i4b) :: i, j, k
+   integer(i4b) :: phiindx
+   real(dp) :: mueff
+   real(dp) :: n_x, n_z
 !
 ! ... local arrays
 !real(dp), dimension(:,:,:), allocatable :: int3d_test
 !
 ! ... local characters
-character(len=32) :: fname
+   character(len=32) :: fname
 !
 !
-int3d=0.d0
+   int3d=0.d0
 !
 !-------------------method 1: calculate mueff directly------------------
 !
-n_x=sqrt(1.d0 - nodes_mu(muindx)**2)
-n_z=nodes_mu(muindx)
+   n_x=sqrt(1.d0 - nodes_mu(muindx)**2)
+   n_z=nodes_mu(muindx)
 !
-j=ndymax/2+1
+   j=ndymax/2+1
 !
-do k=3, ndzmax-2
-   do i=3, ndxmax-2
-      if(imask3d(i,j,k).eq.4) then
+   do k=3, ndzmax-2
+      do i=3, ndxmax-2
+         if(imask3d(i,j,k).eq.4) then
 !inside the star, set intensities correctly
-         mueff=(n_x*x(i)+n_z*z(k))/sqrt(x(i)**2+z(k)**2)
-         if(mueff.ge.0.d0) then
-            int3d(i,j,k) = xic1
-         else
-            int3d(i,j,k) = 0.d0
+            mueff=(n_x*x(i)+n_z*z(k))/sqrt(x(i)**2+z(k)**2)
+            if(mueff.ge.0.d0) then
+               int3d(i,j,k) = xic1
+            else
+               int3d(i,j,k) = 0.d0
+            endif
          endif
-      endif
+      enddo
    enddo
-enddo
 !
 !--------------------method2: read in everything------------------------
 !
@@ -993,126 +993,126 @@ subroutine fsc_line2d(muindx,xobsindx)
 !-----------calculating intensities for given mu and xobs---------------
 !-----------------------------------------------------------------------
 !
-use prog_type
+   use prog_type
 
-use fund_const
-use dime3d, only: ndxmax, ndzmax, ndymax, x, y, z
-use dime3d, only: int3d, mintbar3d, opalbar3d, sline3d, velx3d, vely3d, velz3d, vth3d, &
-                  normalization3d, imask3d, aloline_nn3d, aloline_on_nn3d
-use dimecr, only: n1d_cr, r1d_cr, sline1d_cr
-use angles, only: nodes_mu, weight_mu, dim_mu
-use freq, only: nodes_xobs, weight_xobs, nxobs, deltax, xcmf_min, xcmf_max
-use params_input, only: vth_fiducial
-use bcondition, only: xic1
-use mod_interp1d, only: interpol_yp, interpol_ypl, interpol_typ_quad2b, interpol_typ_quad3, interpol_typ_quad3b
-use mod_interp2d, only: coeff2d_4p_lin
+   use fund_const
+   use dime3d, only: ndxmax, ndzmax, ndymax, x, y, z
+   use dime3d, only: int3d, mintbar3d, opalbar3d, sline3d, velx3d, vely3d, velz3d, vth3d, &
+      normalization3d, imask3d, aloline_nn3d, aloline_on_nn3d
+   use dimecr, only: n1d_cr, r1d_cr, sline1d_cr
+   use angles, only: nodes_mu, weight_mu, dim_mu
+   use freq, only: nodes_xobs, weight_xobs, nxobs, deltax, xcmf_min, xcmf_max
+   use params_input, only: vth_fiducial
+   use bcondition, only: xic1
+   use mod_interp1d, only: interpol_yp, interpol_ypl, interpol_typ_quad2b, interpol_typ_quad3, interpol_typ_quad3b
+   use mod_interp2d, only: coeff2d_4p_lin
 !
-implicit none
+   implicit none
 !
 ! ... arguments
-integer(i4b), intent(in) :: muindx, xobsindx
+   integer(i4b), intent(in) :: muindx, xobsindx
 !
 ! ... local scalars
-integer(i4b) :: i, j, k
-integer(i4b) :: alpha, gamma
-integer(i4b) :: startx, startz, endx, endz
-integer(i4b) :: iim2, iim1, iip1, kkm2, kkm1, kkp1
-real(dp) :: nn_x, nn_y, nn_z, xobs, mueff, wmu, wxobs, wall, phinorm
-real(dp) :: opalbar_u, sline_u, dels_u, dels_xu, dels_zu, int_u, &
-            opalbar_d, sline_d, dels_d, dels_xd, dels_zd, &
-            opalbar_p, sline_p, dels_r, &
-            vel_u, vel_p, vel_d, velx_u, velx_p, velx_d, &
-            vely_u, vely_p, vely_d, velz_u, velz_p, velz_d, &
-            vth_u, vth_p, vth_d, &
-            opalbar_u2, opac_p, opac_u2, velx_u2, vely_u2, velz_u2, opac_u
-real(dp) :: x_u, z_u, x_d, z_d
-real(dp) :: acoeff, bcoeff, ccoeff, dcoeff
-real(dp) :: abs_sc, contr_sc, int_sc, alo_u, alo_p, alo_d
+   integer(i4b) :: i, j, k
+   integer(i4b) :: alpha, gamma
+   integer(i4b) :: startx, startz, endx, endz
+   integer(i4b) :: iim2, iim1, iip1, kkm2, kkm1, kkp1
+   real(dp) :: nn_x, nn_y, nn_z, xobs, mueff, wmu, wxobs, wall, phinorm
+   real(dp) :: opalbar_u, sline_u, dels_u, dels_xu, dels_zu, int_u, &
+      opalbar_d, sline_d, dels_d, dels_xd, dels_zd, &
+      opalbar_p, sline_p, dels_r, &
+      vel_u, vel_p, vel_d, velx_u, velx_p, velx_d, &
+      vely_u, vely_p, vely_d, velz_u, velz_p, velz_d, &
+      vth_u, vth_p, vth_d, &
+      opalbar_u2, opac_p, opac_u2, velx_u2, vely_u2, velz_u2, opac_u
+   real(dp) :: x_u, z_u, x_d, z_d
+   real(dp) :: acoeff, bcoeff, ccoeff, dcoeff
+   real(dp) :: abs_sc, contr_sc, int_sc, alo_u, alo_p, alo_d
 !
 ! ... local arrays
 !
 ! ... local functions
-real(dp) :: dist_sphere
+   real(dp) :: dist_sphere
 !
 ! ... local characters
-character(len=50) :: enter
+   character(len=50) :: enter
 !
 ! ... local logicals
 !
 !
 !stop 'there might be errors due to new version of function dist_sphere: check this!!!'
 !
-nn_x=sqrt(1.d0 - nodes_mu(muindx)*nodes_mu(muindx))
-nn_y=0.d0
-nn_z=nodes_mu(muindx)
+   nn_x=sqrt(1.d0 - nodes_mu(muindx)*nodes_mu(muindx))
+   nn_y=0.d0
+   nn_z=nodes_mu(muindx)
 !
-xobs=nodes_xobs(xobsindx)
+   xobs=nodes_xobs(xobsindx)
 !
-wmu=weight_mu(muindx)
-wxobs=weight_xobs(xobsindx)
-wall=wmu*wxobs
+   wmu=weight_mu(muindx)
+   wxobs=weight_xobs(xobsindx)
+   wall=wmu*wxobs
 !
 !-----------------------------------------------------------------------
 !
 !set directional index-parameter (phantom points are excluded from calculation)
 !
 !index parameter:
-!         if n_x >= 0                 if n_x < 0                
-!                startx = 2                  startx = ndxmax-1  
-!                endx = ndxmax-1             endx = 2           
-!                alpha=  1                   alpha=-1                  
+!         if n_x >= 0                 if n_x < 0
+!                startx = 2                  startx = ndxmax-1
+!                endx = ndxmax-1             endx = 2
+!                alpha=  1                   alpha=-1
 !
-!         if n_z >= 0                 if n_z < 0                
-!                startz = 2                  startz = ndzmax-1  
-!                endz = ndzmax-1             endz = 2           
+!         if n_z >= 0                 if n_z < 0
+!                startz = 2                  startz = ndzmax-1
+!                endz = ndzmax-1             endz = 2
 !                gamma = 1                   gamma = -1
 !
 !could make an own array for this!!!
-if(nn_x.gt.0.d0) then
-   startx = 3
-   endx = ndxmax-2
-   alpha=  1
-elseif(nn_x.lt.0.d0) then
-   startx = ndxmax-2
-   endx = 3
-   alpha=-1
-else
-   stop 'error in fsc_line2d: n_x = 0 not allowed'
-endif
+   if(nn_x.gt.0.d0) then
+      startx = 3
+      endx = ndxmax-2
+      alpha=  1
+   elseif(nn_x.lt.0.d0) then
+      startx = ndxmax-2
+      endx = 3
+      alpha=-1
+   else
+      stop 'error in fsc_line2d: n_x = 0 not allowed'
+   endif
 !
-if(nn_z.gt.0.d0) then
-   startz = 2
-   endz = ndzmax-2
-   gamma=  1
-elseif(nn_z.lt.0.d0) then
-   startz = ndzmax-2
-   endz = 3
-   gamma=-1
-else
-   stop 'error in fsc_line2d: n_z = 0 not allowed'
-endif
+   if(nn_z.gt.0.d0) then
+      startz = 2
+      endz = ndzmax-2
+      gamma=  1
+   elseif(nn_z.lt.0.d0) then
+      startz = ndzmax-2
+      endz = 3
+      gamma=-1
+   else
+      stop 'error in fsc_line2d: n_z = 0 not allowed'
+   endif
 !
 !--------------------reset the intensities and alo----------------------
 !
-call set_boundary2d(muindx)
+   call set_boundary2d(muindx)
 !
-aloline_on_nn3d=0.d0
+   aloline_on_nn3d=0.d0
 !
 !-----------------------------------------------------------------------
 !
-j=ndymax/2+1
+   j=ndymax/2+1
 !
 !***debug
 !open(1, file='TRASH/interp2.dat', form='formatted', position='append')
 !
-do k=startz, endz, gamma
-   do i=startx, endx, alpha
+   do k=startz, endz, gamma
+      do i=startx, endx, alpha
 !
-      select case(imask3d(i,j,k))
+         select case(imask3d(i,j,k))
 !
 !************************standard radiative transfer********************
 !
-         case(1)
+          case(1)
 !
             iim1=i-alpha
             kkm1=k-gamma
@@ -1208,11 +1208,11 @@ do k=startz, endz, gamma
             call model_debug(x_u, 0.d0, z_u, velx_u2, vely_u2, velz_u2, opalbar_u2, opac_u)
 !            write(*,'(8es20.8)') opalbar_p2/opalbar_p
 !***debug end
-            vel_u = nn_x*velx_u + nn_y*vely_u + nn_z*velz_u 
-!            vel_d = nn_x*velx_d + nn_y*vely_d + nn_z*velz_d 
+            vel_u = nn_x*velx_u + nn_y*vely_u + nn_z*velz_u
+!            vel_d = nn_x*velx_d + nn_y*vely_d + nn_z*velz_d
             call fsc_line_lin(xobs, vth_fiducial, deltax, xcmf_min, xcmf_max, int_u, opalbar_u, opalbar_p, &
-                                sline_u, sline_p, vel_u, vel_p, vth_u, vth_p, &
-                                dels_u, abs_sc, contr_sc, int_sc, alo_u, alo_p)
+               sline_u, sline_p, vel_u, vel_p, vth_u, vth_p, &
+               dels_u, abs_sc, contr_sc, int_sc, alo_u, alo_p)
 !            call fsc_line(xobs, vth_fiducial, deltax, xcmf_min, xcmf_max, int_u, &
 !                            opalbar_u, opalbar_p, opalbar_d, &
 !                            sline_u, sline_p, sline_d, &
@@ -1231,7 +1231,7 @@ do k=startz, endz, gamma
 !
 !***********special treatment: point is in vicinity of boundary*********
 !
-         case(2)
+          case(2)
 !
             iim1=i-alpha
             kkm1=k-gamma
@@ -1269,19 +1269,19 @@ do k=startz, endz, gamma
                z_u=z(k)-dels_r*nn_z
                int_u=xic1
                call coeff2d_4p_lin(x(iim1), x(i), z(kkm1), z(k), x_u, z_u, &
-                                   acoeff, bcoeff, ccoeff, dcoeff)
+                  acoeff, bcoeff, ccoeff, dcoeff)
                sline_u = acoeff*sline3d(iim1,j,kkm1) + bcoeff*sline3d(i,j,kkm1) + &
-                         ccoeff*sline3d(iim1,j,k) + dcoeff*sline3d(i,j,k)
+                  ccoeff*sline3d(iim1,j,k) + dcoeff*sline3d(i,j,k)
                opalbar_u = acoeff*opalbar3d(iim1,j,kkm1) + bcoeff*opalbar3d(i,j,kkm1) + &
-                           ccoeff*opalbar3d(iim1,j,k) + dcoeff*opalbar3d(i,j,k)
+                  ccoeff*opalbar3d(iim1,j,k) + dcoeff*opalbar3d(i,j,k)
                velx_u = acoeff*velx3d(iim1,j,kkm1) + bcoeff*velx3d(i,j,kkm1) + &
-                        ccoeff*velx3d(iim1,j,k) + dcoeff*velx3d(i,j,k)
+                  ccoeff*velx3d(iim1,j,k) + dcoeff*velx3d(i,j,k)
                vely_u = acoeff*vely3d(iim1,j,kkm1) + bcoeff*vely3d(i,j,kkm1) + &
-                        ccoeff*vely3d(iim1,j,k) + dcoeff*vely3d(i,j,k)
+                  ccoeff*vely3d(iim1,j,k) + dcoeff*vely3d(i,j,k)
                velz_u = acoeff*velz3d(iim1,j,kkm1) + bcoeff*velz3d(i,j,kkm1) + &
-                        ccoeff*velz3d(iim1,j,k) + dcoeff*velz3d(i,j,k)
+                  ccoeff*velz3d(iim1,j,k) + dcoeff*velz3d(i,j,k)
                vth_u = acoeff*vth3d(iim1,j,kkm1) + bcoeff*vth3d(i,j,kkm1) + &
-                       ccoeff*vth3d(iim1,j,k) + dcoeff*vth3d(i,j,k)
+                  ccoeff*vth3d(iim1,j,k) + dcoeff*vth3d(i,j,k)
 !               sline_u = xic1
 !               dcoeff = 0.d0
             elseif(dels_xu.eq.dels_u) then
@@ -1350,11 +1350,11 @@ do k=startz, endz, gamma
             call model_debug(x_u, 0.d0, z_u, velx_u2, vely_u2, velz_u2, opalbar_u2, opac_u)
 !            write(*,'(8es20.8)') opalbar_p2/opalbar_p
 !***debug end
-            vel_u = nn_x*velx_u + nn_y*vely_u + nn_z*velz_u 
-!            vel_d = nn_x*velx_d + nn_y*vely_d + nn_z*velz_d 
+            vel_u = nn_x*velx_u + nn_y*vely_u + nn_z*velz_u
+!            vel_d = nn_x*velx_d + nn_y*vely_d + nn_z*velz_d
             call fsc_line_lin(xobs, vth_fiducial, deltax, xcmf_min, xcmf_max, int_u, opalbar_u, opalbar_p, &
-                                sline_u, sline_p, vel_u, vel_p, vth_u, vth_p, &
-                                dels_u, abs_sc, contr_sc, int_sc, alo_u, alo_p)
+               sline_u, sline_p, vel_u, vel_p, vth_u, vth_p, &
+               dels_u, abs_sc, contr_sc, int_sc, alo_u, alo_p)
 !            call fsc_line(xobs, vth_fiducial, deltax, xcmf_min, xcmf_max, int_u, &
 !                            opalbar_u, opalbar_p, opalbar_d, &
 !                            sline_u, sline_p, sline_d, &
@@ -1373,7 +1373,7 @@ do k=startz, endz, gamma
 !
 !***********special treatment: point lies directly on boundary**********
 !
-         case(3)
+          case(3)
             mueff=nn_x*x(i)+nn_z*z(k)
             if(mueff.ge.0.d0) then
                int3d(i,j,k)=xic1
@@ -1479,14 +1479,14 @@ do k=startz, endz, gamma
 !-----------------------radiative transfer------------------------------
 !
 !***debug start
-            call model_debug(x_u, 0.d0, z_u, velx_u2, vely_u2, velz_u2, opalbar_u2, opac_u)
+               call model_debug(x_u, 0.d0, z_u, velx_u2, vely_u2, velz_u2, opalbar_u2, opac_u)
 !            write(*,'(8es20.8)') opalbar_p2/opalbar_p
 !***debug end
-               vel_u = nn_x*velx_u + nn_y*vely_u + nn_z*velz_u 
-!               vel_d = nn_x*velx_d + nn_y*vely_d + nn_z*velz_d 
+               vel_u = nn_x*velx_u + nn_y*vely_u + nn_z*velz_u
+!               vel_d = nn_x*velx_d + nn_y*vely_d + nn_z*velz_d
                call fsc_line_lin(xobs, vth_fiducial, deltax, xcmf_min, xcmf_max, int_u, opalbar_u, opalbar_p, &
-                                   sline_u, sline_p, vel_u, vel_p, vth_u, vth_p, &
-                                   dels_u, abs_sc, contr_sc, int_sc, alo_u, alo_p)
+                  sline_u, sline_p, vel_u, vel_p, vth_u, vth_p, &
+                  dels_u, abs_sc, contr_sc, int_sc, alo_u, alo_p)
 !               call fsc_line(xobs, vth_fiducial, deltax, xcmf_min, xcmf_max,, int_u, &
 !                               opalbar_u, opalbar_p, opalbar_d, &
 !                               sline_u, sline_p, sline_d, &
@@ -1505,13 +1505,13 @@ do k=startz, endz, gamma
 
             endif
 !
-         case default
+          case default
 !
-      end select
+         end select
 !
-         
+
+      enddo
    enddo
-enddo
 !
 !***debug
 !close(1)
