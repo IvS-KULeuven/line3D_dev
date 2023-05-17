@@ -661,13 +661,13 @@ subroutine read_input
    IF (iotstat.EQ.0) then
       ! do somethind
       write(*,*) 'Priceeding with input argument: ', trim(input_arg)
-      indat_file = trim(input_arg)
-      print*, indat_file
+      fname = trim(input_arg)
+      print*, fname
    else
       write(*,*) '----------------------------read input-----------------------------------------'
       write(*,*) 'input file name (*.nml) to define model-atmosphere'
-      read(*,*) indat_file
-      write(*,*) 'reading input from file: ', trim(indat_file)
+      read(*,*) fname
+      write(*,*) 'reading input from file: ', trim(fname)
       write(*,*)
       ! do somtheing else
    endif

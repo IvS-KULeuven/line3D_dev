@@ -25,8 +25,8 @@ UNAME := $(shell uname)
 #####################GFORTRAN COMPILER OPTIONS ETC#######################
 
 ifneq (,$(findstring gfortran,$(COMPILER)))
-   F90 = COMPILER
-   LD = COMPILER
+   F90 = $(COMPILER)
+   LD = $(COMPILER)
 
    ifeq ($(UNAME), Linux)
       $(info OS detected: Linux)
@@ -67,8 +67,8 @@ endif
 
 ifneq (,$(findstring ifort,$(COMPILER)))
 
-   F90 = COMPILER
-   LD = COMPILER
+   F90 = $(COMPILER)
+   LD = $(COMPILER)
 
    ifeq ($(UNAME), Linux)
       $(info OS detected: Linux)
@@ -109,8 +109,8 @@ endif
 
 ifneq (,$(findstring mpif90,$(COMPILER)))
 
-   F90 = COMPILER
-   LD = COMPILER
+   F90 = $(COMPILER)
+   LD = $(COMPILER)
 
    ifeq ($(UNAME), Linux)
       $(info OS detected: Linux)

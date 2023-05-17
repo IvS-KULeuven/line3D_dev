@@ -1060,6 +1060,8 @@ subroutine read_input
 ! LP
    character(len=300) :: input_arg
 !
+! ! ... local characters
+! character(len=100) :: input_file
 ! ... local functions
    real(dp) :: calc_req
 !
@@ -1090,13 +1092,13 @@ subroutine read_input
    IF (iotstat.EQ.0) then
       ! do somethind
       write(*,*) 'Priceeding with input argument: ', trim(input_arg)
-      indat_file = trim(input_arg)
-      print*, indat_file
+      input_file = trim(input_arg)
+      print*, input_file
    else
       write(*,*) '----------------------------read input-----------------------------------------'
       write(*,*) 'input file name (*.nml) to define model-atmosphere'
-      read(*,*) indat_file
-      write(*,*) 'reading input from file: ', trim(indat_file)
+      read(*,*) input_file
+      write(*,*) 'reading input from file: ', trim(input_file)
       write(*,*)
       ! do somtheing else
    endif
