@@ -4,7 +4,7 @@ module mod_lte
 !
    use prog_type
    use fund_const
-   use mod_iline, only: element_lu, element_ll, fname_lte
+   use mod_iline, only: element_lu, element_ll, fname_lte, lte_file_dir
 !
    implicit none
 !
@@ -17,11 +17,10 @@ module mod_lte
    real(dp), dimension(:), allocatable :: temp_lte
    real(dp), dimension(:,:), allocatable :: nlower_lte
 !
-   character(len=25), parameter :: dir_lte='lte_tables'
-!
 contains
 
    subroutine get_lte_table(yhe_mass)
+      !
       !
       !yhe_mass is mass fraction  m_he/m_tot
       !
@@ -42,34 +41,38 @@ contains
       !
       !-----------------------------------------------------------------------
       !
+      ! PL NOTE:  The comment below should be fixed by creating grid of LTE tables 
+      ! for now we use singular file provided in at destination written in file 'in_linelist.dat'
+      !
       !find nearest yhe_mass in opal table
-      weight_yhe = 1.d10
-      indx = 1
-      do i=1, nyhe_lte
-         dist = (yhe_mass - yhe_lte(i))**2
-         if(dist.lt.weight_yhe) then
-            indx=i
-            weight_yhe=dist
-         endif
-      enddo
+      ! weight_yhe = 1.d10
+      ! indx = 1
+      ! do i=1, nyhe_lte
+      !    dist = (yhe_mass - yhe_lte(i))**2
+      !    if(dist.lt.weight_yhe) then
+      !       indx=i
+      !       weight_yhe=dist
+      !    endif
+      ! enddo
+      ! !
+      ! write(fname,'(a1,i5.5)') 'Y', int(10000*yhe_lte(indx))
       !
-      write(fname,'(a1,i5.5)') 'Y', int(10000*yhe_lte(indx))
-      !
-      inquire(file=trim(dir_lte)//'/'//fname//'/'//fname_lte, exist=lcheck)
+      !LP: using TRIM(lte_file_dir) is a teporal fix to an issue with hardcoded destination of lte tables 
+      inquire(file=TRIM(lte_file_dir)//'/'//fname_lte, exist=lcheck)
       !
       if(.not.lcheck) then
-         write(*,*) 'error in get_lte_table: file "', trim(dir_lte)//'/'//fname//'/'//fname_lte, '" does not exist'
+         write(*,*) 'error in get_lte_table: file "', TRIM(lte_file_dir)//'/'//fname_lte, '" does not exist'
          stop
       endif
       !
       !-----------------------------------------------------------------------
       !
       write(*,*) '---------------------------reading LTE tables----------------------------------'
-      write(*,*) 'reading from file: ', trim(dir_lte)//'/'//fname//'/'//fname_lte
+      write(*,*) 'reading from file: ', TRIM(lte_file_dir)//'/'//fname_lte
       write(*,*)
       !
       !read in corresponding nlower
-      open(1, file=trim(dir_lte)//'/'//fname//'/'//fname_lte)
+      open(1, file=TRIM(lte_file_dir)//'/'//fname_lte)
 
       !skip first lines
       do i=1, 2

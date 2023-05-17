@@ -28,6 +28,7 @@ module mod_iline
   !
   !file name of the lte table if needed to be read in
   character(len=12) :: fname_lte
+  character(len=255) :: lte_file_dir
   !
   !line-strength parameters (if required)
   real(dp) :: kline, alpha, kappa0  
@@ -68,9 +69,11 @@ contains
           write(*,*) 'Line from LTE tables'
 
           !read in line list (only second row)
+          write(*,*) "reading input line properties from : in_linelist.dat"
           open(1, file='in_linelist.dat')
              read(1,*)
              read(1,*) element_z, element_i, element_ll, element_lu
+             read(1,*) lte_file_dir
           close(1)
 
           write(str_z,'(i2.2)') element_z
@@ -78,17 +81,17 @@ contains
           write(str_ll,'(i2.2)') element_ll
           fname_lte = str_z//'_'//str_i//'_'//str_ll//'.txt'
 
-          write(*,*) 'reading line data from', './lte_tables/Y02800/'//fname_lte
+          write(*,*) 'reading line data from', TRIM(lte_file_dir)//'/'//fname_lte
 
-          inquire(file='./lte_tables/Y02800/'//fname_lte, exist=lcheck)
+          inquire(file=TRIM(lte_file_dir)//'/'//fname_lte, exist=lcheck)
 
           if(.not.lcheck) then
-             write(*,*) 'error in get_iline: file "', './lte_tables/Y02800/'//fname_lte, '" does not exist'
+             write(*,*) 'error in get_iline: file "', TRIM(lte_file_dir)//'/'//fname_lte, '" does not exist'
              stop
           endif
 
 
-          open(1, file='./lte_tables/Y02800/'//fname_lte)
+          open(1, file=TRIM(lte_file_dir)//'/'//fname_lte)
 
              !skip one line
              read(1,*)
@@ -169,7 +172,7 @@ contains
           flu = 1.9d-1
           gf = gl*flu
           xnue0 = 1.93798d15
-          fname_lte='06_04_01.txt'
+         !  fname_lte='06_04_01.txt'
        case(11)
           !CIII (1s2,2s,3p) -> (1s2,2s,3d)
           write(*,*) 'CIII 5696 line'

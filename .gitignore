@@ -1,0 +1,12 @@
+*.eo
+*.mod
+*.o
+/modules
+/objects
+*.out
+*.div
+*.bbl
+*.ps
+*.synctex.gz
+*.h5
+*__pycache__
