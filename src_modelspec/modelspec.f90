@@ -1222,8 +1222,7 @@ subroutine calc_model3d_amrvac
             enddo
          enddo
          call cpu_time(cpu_time_finish)
-         write(*,*) i*j*k, '/',  nr*ntheta*nphi, &
-                     "   ETC =", (nr*ntheta*nphi - i*j*k)*(cpu_time_finish-cpu_time_start)/60/60, " H", &
+         write(*,"(F5.1, A, F6.3, A, F6.3)") i*j*k/nr*ntheta*nphi * 100., "%   ETC =", (nr*ntheta*nphi - i*j*k)*(cpu_time_finish-cpu_time_start)/60/60, " H", &
                      "   ET =", cpu_time_finish-cpu_time_start
       enddo
       !$OMP END DO
