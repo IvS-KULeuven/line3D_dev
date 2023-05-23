@@ -1125,7 +1125,7 @@ subroutine calc_model3d_amrvac
       theta=theta_modext
       phi=phi_modext
    !
-      write(*,*)  nr, ntheta, nphi
+      write(*,'(4(A, I4))')  'Nr = ', nr, "  Nt = ", ntheta, '  Np = ', nphi, '  Tot = ', nr*ntheta*nphi
       call cpu_time(cpu_time_finish)
       !$OMP DO SCHEDULE(GUIDED)
       do i=1, nr
@@ -1222,8 +1222,9 @@ subroutine calc_model3d_amrvac
             enddo
          enddo
          call cpu_time(cpu_time_finish)
-         write(*,"(F5.1, A, F6.3, A, F6.3)") i*j*k/nr*ntheta*nphi * 100., "%   ETC =", (nr*ntheta*nphi - i*j*k)*(cpu_time_finish-cpu_time_start)/60/60, " H", &
-                     "   ET =", cpu_time_finish-cpu_time_start
+         write(*,"(F6.2, A, F10.2, A, F6.3)") (100.0d0*i*j*k)/(nr*ntheta*nphi), &
+         "%   ETC(h) =", (nr*ntheta*nphi - i*j*k)*(cpu_time_finish-cpu_time_start)/60/60, &
+                     "   ET(s) =", cpu_time_finish-cpu_time_start
       enddo
       !$OMP END DO
    !
