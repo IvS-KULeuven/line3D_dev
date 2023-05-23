@@ -100,7 +100,7 @@ subroutine read_input
    implicit none
 !
 ! ... local scalars
-   real(dp) :: fcheck1, fcheck2, fcheck3
+   real(dp) :: fcheck1, fcheck2, fcheck3, yhe_mass
 !
 ! ... local scalars
 ! LP
@@ -235,8 +235,9 @@ subroutine read_input
 !
    close(1)
 !
-!
-   call get_iline(iline)
+! 
+   yhe_mass = one / (one + one/four/yhe1_mass)
+   call get_iline(iline, yhe_mass)
 !
 !
 !
@@ -1704,7 +1705,8 @@ subroutine calc_model3df
    yhe2_mass = one / (one + one/four/yhe2)
 !
 !get the lte table
-   call get_lte_table(yhe1_mass)
+   ! call get_lte_table(yhe1_mass) 
+   call get_lte_table() ! LP since the value of yhe is already set in the dir_lte when reading the ilin 
 !
 !----------------------define disc 1--------------------------
 !

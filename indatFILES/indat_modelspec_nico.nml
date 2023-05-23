@@ -18,7 +18,8 @@ vmax = 4.d3        ! used for case of beta velocity in km/sec
 vmicro = 1.0d2      ! micro turbulence velocity in km/sec  - For full 3d hydro can be 10 ( but runs faster for higher)
 vth_fiducial=1.d2
 beta = 1.d0        ! used for beta law 
-yhe = 12.25d0        ! He mass fraction Y (12.25 corresponds to mass-fraction 0.98)
+yhe = 0.0146d0        ! He mass fraction Y (12.25 corresponds to mass-fraction 0.98)
+                    ! yhe = Y/(1-Y)/4
 hei = 2.d0         ! number ogf free electrons per helium atom    
 /
  
@@ -36,7 +37,7 @@ alpha = 0.d0      ! not used
 /
 
 &input_usr
-opt_opac = 2   ! 0 - continuum opacity = 0 ; 1 -  continuum opacity = OPAL ; 2 -  continuum opacity = Thomson;
+opt_opac = 1   ! 0 - continuum opacity = 0 ; 1 -  continuum opacity = OPAL ; 2 -  continuum opacity = Thomson;
 opt_scont = 1  ! 0 - source function = 0 ; 1 - source function = Planck(local) ; 2 - source function = dilution * Planck(T_rad) 
 opt_sline = 1  ! 0 - line source function = 0 ; 1 - line source function = Planck(local) ; 2 - line source function = dilution * Planck(T_rad)
 kcont = 1.d0   ! scaling factor to continuum opacity

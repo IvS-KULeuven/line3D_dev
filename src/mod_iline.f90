@@ -25,17 +25,20 @@ module mod_iline
   !
   !atomic number z, ionizationg stage i (in roman numbering), lower level ll, and upper level lu
   integer(i4b) :: element_z, element_i, element_ll, element_lu
+
+  integer(i4b), parameter :: nyhe_lteopal=1
+  real(dp), dimension(nyhe_lteopal), parameter :: yhe_lteopal=(/0.00999d0/) !, 0.1d0, 0.28d0, 0.59d0, 0.61d0, 0.98d0, 0.99d0, 1.d0 /)
   !
   !file name of the lte table if needed to be read in
-  character(len=12) :: fname_lte
-  character(len=255) :: lte_file_dir
+  character(len=255) :: dir_lte
+  character(len=255) :: dir_opal
   !
   !line-strength parameters (if required)
   real(dp) :: kline, alpha, kappa0  
   !
 contains
 
-  subroutine get_iline(iline)
+  subroutine get_iline(iline, yhe_mass)
     !
     !get all required data for a given line described by integer iline
     !note: whenever you change something in here,
@@ -44,17 +47,22 @@ contains
     !         subroutines get_photprof, get_photprof_herrero, calc_photprof
     !
     !input: iline - line identifier
+    !       yhe_mass - helium mass fraction 
     !
     ! ... arguments
     integer(i4b), intent(in) :: iline
+    real(dp), intent(in) :: yhe_mass
     !
     ! ... local scalars
     integer(i4b) :: i, nlines, idum, lu_dum
     real(dp) :: lambda, fdum
+    real(dp) :: weight_yhe, dist
+    integer(i4b) :: indx_lteopal
     !
     ! ... local characters
     character(len=2) :: str_z, str_i, str_ll
     character :: chdum
+    character(len=20) :: yname = ' '
     !
     ! ... local logicals
     logical :: lcheck
@@ -64,34 +72,56 @@ contains
     write(*,*) '---get_iline: getting xnue0, na, z, i, ll, lu, gl, gu, flu----'
     write(*,'(a10,i20)') 'iline', iline
 
+    !find nearest yhe in LTE OPAL table
+    weight_yhe = 1.d10
+    indx_lteopal = 1
+    do i=1, nyhe_lteopal
+       dist = (yhe_mass - yhe_lteopal(i))**2
+       if(dist.lt.weight_yhe) then
+         indx_lteopal=i
+          weight_yhe=dist
+       endif
+    enddo
+    !
+    write(yname,'(a1,i5.5)') 'Y', int(100000*yhe_lteopal(indx_lteopal))
+    !
+    !Get the destination ot the data location (check if the enviroment was set)
+    CALL get_environment_variable("DIR_OPAL", dir_opal)
+    IF (LEN_TRIM(dir_opal) .EQ. 0) STOP '---- Error: DIR_OPAL not set -----'
+    dir_opal = TRIM(dir_opal)//'/'//TRIM(yname)
+
     select case(iline)
        case(0)
           write(*,*) 'Line from LTE tables'
 
+          ! Get the destination ot the data location (check if the enviroment was set)
+          CALL get_environment_variable("DIR_LTE", dir_lte)
+          IF (LEN_TRIM(dir_lte) .EQ. 0) STOP '---- Error: DIR_LTE not set -----'
+          dir_lte = TRIM(dir_lte)//'/'//TRIM(yname)
+
           !read in line list (only second row)
           write(*,*) "reading input line properties from : in_linelist.dat"
-          open(1, file='in_linelist.dat')
+          open(1, file='./in_linelist.dat')
              read(1,*)
              read(1,*) element_z, element_i, element_ll, element_lu
-             read(1,*) lte_file_dir
           close(1)
-
+         !
           write(str_z,'(i2.2)') element_z
           write(str_i,'(i2.2)') element_i
           write(str_ll,'(i2.2)') element_ll
-          fname_lte = str_z//'_'//str_i//'_'//str_ll//'.txt'
+          dir_lte = TRIM(dir_lte)//'/'//TRIM(str_z//'_'//str_i//'_'//str_ll//'.txt')
 
-          write(*,*) 'reading line data from', TRIM(lte_file_dir)//'/'//fname_lte
+          write(*,*) 'reading line data from', TRIM(dir_lte)
 
-          inquire(file=TRIM(lte_file_dir)//'/'//fname_lte, exist=lcheck)
+          inquire(file=TRIM(dir_lte), exist=lcheck)
 
           if(.not.lcheck) then
-             write(*,*) 'error in get_iline: file "', TRIM(lte_file_dir)//'/'//fname_lte, '" does not exist'
+             write(*,*) 'error in get_iline: file "', TRIM(dir_lte), '" does not exist'
              stop
           endif
 
 
-          open(1, file=TRIM(lte_file_dir)//'/'//fname_lte)
+          open(1, file=TRIM(dir_lte))
 
              !skip one line
              read(1,*)
@@ -144,7 +174,6 @@ contains
           flu = 6.4108d-1
           gf = gl*flu
           xnue0= 4.5680294d14          
-          fname_lte='01_01_02.txt'
        case(2)
           !hydrogen 2->4
           write(*,*) 'Hbeta'
@@ -158,7 +187,6 @@ contains
           flu = 1.1938d-1
           gf = gl*flu
           xnue0= 6.1668776d14
-          fname_lte='01_01_02.txt'
        case(10)
           !CIV (1s2,2s) -> (1s2,2p,spin 3/2)
           write(*,*) 'CIV resonance line'
@@ -172,7 +200,6 @@ contains
           flu = 1.9d-1
           gf = gl*flu
           xnue0 = 1.93798d15
-         !  fname_lte='06_04_01.txt'
        case(11)
           !CIII (1s2,2s,3p) -> (1s2,2s,3d)
           write(*,*) 'CIII 5696 line'
@@ -186,7 +213,6 @@ contains
           flu = 3.46d-1
           gf = gl*flu
           xnue0 = 5.2632103d14
-          fname_lte='06_03_09.txt'
        case default
           stop 'error in get_iline: iline not properly specified'
     end select
@@ -201,7 +227,6 @@ contains
     write(*,'(a20,es20.8)') 'gf-value', gf
     write(*,'(a20,i20)') 'na', na
     write(*,'(a20,es20.8)') 'xnue0', xnue0
-    write(*,'(a20,a20)') 'fname_lte', fname_lte
     write(*,*)
     !
     !

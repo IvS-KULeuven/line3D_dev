@@ -318,17 +318,33 @@ I recommend to create a local build for your HDF5 libraries. To this end, please
   \verb|    make install|\\
    all done
 \item Include the library path in the Makefile of the main code (\eg~\verb|line3D/Makefile|)
-\item Update your .bashrc file to add the library path to your LD environment variable, and define a new environment variable that will be used in the Makefiles:\\
+\item Add the library path to your LD environment variable, and define a new environment variable that will be used in the Makefiles:\\
+  \begin{verbatim}
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<.../hdf5_lib/lib>
+    export LIB_HDF5=<.../hdf5_lib>
+    export COMPILER=<.../gfortran>
+    export DIR_OPAL=<.../opal_tables>
+    export DIR_LTE=<.../lte_tables>
+  \end{verbatim}
+  This can be either added to \texttt{.bashrc} / \texttt{.zshrc}, or text file can be created with the list of variables. 
+  To do this we create \texttt{.env} file with folowing contents: 
   \begin{verbatim}
     HDF5_PATH=<.../hdf5_lib/lib>
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ADD_LIB_PATH|
-    export LD_LIBRARY_PATH
-
-    LIB_HDF5=<.../hdf5_lib>
-    export LIB_HDF5
     COMPILER=<.../gfortran>
-    export COMPILER
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HDF5_PATH
+    LIB_HDF5=<.../hdf5_lib>
+    DIR_OPAL=<.../opal_tables>
+    DIR_LTE=<.../lte_tables>
   \end{verbatim}
+  Variables from such file can simply be exported by calling
+  \begin{verbatim}
+    export $(grep -v "^#" .env | xargs -d '\n')
+  \end{verbatim}
+  for GNU system or 
+  \begin{verbatim}
+    export $(grep -v "^#" .env | xargs -0)
+  \end{verbatim}
+  BSD systems.
     % {\color{red} NOTE. This commants may need to be modified for the new MACs with M1 chip (see instalation instractions below)}
 \end{enumerate}
 
