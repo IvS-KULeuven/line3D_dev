@@ -1183,12 +1183,12 @@ subroutine grid_obsdir
 !---------------equidistant in log-space outside core-------------------
 !
    if(opt_obsdir_read) then
-      open(1, file='in_alpha.dat', form='formatted')
+      open(1, file='./in_alpha.dat', form='formatted')
       do i=1, nalpha
          read(1,*) alpha_arr(i)
       enddo
       close(1)
-      open(1, file='in_gamma.dat', form='formatted')
+      open(1, file='./in_gamma.dat', form='formatted')
       do i=1, ngamma
          read(1,*) gamma_arr(i)
       enddo
