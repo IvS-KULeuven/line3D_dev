@@ -40,18 +40,26 @@ def quickplot(filename):
 def plot_at_axi(axi, model):
     
     if "xobs" in model.keys():
+
         axi.plot(model['xobs'], model['flux_norm'])
         axi.invert_xaxis()
+
         # set lables 
         # axi.set_title(f'{axind+1}')
         plt.xlabel(r'$\Delta v (v/v_{th})$')
         plt.ylabel(r'$F_{tot}/F_{cont}$')
-    elif 'x' in model.keys():
-        axi.pcolor(model['p'], model['zeta'], model['icont_surface'])
+    elif 'p' in model.keys():
+
+        # translate from p-zeta to cortesian 
+        x = np.outer(np.sin(model['zeta']), np.transpose(model['p']))
+        y = np.outer(np.cos(model['zeta']), np.transpose(model['p']))
+
+        axi.pcolor(x, y, model['icont_surface'], cmap="afmhot")
+
         # set lables 
         # axi.set_title(f'{axind+1}')
-        plt.xlabel(r'$P$')
-        plt.ylabel(r'$\Zeta$')
+        plt.xlabel(r'$X [R_\star]$')
+        plt.ylabel(r'$Y [R_\star]$')
     else:
         raise NotImplementedError("function note yet mplemented")
 
@@ -90,7 +98,7 @@ def get_int2d(filename):
             'int2d' : [], \
             'tau2d' : [], \
             'vn2d' : []}
-    
+
     with h5py.File(filename, "r") as fio:
         a_ray = fio.get('along_ray')
         
@@ -134,7 +142,13 @@ def get_surface(filename):
                 'icont_surface' : [], \
                 'iem_surface' : [], \
                 'iemi_surface' : []}
-    
+      
+    # icont  = continuum intensity if there was no line
+    # iemi   = emmission part of intensity
+    # iabs   = absorprion part 
+    # iem    = emergent intensity 
+    # norm   = iem/icont  
+      
     with h5py.File(filename, "r") as fio:
 
         cord = fio.get('coordinates')
