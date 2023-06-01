@@ -23,45 +23,46 @@ def quickplot(filename):
     if len(sbpltdim) > 2:
         print(int(sbpltdim[1]), int(len(filename)/sbpltdim[1]))
         fig, axs = plt.subplots(int(sbpltdim[1]), int(len(filename)/sbpltdim[1]))
-
-        axind = 0
-        for axi in axs.ravel():
-            model =  getmodel(filename[axind])
-            plot_at_axi(axi, model)
-            axind += 1
     else:
+        
         fig, axs = plt.subplots(1, len(filename))
 
-        model =  getmodel(filename[0])
-        plot_at_axi(axs, model)
-        
+    plot_at_axi(axs, filename)  
     plt.show()
 
-def plot_at_axi(axi, model):
+def plot_at_axi(axs, filename):
     
-    if "xobs" in model.keys():
-
-        axi.plot(model['xobs'], model['flux_norm'])
-        axi.invert_xaxis()
-
-        # set lables 
-        # axi.set_title(f'{axind+1}')
-        plt.xlabel(r'$\Delta v (v/v_{th})$')
-        plt.ylabel(r'$F_{tot}/F_{cont}$')
-    elif 'p' in model.keys():
-
-        # translate from p-zeta to cortesian 
-        x = np.outer(np.sin(model['zeta']), np.transpose(model['p']))
-        y = np.outer(np.cos(model['zeta']), np.transpose(model['p']))
-
-        axi.pcolor(x, y, model['icont_surface'], cmap="afmhot")
-
-        # set lables 
-        # axi.set_title(f'{axind+1}')
-        plt.xlabel(r'$X [R_\star]$')
-        plt.ylabel(r'$Y [R_\star]$')
+    axilen = len(filename)
+    if axilen != 1:
+        axi = axs.ravel()
     else:
-        raise NotImplementedError("function note yet mplemented")
+        axi = [axs]
+
+    for  axind in range(axilen):
+        model =  getmodel(filename[axind])
+        if "xobs" in model.keys():
+
+            axi[axind].plot(model['xobs'], model['flux_norm'])
+            axi[axind].invert_xaxis()
+
+            # set lables 
+            # axi.set_title(f'{axind+1}')
+            plt.xlabel(r'$\Delta v (v/v_{th})$')
+            plt.ylabel(r'$F_{tot}/F_{cont}$')
+        elif 'p' in model.keys():
+
+            # translate from p-zeta to cortesian 
+            x = np.outer(np.sin(model['zeta']), np.transpose(model['p']))
+            y = np.outer(np.cos(model['zeta']), np.transpose(model['p']))
+
+            axi[axind].pcolor(x, y, model['icont_surface'], cmap="afmhot")
+
+            # set lables 
+            # axi.set_title(f'{axind+1}')
+            plt.xlabel(r'$X [R_\star]$')
+            plt.ylabel(r'$Y [R_\star]$')
+        else:
+            raise NotImplementedError("function note yet mplemented")
 
 def getmodel(filename):
 
