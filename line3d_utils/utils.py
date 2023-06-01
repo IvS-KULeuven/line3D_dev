@@ -23,38 +23,37 @@ def quickplot(filename):
     if len(sbpltdim) > 2:
         print(int(sbpltdim[1]), int(len(filename)/sbpltdim[1]))
         fig, axs = plt.subplots(int(sbpltdim[1]), int(len(filename)/sbpltdim[1]))
-    # elif len(sbpltdim) == 2:
-    #     print(int(sbpltdim[0]), int(len(filename)/sbpltdim[0]))
-    #     fig, axs = plt.subplots(int(sbpltdim[1]), int(len(filename)/sbpltdim[1]))
+
+        axind = 0
+        for axi in axs.ravel():
+            model =  getmodel(filename[axind])
+            plot_at_axi(axi, model)
+            axind += 1
     else:
         fig, axs = plt.subplots(1, len(filename))
 
-    axind = 0
-    for axi in axs.ravel():
-        model =  getmodel(filename[axind])
-
-        if "xobs" in model.keys():
-            axi.plot(model['xobs'], model['flux_norm'])
-            axi.invert_xaxis()
-            # set lables 
-            axi.set_title(f'{axind+1}')
-            plt.xlabel(r'$\Delta v (v/v_{th})$')
-            plt.ylabel(r'$F_{tot}/F_{cont}$')
-        elif 'x' in model.keys():
-            axi.pcolor(model['p'], model['zeta'], model['icont_surface'])
-            # set lables 
-            axi.set_title(f'{axind+1}')
-            plt.xlabel(r'$P$')
-            plt.ylabel(r'$\Zeta$')
-        else:
-            raise NotImplementedError("function note yet mplemented")
-        
-        axind += 1
+        model =  getmodel(filename[0])
+        plot_at_axi(axs, model)
         
     plt.show()
 
-
-
+def plot_at_axi(axi, model):
+    
+    if "xobs" in model.keys():
+        axi.plot(model['xobs'], model['flux_norm'])
+        axi.invert_xaxis()
+        # set lables 
+        # axi.set_title(f'{axind+1}')
+        plt.xlabel(r'$\Delta v (v/v_{th})$')
+        plt.ylabel(r'$F_{tot}/F_{cont}$')
+    elif 'x' in model.keys():
+        axi.pcolor(model['p'], model['zeta'], model['icont_surface'])
+        # set lables 
+        # axi.set_title(f'{axind+1}')
+        plt.xlabel(r'$P$')
+        plt.ylabel(r'$\Zeta$')
+    else:
+        raise NotImplementedError("function note yet mplemented")
 
 def getmodel(filename):
 
