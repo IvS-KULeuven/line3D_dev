@@ -1151,7 +1151,7 @@ subroutine calc_mod3d_nicowr3d
    if(idum.lt.is_min) stop 'error in calc_mod3d_nicowr3d: random indx lt is_min'
    if(idum.gt.is_max) stop 'error in calc_mod3d_nicowr3d: random indx gt is_max'
 !
-   write(fname,'(a,a,i4.4,a)') trim(fname_model), '_', idum, '.dat'
+   write(fname,'(a,i4.4,a)') trim(fname_model),idum, '.dat'
 !
    fname=adjustl(fname)
    inquire(file=trim(fname), exist=check1)
@@ -1293,7 +1293,7 @@ subroutine calc_mod3d_nicowr3d
       if(idum.lt.is_min) stop 'error in calc_mod3d_nicowr3d: random indx lt is_min'
       if(idum.gt.is_max) stop 'error in calc_mod3d_nicowr3d: random indx gt is_max'
 !
-      write(fname,'(a,a,i4.4,a)') trim(fname_model), '_', idum, '.dat'
+      write(fname,'(a,i4.4,a)') trim(fname_model), idum, '.dat'
 !
       fname=adjustl(fname)
       inquire(file=trim(fname), exist=check1)
