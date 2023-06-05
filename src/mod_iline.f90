@@ -99,9 +99,22 @@ contains
           IF (LEN_TRIM(dir_lte) .EQ. 0) STOP '---- Error: DIR_LTE not set -----'
           dir_lte = TRIM(dir_lte)//'/'//TRIM(yname)
 
-          !read in line list (only second row)
-          write(*,*) "reading input line properties from : in_linelist.dat"
-          open(1, file='./in_linelist.dat')
+          inquire(file="./in_line_lte.dat", exist=lcheck)
+          !
+          if(.not.lcheck) then
+             write(*,*) 'error in line: file ./in_line.dat does not exist'
+             stop
+          endif
+
+          !read in line (only second row)
+          write(*,*) "reading input line properties from : in_line.dat"
+          open(1, file='./in_line.dat')
+             read(1,*)
+             read(1,*)
+             read(1,*)
+             read(1,*)
+             read(1,*)
+             read(1,*)
              read(1,*)
              read(1,*) element_z, element_i, element_ll, element_lu
           close(1)
@@ -162,57 +175,26 @@ contains
           flu = gf/gl
 
        case(1)
-          !hydrogen 2->3
-          write(*,*) 'Halpha model'
-          na=1
-          element_z = 1
-          element_i = 1
-          element_ll = 2
-          element_lu = 3
-          gl = 8.d0
-          gu = 18.d0
-          flu = 6.4108d-1
+          inquire(file="./in_line.dat", exist=lcheck)
+          !
+          if(.not.lcheck) then
+             write(*,*) 'error in line: file ./in_line.dat does not exist'
+             stop
+          endif
+
+          write(*,*) "reading input line properties from : in_line.dat"
+          open(1, file='./in_line.dat')
+             read(1,*)
+             read(1,*)
+             read(1,*)
+             read(1,*)
+             read(1,*)
+             read(1,*)
+             read(1,*)
+             read(1,*) element_z, element_i, element_ll, element_lu
+             read(1,*) gl, gu, flu, xnue0 , na
+          close(1)       
           gf = gl*flu
-          xnue0= 4.5680294d14          
-       case(2)
-          !hydrogen 2->4
-          write(*,*) 'Hbeta'
-          na=1
-          element_z = 1
-          element_i = 1
-          element_ll = 2
-          element_lu = 4
-          gl = 8.d0
-          gu = 32.d0
-          flu = 1.1938d-1
-          gf = gl*flu
-          xnue0= 6.1668776d14
-       case(10)
-          !CIV (1s2,2s) -> (1s2,2p,spin 3/2)
-          write(*,*) 'CIV resonance line'
-          na=12
-          element_z = 6
-          element_i = 4
-          element_ll = 1
-          element_lu = 2          
-          gl = 2.d0
-          gu = 4.d0
-          flu = 1.9d-1
-          gf = gl*flu
-          xnue0 = 1.93798d15
-       case(11)
-          !CIII (1s2,2s,3p) -> (1s2,2s,3d)
-          write(*,*) 'CIII 5696 line'
-          na=12
-          element_z = 6
-          element_i = 3
-          element_ll = 9
-          element_lu = 12
-          gl = 3.d0
-          gu = 5.d0
-          flu = 3.46d-1
-          gf = gl*flu
-          xnue0 = 5.2632103d14
        case default
           stop 'error in get_iline: iline not properly specified'
     end select

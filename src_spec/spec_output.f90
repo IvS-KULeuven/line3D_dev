@@ -199,12 +199,21 @@ subroutine output_int2d(indx, xobs, alpha, gamma)
    character(len=8) :: name
    character(len=12) :: fname_base='/spec_int2d_'
    character(len=512) :: fname
+
+   logical :: check_dir1
 !
 !store indx in string-variable 'name' with 5 digits and 5 zeros to the left
    write(name,'(i5.5)') indx
    fname = trim(output_dir)//fname_base//trim(name)//'.h5'
 !
 !
+   inquire(file=trim(output_dir)//'/.', exist=check_dir1)
+   if(.not.check_dir1) then
+      write(*,*) "Check options: directory does not exist"
+      write(*,*) "creating new directory: ", output_dir
+      call system("mkdir"//trim(output_dir))
+      ! stop
+   endif
 !
    write(*,*) '------------------------------output to file-----------------------------------'
    write(*,*) trim(fname)

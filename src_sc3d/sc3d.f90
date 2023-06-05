@@ -1714,23 +1714,27 @@ subroutine check_options
 !inquire(directory=trim(model_dir), exist=check_dir4)
 !
    if(.not.check_dir1) then
-      write(*,*) 'error in check_options: directory does not exist'
-      write(*,*) output_dir
-      stop
+      write(*,*) "Check options: directory does not exist"
+      write(*,*) "creating new directory: ", output_dir
+      call system("mkdir"//trim(output_dir))
+      ! stop
    endif
    if(.not.check_dir2) then
-      write(*,*) 'error in check_options: directory does not exist'
-      write(*,*) output_dir_temp
-      stop
+      write(*,*) 'Check options: directory does not exist'
+      write(*,*) "creating new directory: ", output_dir_temp
+      call system("mkdir"//trim(output_dir_temp))
+      ! stop
    endif
    if(.not.check_dir3) then
-      write(*,*) 'error in check_options: directory does not exist'
-      write(*,*) output_dir_test
+      write(*,*) 'Check options: directory does not exist'
+      write(*,*) "creating new directory: ", output_dir_test
+      call system("mkdir"//trim(output_dir_test))
       stop
    endif
    if(.not.check_dir4) then
-      write(*,*) 'error in check_options: directory does not exist'
-      write(*,*) model_dir
+      write(*,*) 'Check options: directory does not exist'
+      write(*,*) "creating new directory: ", model_dir
+      call system("mkdir"//trim(model_dir))
       stop
    endif
 !
