@@ -85,7 +85,6 @@ end module dime_modspec
 !
 module params_modspec
 !
-!
    use prog_type
 !
    implicit none
@@ -93,6 +92,8 @@ module params_modspec
    real(dp) :: unit_length
 !
    real(dp) :: xlogg, lstar, rstar, mstar, rmin, rmax, xmloss, yhe, yhe_mass, hei, sr
+!LP
+   real(dp) :: X_mass, Y_mass
 !yhe = n_He/n_H, yhe_mass = m_He/m_tot
 !
    real(dp) :: teff, tmin, trad, xic1, xic2

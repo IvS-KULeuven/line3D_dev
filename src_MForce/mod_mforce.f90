@@ -39,8 +39,8 @@ MODULE mod_mforce
 
         call LINES%Find(e_z, e_i, e_ll, e_lu)
 
-        gl = ATOMS%Degeneracy(e_z,e_i,e_ll)
-        gu = ATOMS%Degeneracy(e_z,e_i,e_lu)
+        gl = ATOMS%Degeneracy(e_ll,e_i,e_z)
+        gu = ATOMS%Degeneracy(e_lu,e_i,e_z)
 
         gf  = LINES%gf_val(LINES%Index(1)) 
         lam = LINES%Lambda(LINES%Index(1)) 
@@ -76,8 +76,8 @@ MODULE mod_mforce
         TtoT = Tg/Tr
         call NLTE%Set(rho = rho , T = Tr, Te_to_T = TtoT, Dilution = W)
 
-        nl = NLTE%Occupation(e_z_nlte,e_i_nlte,e_l_nlte)
-        nu = NLTE%Occupation(e_z_nlte,e_i_nlte,e_u_nlte)
+        nl = NLTE%Occupation(e_l_nlte,e_i_nlte,e_z_nlte)
+        nu = NLTE%Occupation(e_u_nlte,e_i_nlte,e_z_nlte)
 
         get_nlte_kl = c1 * gf_nlte * (nl/gl_nlte - nu/gu_nlte)
 

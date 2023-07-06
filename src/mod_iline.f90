@@ -38,7 +38,7 @@ module mod_iline
    !
    contains
 
-      subroutine get_iline(iline, yhe_mass)
+      subroutine get_iline(iline, yhe_mass, X_mass, Y_mass)
          !
          !get all required data for a given line described by integer iline
          !note: whenever you change something in here,
@@ -52,6 +52,7 @@ module mod_iline
          ! ... arguments
          integer(i4b), intent(in) :: iline
          real(dp), intent(in) :: yhe_mass
+         real(dp), optional, intent(in) :: X_mass, Y_mass
          !
          ! ... local scalars
          integer(i4b) :: i, nlines, idum, lu_dum
@@ -223,9 +224,9 @@ module mod_iline
                write(str_ll,'(i2.2)') element_ll   
                write(*,*) 'using MFORCE for Z ',str_z, '  I ', str_i
 
-               call Initialise_NLTE()
+               call Initialise_NLTE(X_mass, Y_mass)
                call Get_NLTE_line(element_z, element_i, element_ll, element_lu, gl, gu, gf, lambda)
-               write(*,*) element_z, element_i, element_ll, element_lu, gl, gu, gf, lambda
+               ! write(*,*) element_z, element_i, element_ll, element_lu, gl, gu, gf, lambda
 
                flu =  gf/gl
                xnue0 = cgs_clight/lambda*1.d8 

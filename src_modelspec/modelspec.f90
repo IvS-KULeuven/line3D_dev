@@ -51,7 +51,7 @@ subroutine read_input
    use options_modspec, only: indat_file, input_file, input_file2, output_file, input_mod
    use params_modspec, only: teff, trad, tmin, xlogg, rstar, rmax, tmin, xmloss, vmin, &
       vmax, beta, yhe, yhe_mass, hei, vrot, vmicro, vth_fiducial, &
-      sr, rmin, eps_line, unit_length, xic2
+      sr, rmin, eps_line, unit_length, xic2, X_mass, Y_mass
    use fund_const, only: rsu, pi, cgs_grav, xmsu
    use mod_opal
    use mod_mforce
@@ -75,7 +75,7 @@ subroutine read_input
 ! ... namelist
    namelist / input_options / input_file, input_file2, output_file, input_mod
    namelist / input_model / teff, trad, xlogg, rstar, rmax, tmin, xmloss, vmin, vmax, vrot, &
-      vmicro, vth_fiducial, beta, yhe, hei
+      vmicro, vth_fiducial, beta, yhe, hei, X_mass, Y_mass
    namelist / input_line / iline, eps_line, kline, alpha, kappa0
 !
 !-----------------------------------------------------------------------
@@ -119,7 +119,7 @@ subroutine read_input
 !
 !calculate mass fraction where yhe = n_he/n_h = yhe/(1-yhe), where yhe=n_he/(n_h+n_he)
    yhe_mass = one / (one + one/four/yhe)
-   call get_iline(iline, yhe_mass)
+   call get_iline(iline, yhe_mass, X_mass, Y_mass)
 !
    sr=rstar*rsu
    unit_length=sr
