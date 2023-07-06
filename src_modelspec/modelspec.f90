@@ -54,6 +54,7 @@ subroutine read_input
       sr, rmin, eps_line, unit_length, xic2
    use fund_const, only: rsu, pi, cgs_grav, xmsu
    use mod_opal
+   use mod_mforce
    use mod_lte
    use mod_iline, only: iline, get_iline, na, kline, alpha, kappa0
 !
@@ -136,10 +137,10 @@ subroutine read_input
 !opal tables
    call get_opal_table()
 !
-!lte tables
-   if(iline.eq.0) then
+!initialise lte tables  - redundent 
+   if (iline.eq.0) then 
       call get_lte_table()
-   endif
+   end if       
 !
 !
 !default xic2
@@ -1125,7 +1126,7 @@ subroutine calc_model3d_amrvac
       theta=theta_modext
       phi=phi_modext
    !
-      write(*,'(4(A, I4))')  'Nr = ', nr, "  Nt = ", ntheta, '  Np = ', nphi, '  Tot = ', nr*ntheta*nphi
+      write(*,'(4(A, I8))')  'Nr = ', nr, "  Nt = ", ntheta, '  Np = ', nphi, '  Tot = ', nr*ntheta*nphi
       call cpu_time(cpu_time_finish)
       !$OMP DO SCHEDULE(GUIDED)
       do i=1, nr
@@ -1181,7 +1182,7 @@ subroutine calc_model3d_amrvac
                b2 = one
                b3 = one
                opalbar3d(i,j,k) = get_opalbar(iline, kline, unit_length, yhe, hei, t3d(i,j,k), vth_fiducial, xnue0, b2, b3, rho3d_modext(i,j,k)) !in 1/unit_length
-   !
+               write(*,*) opalbar3d(i,j,k) 
    !---------------------calculate continuum source function---------------
    !
                select case(opt_scont)

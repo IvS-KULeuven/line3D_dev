@@ -15,6 +15,12 @@ ifndef COMPILER
    $(error Please define environment variable COMPILER: export COMPILER=<location of sutable compiler>)
 endif
 
+#########################MFORCE_DIR ENVIRONMENT VARIABLE##################
+ifndef MFORCE_DIR
+   $(info MFORCE_DIR  Not defined)
+   $(error Please define environment variable MFORCE_DIR: export MFORCE_DIR=<location of src_MForce>)
+endif
+
 #########################################################################
 
 #operating system
@@ -56,7 +62,7 @@ ifneq (,$(findstring gfortran,$(COMPILER)))
       DEBUG_FLAGS =
    endif
 
-   CFLAGS = -ffree-line-length-none -c -O3 $(OMP_FLAG) $(DEBUG_FLAGS)
+   CFLAGS = -ffree-line-length-none -c $(OMP_FLAG) $(DEBUG_FLAGS)
    MFLAGS = -J
 
    CDEFINED = true
@@ -98,7 +104,7 @@ ifneq (,$(findstring ifort,$(COMPILER)))
       DEBUG_FLAGS =
    endif
 
-   CFLAGS = -w -c -O3 -mp -assume byterecl -r8 $(OMP_FLAG) $(DEBUG_FLAG)
+   CFLAGS = -w -c -03 -mp -assume byterecl -r8 $(OMP_FLAG) $(DEBUG_FLAG)
    MFLAGS = -module
 
    CDEFINED = true
@@ -198,6 +204,9 @@ DIR_SRC_LTE = src_lte
 DIR_OBJ_LTE = objects/objects_lte
 DIR_MOD_LTE = modules/modules_lte
 
+DIR_SRC_MF = src_MForce
+DIR_OBJ_MF = objects/objects_mforce
+DIR_MOD_MF = modules/modules_mforce
 
 #module files
 OBJSM_TYPE = $(DIR_OBJ)/mod_type.o
@@ -209,6 +218,9 @@ OBJSM_MODEL = $(DIR_OBJ)/mod_type.o                   \
               $(DIR_OBJ)/mod_interp1d.o               \
               $(DIR_OBJ)/mod_interp2d.o               \
               $(DIR_OBJ)/mod_interp3d.o               \
+              $(DIR_OBJ_MF)/mod_line.o                \
+              $(DIR_OBJ_MF)/mod_nlte.o                \
+              $(DIR_OBJ_MF)/mod_mforce.o              \
               $(DIR_OBJ)/mod_opacities.o              \
               $(DIR_OBJ)/mod_iline.o                  \
               $(DIR_OBJ)/mod_amrvac_reader.o          \
@@ -227,10 +239,14 @@ OBJSM_SC3D = $(DIR_OBJ)/mod_type.o                    \
              $(DIR_OBJ)/mod_interp1d.o                \
              $(DIR_OBJ)/mod_interp2d.o                \
              $(DIR_OBJ)/mod_interp3d.o                \
+             $(DIR_OBJ_LTE)/mod_lte.o                 \
+             $(DIR_OBJ_MF)/mod_line.o                 \
+             $(DIR_OBJ_MF)/mod_nlte.o                 \
+             $(DIR_OBJ_MF)/mod_mforce.o               \
              $(DIR_OBJ)/mod_opacities.o               \
              $(DIR_OBJ)/mod_iline.o                   \
-             $(DIR_OBJ_LTE)/mod_lte.o                 \
              $(DIR_OBJ_SC3D)/mod_sc3d.o
+
 
 OBJSM_SPEC = $(DIR_OBJ)/mod_type.o                    \
              $(DIR_OBJ)/mod_grid.o                    \
@@ -239,11 +255,15 @@ OBJSM_SPEC = $(DIR_OBJ)/mod_type.o                    \
              $(DIR_OBJ)/mod_interp1d.o                \
              $(DIR_OBJ)/mod_interp2d.o                \
              $(DIR_OBJ)/mod_interp3d.o                \
+             $(DIR_OBJ_LTE)/mod_lte.o                 \
+             $(DIR_OBJ_MF)/mod_line.o                 \
+             $(DIR_OBJ_MF)/mod_nlte.o                 \
+             $(DIR_OBJ_MF)/mod_mforce.o               \
              $(DIR_OBJ)/mod_opacities.o               \
              $(DIR_OBJ)/mod_iline.o                   \
-             $(DIR_OBJ_LTE)/mod_lte.o                 \
              $(DIR_OBJ_PHOTPROF)/mod_photprof.o       \
              $(DIR_OBJ_SPEC)/mod_spec.o
+
 
 OBJSM_MODELSPEC = $(DIR_OBJ)/mod_type.o               \
                   $(DIR_OBJ)/mod_sort.o               \
@@ -255,6 +275,9 @@ OBJSM_MODELSPEC = $(DIR_OBJ)/mod_type.o               \
                   $(DIR_OBJ)/mod_opacities.o          \
                   $(DIR_OBJ)/mod_iline.o              \
                   $(DIR_OBJ_LTE)/mod_lte.o            \
+                  $(DIR_OBJ_MF)/mod_line.o            \
+                  $(DIR_OBJ_MF)/mod_nlte.o            \
+                  $(DIR_OBJ_MF)/mod_mforce.o          \
                   $(DIR_OBJ_MODELSPEC)/mod_modelspec.o
 
 OBJSM_SPECVBIN = $(DIR_OBJ)/mod_type.o                \
@@ -264,9 +287,12 @@ OBJSM_SPECVBIN = $(DIR_OBJ)/mod_type.o                \
                  $(DIR_OBJ)/mod_interp1d.o            \
                  $(DIR_OBJ)/mod_interp2d.o            \
                  $(DIR_OBJ)/mod_interp3d.o            \
+                 $(DIR_OBJ_LTE)/mod_lte.o             \
+                 $(DIR_OBJ_MF)/mod_line.o             \
+                 $(DIR_OBJ_MF)/mod_nlte.o             \
+                 $(DIR_OBJ_MF)/mod_mforce.o           \
                  $(DIR_OBJ)/mod_opacities.o           \
                  $(DIR_OBJ)/mod_iline.o               \
-                 $(DIR_OBJ_LTE)/mod_lte.o             \
                  $(DIR_OBJ_PHOTPROF)/mod_photprof.o   \
                  $(DIR_OBJ_SPECVBIN)/mod_spec.o
 
@@ -277,9 +303,12 @@ OBJSM_MODELSPECVBIN = $(DIR_OBJ)/mod_type.o           \
                       $(DIR_OBJ)/mod_interp1d.o       \
                       $(DIR_OBJ)/mod_interp2d.o       \
                       $(DIR_OBJ)/mod_interp3d.o       \
+                      $(DIR_OBJ_LTE)/mod_lte.o        \
+                      $(DIR_OBJ_MF)/mod_line.o        \
+                      $(DIR_OBJ_MF)/mod_nlte.o        \
+                      $(DIR_OBJ_MF)/mod_mforce.o      \
                       $(DIR_OBJ)/mod_opacities.o      \
                       $(DIR_OBJ)/mod_iline.o          \
-                      $(DIR_OBJ_LTE)/mod_lte.o        \
                       $(DIR_OBJ_MODELSPECVBIN)/mod_modelspec.o
 
 OBJSM_OPAL = $(DIR_OBJ)/mod_type.o \
@@ -287,6 +316,10 @@ OBJSM_OPAL = $(DIR_OBJ)/mod_type.o \
 
 OBJSM_LTE = $(DIR_OBJ)/mod_type.o \
             $(DIR_OBJ_OPAL)/mod_lte.o
+
+OBJSM_MFORCE = $(DIR_OBJ)/mod_type.o \
+               $(DIR_OBJ_MF)/line_module.o \
+               $(DIR_OBJ_MF)/nlte_module.o
 
 ########################################################################
 
@@ -503,8 +536,9 @@ $(DIR_OBJ)/mod_opacities.o: $(DIR_SRC)/mod_opacities.f90  \
                             $(DIR_OBJ)/info_region.o \
                             $(DIR_OBJ)/mod_iline.o \
                             $(DIR_OBJ_LTE)/mod_lte.o \
+                            $(DIR_OBJ_MF)/mod_mforce.o \
                             $(OBJSM_TYPE)
-		$(F90) $(CFLAGS) -I $(DIR_MOD) -I $(DIR_MOD_LTE) $(MFLAGS) $(DIR_MOD) $< -o $(DIR_OBJ)/mod_opacities.o
+		$(F90) $(CFLAGS) -I $(DIR_MOD) -I $(DIR_MOD_LTE) -I $(DIR_MOD_MF) $(MFLAGS) $(DIR_MOD) $< -o $(DIR_OBJ)/mod_opacities.o
 
 $(DIR_OBJ)/info_region.o: $(DIR_SRC)/info_region.f90  \
                           $(OBJSM_TYPE)
@@ -587,8 +621,9 @@ $(DIR_OBJ)/model_laws.o: $(DIR_SRC)/model_laws.f90  \
 		$(F90) $(CFLAGS) -I $(DIR_MOD) $< -o $(DIR_OBJ)/model_laws.o
 
 $(DIR_OBJ)/mod_iline.o: $(DIR_SRC)/mod_iline.f90 \
+                        $(DIR_OBJ_MF)/mod_mforce.o \
                         $(OBJSM_TYPE)
-		$(F90) $(CFLAGS) $(MFLAGS) $(DIR_MOD) -I $(DIR_MOD) $< -o $(DIR_OBJ)/mod_iline.o
+		$(F90) $(CFLAGS) $(MFLAGS) $(DIR_MOD) -I $(DIR_MOD) -I $(DIR_MOD_MF) $< -o $(DIR_OBJ)/mod_iline.o
 
 $(DIR_OBJ)/sparse.o: $(DIR_SRC)/sparse.f90 \
                      $(DIR_OBJ)/ng_extrapol.o \
@@ -608,16 +643,29 @@ $(DIR_OBJ_OPAL)/mod_opal.o: $(DIR_SRC_OPAL)/mod_opal.f90 \
 ########################################################################
 
 $(DIR_OBJ_LTE)/mod_lte.o: $(DIR_SRC_LTE)/mod_lte.f90 \
-                          $(DIR_OBJ/mod_iline.o \
+                          $(DIR_OBJ)/mod_iline.o \
                           $(OBJSM_TYPE)
 		$(F90) $(CFLAGS) $(MFLAGS) $(DIR_MOD_LTE) -I $(DIR_MOD) $< -o $(DIR_OBJ_LTE)/mod_lte.o
 
+############################ MForce interface #############################
+$(DIR_OBJ_MF)/mod_mforce.o: $(DIR_SRC_MF)/mod_mforce.f90 \
+                            $(DIR_OBJ_MF)/mod_line.o \
+                            $(DIR_OBJ_MF)/mod_nlte.o \
+                            $(OBJSM_TYPE)
+		$(F90) $(CFLAGS) $(MFLAGS) $(DIR_MOD_MF) -I $(DIR_MOD) $< -o $(DIR_OBJ_MF)/mod_mforce.o
 
+$(DIR_OBJ_MF)/mod_nlte.o: $(DIR_SRC_MF)/mod_nlte.f90 \
+                          $(OBJSM_TYPE)
+		$(F90) $(CFLAGS) $(MFLAGS) $(DIR_MOD_MF) -I $(DIR_MOD) $< -o $(DIR_OBJ_MF)/mod_nlte.o
+
+$(DIR_OBJ_MF)/mod_line.o: $(DIR_SRC_MF)/mod_line.f90 \
+                          $(OBJSM_TYPE)
+		$(F90) $(CFLAGS) $(MFLAGS) $(DIR_MOD_MF) -I $(DIR_MOD) $< -o $(DIR_OBJ_MF)/mod_line.o
 ########################################################################
 
 $(DIR_OBJ_MODEL)/mod_model.o: $(DIR_SRC_MODEL)/mod_model.f90 \
                               $(OBJSM_TYPE)
-		$(F90) $(CFLAGS) $(MFLAGS) $(DIR_MOD_MODEL) -I $(DIR_MOD) -I $(DIR_MOD_HDF5) -I $(DIR_MOD_LTE) $< -o $(DIR_OBJ_MODEL)/mod_model.o
+		$(F90) $(CFLAGS) $(MFLAGS) $(DIR_MOD_MODEL) -I $(DIR_MOD) -I $(DIR_MOD_HDF5) -I $(DIR_MOD_LTE) -I  $(DIR_MOD_MF) $< -o $(DIR_OBJ_MODEL)/mod_model.o
 
 $(DIR_OBJ_MODEL)/model1d.o: $(DIR_SRC_MODEL)/model1d.f90 \
                             $(DIR_OBJ)/model_laws.o \
@@ -646,7 +694,7 @@ $(DIR_OBJ_MODEL)/model.o: $(DIR_SRC_MODEL)/model.f90 \
 
 $(DIR_OBJ_SC3D)/mod_sc3d.o: $(DIR_SRC_SC3D)/mod_sc3d.f90 \
                             $(OBJSM_TYPE)
-		$(F90) $(CFLAGS) $(MFLAGS) $(DIR_MOD_SC3D) -I $(DIR_MOD) -I $(DIR_MOD_LTE) $< -o $(DIR_OBJ_SC3D)/mod_sc3d.o
+		$(F90) $(CFLAGS) $(MFLAGS) $(DIR_MOD_SC3D) -I $(DIR_MOD) -I $(DIR_MOD_LTE) -I $(DIR_MOD_MF) $< -o $(DIR_OBJ_SC3D)/mod_sc3d.o
 
 $(DIR_OBJ_SC3D)/anglenodes.o: $(DIR_SRC_SC3D)/anglenodes.f90 \
                               $(DIR_OBJ)/math.o \
@@ -897,7 +945,7 @@ $(DIR_OBJ_SPEC)/mod_spec.o: $(DIR_SRC_SPEC)/mod_spec.f90 \
 $(DIR_OBJ_MODELSPEC)/modelspec.o: $(DIR_SRC_MODELSPEC)/modelspec.f90 \
                                   $(OBJSM_MODELSPEC) \
                                   $(OBJS1_MODELSPEC)
-		$(F90) $(CFLAGS) -I $(DIR_MOD) -I $(DIR_MOD_MODELSPEC) -I $(DIR_MOD_HDF5) -I $(DIR_MOD_OPAL) -I $(DIR_MOD_LTE) $< -o $(DIR_OBJ_MODELSPEC)/modelspec.o
+		$(F90) $(CFLAGS) -I $(DIR_MOD) -I $(DIR_MOD_MODELSPEC) -I $(DIR_MOD_HDF5) -I $(DIR_MOD_OPAL) -I $(DIR_MOD_LTE) -I $(DIR_MOD_MF) $< -o $(DIR_OBJ_MODELSPEC)/modelspec.o
 
 $(DIR_OBJ_MODELSPEC)/mod_modelspec.o: $(DIR_SRC_MODELSPEC)/mod_modelspec.f90 \
                                       $(OBJSM_TYPE)
@@ -955,7 +1003,7 @@ $(DIR_OBJ_SPECVBIN)/mod_spec.o: $(DIR_SRC_SPECVBIN)/mod_spec.f90 \
 $(DIR_OBJ_MODELSPECVBIN)/modelspec.o: $(DIR_SRC_MODELSPECVBIN)/modelspec.f90 \
                                       $(OBJSM_MODELSPECVBIN) \
                                       $(OBJS1_MODELSPECVBIN)
-		$(F90) $(CFLAGS) -I $(DIR_MOD) -I $(DIR_MOD_MODELSPECVBIN) -I $(DIR_MOD_HDF5) -I $(DIR_MOD_LTE) $< -o $(DIR_OBJ_MODELSPECVBIN)/modelspec.o
+		$(F90) $(CFLAGS) -I $(DIR_MOD) -I $(DIR_MOD_MODELSPECVBIN) -I $(DIR_MOD_HDF5) -I $(DIR_MOD_LTE) -I $(DIR_MOD_MF) $< -o $(DIR_OBJ_MODELSPECVBIN)/modelspec.o
 
 $(DIR_OBJ_MODELSPECVBIN)/mod_modelspec.o: $(DIR_SRC_MODELSPECVBIN)/mod_modelspec.f90 \
                                           $(OBJSM_TYPE)
@@ -978,6 +1026,7 @@ clean:
 		rm -f $(DIR_OBJ_MODELSPECVBIN)/*.o $(DIR_OBJ_MODELSPECVBIN)/*~ $(DIR_OBJ_MODELSPECVBIN)/*.mod $(DIR_MOD_MODELSPECVBIN)/*.mod
 		rm -f $(DIR_OBJ_OPAL)/*.o $(DIR_OBJ_OPAL)/*~ $(DIR_OBJ_OPAL)/*.mod $(DIR_MOD_OPAL)/*.mod
 		rm -f $(DIR_OBJ_LTE)/*.o $(DIR_OBJ_LTE)/*~ $(DIR_OBJ_LTE)/*.mod $(DIR_MOD_LTE)/*.mod
+		rm -f $(DIR_OBJ_MF)/*.o $(DIR_OBJ_MF)/*~ $(DIR_OBJ_MF)/*.mod $(DIR_MOD_MF)/*.mod
 
 		rm -f $(DIR_MOD)/*.o $(DIR_MOD)/*~ $(DIR_MOD)/*.mod
 		rm -f $(DIR_MOD_MODEL)/*.o $(DIR_MOD_MODEL)/*~ $(DIR_MOD_MODEL)/*.mod

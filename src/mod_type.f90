@@ -19,7 +19,17 @@ integer, parameter :: qp = selected_real_kind(33,4931)
 !i1b: 1-byte integer (range [-128,127])
 !i4b: 4-byte integer (range [10^-8 , 10^8])
 !i8b: 8-byte integer (range [10^-18 , 10^18]))
-  
+
+! PL migrating the parameter definitions to accomodate the NLTE and Line modules of MForce
+INTEGER, PARAMETER :: I2B = SELECTED_INT_KIND(2)
+
+INTEGER, PARAMETER :: stdlen = 80
+INTEGER, PARAMETER :: ibmlen = 132
+
+INTEGER, PARAMETER :: stdin  = 5
+INTEGER, PARAMETER :: stdout = 6
+INTEGER, PARAMETER :: stderr = 0
+
 end module prog_type
 !
 !-----------------------------------------------------------------------

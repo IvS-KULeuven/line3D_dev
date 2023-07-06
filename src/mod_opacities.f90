@@ -5,7 +5,8 @@ module mod_opacities
   use mod_interp1d
   use mod_interp2d, only: interpol2d_4p_lin
   use mod_lte, only: rho_lte, temp_lte, nlower_lte, nrho_lte, ntemp_lte
-  use mod_iline, only: gf, gl
+  use mod_mforce
+  use mod_iline, only: gf, gl, element_lu, element_ll, element_z, element_i
 
   implicit none
 
@@ -606,46 +607,61 @@ contains
     !sr: length scale (to have opacities in 1/sr on output instead of 1/cm)
     !
     ! ... arguments
-    real(dp), intent(in) :: rho, temp, bu, bl, xnue0, vth_fiducial, sr
-    real(dp) :: opalbar_lte_table
+      real(dp), intent(in) :: rho, temp, bu, bl, xnue0, vth_fiducial, sr
+      real(dp) :: opalbar_lte_table
     !
     ! ... local scalars
-    integer(i4b) :: i, iim2, iim1, ii, iip1, jjm2, jjm1, jj, jjp1
-    real(dp) :: nlower, deldop_fiducial
-    real(dp) :: rho_local, t_local, fdum
-    real(dp), parameter :: c1 = pi*cgs_e**2 / cgs_me/cgs_clight
+      integer(i4b) :: i, iim2, iim1, ii, iip1, jjm2, jjm1, jj, jjp1
+      real(dp) :: nlower, deldop_fiducial
+      real(dp) :: rho_local, t_local, fdum
+      real(dp), parameter :: c1 = pi*cgs_e**2 / cgs_me/cgs_clight
     !
     ! ... local functions
     !
-    rho_local = log10(rho)
-    t_local = log10(temp)
+      rho_local = log10(rho)
+      t_local = log10(temp)
     !
     !
-    if(t_local.gt.maxval(temp_lte).or.t_local.lt.minval(temp_lte)) then
-       stop 'error in opalbar_lte_table: temperature out of range'
-    endif
-    if(rho_local.gt.maxval(rho_lte).or.rho_local.lt.minval(rho_lte)) then
-       stop 'error in opalbar_lte_table: density out of range'
-    endif    
+      if(t_local.gt.maxval(temp_lte).or.t_local.lt.minval(temp_lte)) then
+         stop 'error in opalbar_lte_table: temperature out of range'
+      endif
+      if(rho_local.gt.maxval(rho_lte).or.rho_local.lt.minval(rho_lte)) then
+         stop 'error in opalbar_lte_table: density out of range'
+      endif    
     !
-    call find_index(t_local, temp_lte, ntemp_lte, iim2, iim1, ii, iip1)
-    call find_index(rho_local, rho_lte, nrho_lte, jjm2, jjm1, jj, jjp1)
+      call find_index(t_local, temp_lte, ntemp_lte, iim2, iim1, ii, iip1)
+      call find_index(rho_local, rho_lte, nrho_lte, jjm2, jjm1, jj, jjp1)
 
-    nlower = interpol2d_4p_lin(nlower_lte(iim1, jjm1), nlower_lte(ii,jjm1), &
+      nlower = interpol2d_4p_lin(nlower_lte(iim1, jjm1), nlower_lte(ii,jjm1), &
                               nlower_lte(iim1, jj),   nlower_lte(ii,jj), &
                               temp_lte(iim1), temp_lte(ii), &
                               rho_lte(jjm1), rho_lte(jj), t_local, rho_local)
     !
-    t_local = ten**t_local
-    fdum = one - bu/bl * exp(-cgs_planck*xnue0/cgs_kb/t_local)
+      t_local = ten**t_local
+      fdum = one - bu/bl * exp(-cgs_planck*xnue0/cgs_kb/t_local)
     
-    opalbar_lte_table = c1*gf * bl/gl * ten**nlower * fdum
+      opalbar_lte_table = c1*gf * bl/gl * ten**nlower * fdum
 
     !finally need to divide this by deldop_fiducial and in units of 1/sr
-    deldop_fiducial=xnue0*vth_fiducial/cgs_clight
-    opalbar_lte_table=opalbar_lte_table*sr/deldop_fiducial
+      deldop_fiducial=xnue0*vth_fiducial/cgs_clight
+      opalbar_lte_table=opalbar_lte_table*sr/deldop_fiducial
     !
-  end function opalbar_lte_table
+   end function opalbar_lte_table
+
+   real function opalbar_nlte(sr, vth_fiducial, xnue0, rho, temp, tgas, w)
+      real(dp), intent(in) :: sr, vth_fiducial, xnue0, rho, temp, tgas, w
+
+      real(dp) ::  kl,  deldop_fiducial 
+
+      kl = get_nlte_kl(rho, temp, tgas, w)
+
+      !finally need to divide this by deldop_fiducial and in units of 1/sr
+      deldop_fiducial = xnue0*vth_fiducial/cgs_clight
+      opalbar_nlte = kl * sr/deldop_fiducial
+   end function opalbar_nlte
+
+
+
   !
   !-----------------------------------------------------------------------
   !-----------------------------------------------------------------------
@@ -682,6 +698,8 @@ contains
           get_opalbar = opalbar_model_kline(yhe, hei, rho, kline)*sr
        case(11)
           get_opalbar = opalbar_model_kline2(yhe, hei, rho, kline)*sr
+       case(111)
+          get_opalbar = opalbar_nlte(sr, vth_fiducial, xnue0, rho, temp, temp, 1.0d0)
        case default
           stop 'error in get_opalbar: iline not properly specified'
     end select
