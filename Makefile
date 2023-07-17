@@ -543,7 +543,7 @@ modelspec_vbin: $(OBJS2_MODELSPECVBIN | $(DIR_LIST_MOD_OBJ))
 ########################################################################
 #
 $(DIR_LIST_MOD_OBJ): 
-   mkdir -p $@
+      mkdir -p $@
 #
 
 $(DIR_OBJ)/mod_interp1d.o: $(DIR_SRC)/mod_interp1d.f90 \
