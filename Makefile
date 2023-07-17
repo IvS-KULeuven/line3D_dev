@@ -208,6 +208,33 @@ DIR_SRC_MF = src_MForce
 DIR_OBJ_MF = objects/objects_mforce
 DIR_MOD_MF = modules/modules_mforce
 
+
+DIR_LIST_MOD_OBJ =   objects                 \
+                     modules                 \
+                     $(DIR_OBJ)              \
+                     $(DIR_MOD)              \
+                     $(DIR_OBJ_MODEL)        \
+                     $(DIR_MOD_MODEL)        \
+                     $(DIR_OBJ_SC3D)         \
+                     $(DIR_MOD_SC3D)         \
+                     $(DIR_OBJ_PHOTPROF)     \
+                     $(DIR_MOD_PHOTPROF)     \
+                     $(DIR_OBJ_SPEC)         \
+                     $(DIR_MOD_SPEC)         \
+                     $(DIR_OBJ_MODELSPEC)    \
+                     $(DIR_MOD_MODELSPEC)    \
+                     $(DIR_OBJ_SPECVBIN)     \
+                     $(DIR_MOD_SPECVBIN)     \
+                     $(DIR_OBJ_MODELSPECVBIN)\
+                     $(DIR_MOD_MODELSPECVBIN)\
+                     $(DIR_OBJ_OPAL)         \
+                     $(DIR_MOD_OPAL)         \
+                     $(DIR_OBJ_LTE)          \
+                     $(DIR_MOD_LTE)          \
+                     $(DIR_OBJ_MF)           \
+                     $(DIR_MOD_MF)
+
+
 #module files
 OBJSM_TYPE = $(DIR_OBJ)/mod_type.o
 
@@ -494,27 +521,31 @@ copy:
 #
 ########################################################################
 #
-model: $(OBJS2_MODEL)
+model: $(OBJS2_MODEL) | $(DIR_LIST_MOD_OBJ)
 #	@echo $(OBJS2_MODEL)
 	 $(LD) $(OBJS2_MODEL) $(OMP_FLAG) -L $(DIR_LIB_HDF5) -o model.eo
 
-sc3d: $(OBJS2_SC3D)
+sc3d: $(OBJS2_SC3D) | $(DIR_LIST_MOD_OBJ)
 	 $(LD) $(OBJS2_SC3D) $(OMP_FLAG) -L $(DIR_LIB_HDF5) -o sc3d.eo
 
-spec: $(OBJS2_SPEC)
+spec: $(OBJS2_SPEC) | $(DIR_LIST_MOD_OBJ)
 	 $(LD) $(OBJS2_SPEC) $(OMP_FLAG) -L $(DIR_LIB_HDF5) -o spec.eo
 
-modelspec: $(OBJS2_MODELSPEC)
+modelspec: $(OBJS2_MODELSPEC | $(DIR_LIST_MOD_OBJ))
 	 $(LD) $(OBJS2_MODELSPEC) $(OMP_FLAG) -L $(DIR_LIB_HDF5) -o modelspec.eo
 
-spec_vbin: $(OBJS2_SPECVBIN)
+spec_vbin: $(OBJS2_SPECVBIN | $(DIR_LIST_MOD_OBJ))
 	 $(LD) $(OBJS2_SPECVBIN) $(OMP_FLAG) -L $(DIR_LIB_HDF5) -o spec_vbin.eo
 
-modelspec_vbin: $(OBJS2_MODELSPECVBIN)
+modelspec_vbin: $(OBJS2_MODELSPECVBIN | $(DIR_LIST_MOD_OBJ))
 	 $(LD) $(OBJS2_MODELSPECVBIN) $(OMP_FLAG) -L $(DIR_LIB_HDF5) -o modelspec_vbin.eo
 #
 ########################################################################
 #
+$(DIR_LIST_MOD_OBJ): 
+   mkdir -p $@
+#
+
 $(DIR_OBJ)/mod_interp1d.o: $(DIR_SRC)/mod_interp1d.f90 \
                            $(OBJSM_TYPE)
 		$(F90) $(CFLAGS) -I $(DIR_MOD) $(MFLAGS) $(DIR_MOD) $< -o $(DIR_OBJ)/mod_interp1d.o
@@ -1054,4 +1085,5 @@ clean:
 
 cleanall: 
 		rm -f *.eo *.o *~ *.mod \#*
+      rm -rf $(DIR_LIST_MOD_OBJ)
 

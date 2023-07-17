@@ -43,7 +43,7 @@
 %----------------------hypersetup-------------------------------------------------
 %
 \newcommand{\notesTitle}{Documentation}
-\newcommand{\notesAuthor}{Levin Hennicker}
+\newcommand{\notesAuthor}{Levin Hennicker \& Luka Poniatowski}
 %
 \hypersetup{
    pdfpagemode = {UseNone}, % Verhindert die automatische Anzeige der Lesezeichen
@@ -273,7 +273,7 @@ The code requires the following packages:
   gfortran: inquire(file=trim(directory)//'/.', exist=my\_boolean)
   \\
   ifort: inquire(directory=trim(directory), exist=my\_boolean)
-\item[\textsc{HDF5}:] The HDF5 library is required (version 1.10.5 or higher). This library needs to be compiled with the same compiler as used for the main programs (\ie~gfortran or ifort). See Sect.~\ref{subsec:hdf5} on how to install HDF5 on your system
+\item[\textsc{HDF5}:] The HDF5 library is required (version 1.14.1 or higher). This library needs to be compiled with the same compiler as used for the main programs (\ie~gfortran or ifort). See Sect.~\ref{subsec:hdf5} on how to install HDF5 on your system
   \item[\textsc{PYTHON, IDL, GDL}] The code comes with an IDL/GDL or PYTHON library for reading and plotting all output files.
 \end{description}  
 \subsection{Getting the code}
@@ -297,9 +297,9 @@ You can get the code from github:
 I recommend to create a local build for your HDF5 libraries. To this end, please follow the following steps (here for version 1.10.6)
 \paragraph{UNIX systems}
 \begin{enumerate}
-\item Download the package \textbf{hdf5-1.10.6.tar.gz}, unzip it, and change to the corresponding folder: \\
-  \verb|    tar -zxvf hdf5-1.10.6.tar.gz|\\
-  \verb|    cd hdf5-1.10.6|
+\item Download the package \textbf{hdf5-1.14.1.tar.gz}, unzip it, and change to the corresponding folder: \\
+  \verb|    tar -zxvf hdf5-1.14.1.tar.gz|\\
+  \verb|    cd hdf5-1.14.1|
 \item Export some required environment variables:\\
     \begin{tabular}{ll}
       \textbf{gfortran}  & \textbf{ifort} \\
