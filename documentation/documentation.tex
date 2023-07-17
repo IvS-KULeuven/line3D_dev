@@ -274,7 +274,7 @@ The code requires the following packages:
   \\
   ifort: inquire(directory=trim(directory), exist=my\_boolean)
 \item[\textsc{HDF5}:] The HDF5 library is required (version 1.14.1 or higher). This library needs to be compiled with the same compiler as used for the main programs (\ie~gfortran or ifort). See Sect.~\ref{subsec:hdf5} on how to install HDF5 on your system
-  \item[\textsc{PYTHON, IDL, GDL}] The code comes with an IDL/GDL or PYTHON library for reading and plotting all output files.
+  \item[\textsc{PYTHON}] The code comes with an PYTHON library for reading and plotting all output files.
 \end{description}  
 \subsection{Getting the code}
 You can get the code from github:
@@ -291,10 +291,75 @@ You can get the code from github:
 %
 \subsection{Quick start}
 
+\paragraph{Compililing the source}
+\label{compilation}
+For the optimal use of the code, we recommend the separation of the source code and the model location. 
+To this end, the main code must be compiled at the location of the source (i.e. inside directory \verb|line3d_dev|) 
+it can then be called and executed from any other desired location. 
+To do so one first needs to export several environmental variables, 
+including those of HDF5 library (if HDF5 library is not present on your machine consult \ref{subsec:hdf5}). \\
+
+  \begin{verbatim}
+    export LIB_HDF5=<.../hdf5_lib>
+    export COMPILER=<.../gfortran>
+    export DIR_OPAL=<.../opal_tables>
+    export DIR_LTE=<.../lte_tables>
+    export MFORCE_DIR=<../line3d_dev/src_mforce>
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<.../hdf5_lib/lib>
+    export PATH=$PATH:<../line3d_dev>
+  \end{verbatim}
+  This can be either added to \texttt{.bashrc} / \texttt{.zshrc}, or text file (e.g. \texttt{.env}) containing the export statments.
+  Variables can then simply be exported by calling:
+  \begin{verbatim}
+      . .env
+  \end{verbatim}
+  % export $(grep -v "^#" .env | xargs -d '\n')
+  % for GNU system or 
+  % \begin{verbatim}
+  %   export $(grep -v "^#" .env | xargs -0)
+  % \end{verbatim}
+  % BSD systems.
+    % {\color{red} NOTE. This commants may need to be modified for the new MACs with M1 chip (see instalation instractions below)}
+% 
+
+After setting up the environment, one can simply compile the code calling \texttt{make}.
+Upon successful compilation executables:
+\begin{itemize}
+  \item \texttt{model.eo}
+  \item \texttt{sc3d.eo}
+  \item \texttt{modelspec.eo}
+  \item \texttt{spec.eo}
+  \item \texttt{modelspec\_vbin.eo}
+  \item \texttt{spec\_vbin.eo} 
+\end{itemize}
+  should be created.
+These programs can then be executed as described below.
+
+\paragraph{Executing programs}
+The recommended way of utilising the code is to create separate directory for execution of the programs. 
+In the example here, we create directory \texttt{line3d-runs}. 
+In this directory we then copy files:
+\begin{itemize}
+  \item \texttt{.env}
+  \item \texttt{indat\_sc3d.nml}
+  \item \texttt{indat\_modelspec.nml}
+  \item \texttt{spec.nml}
+  \item \texttt{in\_alpha.dat}
+  \item \texttt{in\_gamma.dat}
+  \item \texttt{in\_line.dat}
+\end{itemize}. 
+
+At this point input and output directoriesmust by created followind the designation in the \texttt{indat} files 
+(i.e. \verb|model_dir = ''|, \verb|output_dir = ''|, \verb|output_file = ''|, \verb|input_file = ''|, \verb|input_file2 = ''| )
+
+Having exporred environmental variables as above we can then call e.g.:\\ 
+\verb|model.eo indat_sc3d.nml|. 
 
 \subsection{Installing HDF5}
 \label{subsec:hdf5}
-I recommend to create a local build for your HDF5 libraries. To this end, please follow the following steps (here for version 1.10.6)
+
+I recommend to create a local build for your HDF5 libraries. 
+To this end, please follow the following steps (here for version 1.14.1)
 \paragraph{UNIX systems}
 \begin{enumerate}
 \item Download the package \textbf{hdf5-1.14.1.tar.gz}, unzip it, and change to the corresponding folder: \\
@@ -317,37 +382,7 @@ I recommend to create a local build for your HDF5 libraries. To this end, please
   verify that all tests return a `pass' \\
   \verb|    make install|\\
    all done
-\item Include the library path in the Makefile of the main code (\eg~\verb|line3D/Makefile|)
-\item Add the library path to your LD environment variable, and define a new environment variable that will be used in the Makefiles:\\
-  \begin{verbatim}
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<.../hdf5_lib/lib>
-    export LIB_HDF5=<.../hdf5_lib>
-    export COMPILER=<.../gfortran>
-    export DIR_OPAL=<.../opal_tables>
-    export DIR_LTE=<.../lte_tables>
-  \end{verbatim}
-  This can be either added to \texttt{.bashrc} / \texttt{.zshrc}, or text file can be created with the list of variables. 
-  To do this we create \texttt{.env} file with folowing contents: 
-  \begin{verbatim}
-    HDF5_PATH=<.../hdf5_lib/lib>
-    COMPILER=<.../gfortran>
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HDF5_PATH
-    LIB_HDF5=<.../hdf5_lib>
-    DIR_OPAL=<.../opal_tables>
-    DIR_LTE=<.../lte_tables>
-  \end{verbatim}
-  Variables from such file can simply be exported by calling
-  \begin{verbatim}
-    export $(grep -v "^#" .env | xargs -d '\n')
-  \end{verbatim}
-  for GNU system or 
-  \begin{verbatim}
-    export $(grep -v "^#" .env | xargs -0)
-  \end{verbatim}
-  BSD systems.
-    % {\color{red} NOTE. This commants may need to be modified for the new MACs with M1 chip (see instalation instractions below)}
 \end{enumerate}
-
 \paragraph{MAC}
 On the MAC, the installation is essentially performed the same way. For the gfortran compiler, you might need
 \begin{enumerate}
@@ -375,29 +410,36 @@ On the MAC, the installation is essentially performed the same way. For the gfor
   \verb|    brew install hdf5|}
 \end{enumerate}
 
-\subsection{Importing the plotting routines}
-All plotting routines are stored in the directory
-\textit{line3D/plotFILES} or \textit{cont3Dslab/plotFILES}, with
-corresponding libraries named \textit{levpy}, \textit{lib\_gdl} and
-\textit{lib\_idl} for \textsc{PYTHON}, \textsc{GDL}, and \textsc{IDL},
-respectively.
-%
-\paragraph{GDL/IDL}
-The required libraries can be simply read in by typing in your IDL/GDL terminal:\\
-@idl\_lib/startup.pro \\
-@gdl\_lib/startup.pro \\
+\subsection{Importing PYTHON routines}
+Our code package comes with the python utilities desiged to read the output files from the \texttt{spec.eo}. 
+This package also contains small tool for quick plotting. 
+To include it in your python project simply extend python path (or path) 
+to include the source dirctory of this code (e.g. \verb|export PATH=$PATH:<.../line3D_dev>|).
+Then add to your oython project statment \verb|import line3d_utils| to use the provided tools. 
+Provided python example project \texttt{pletter.py} demonstrates how the \texttt{quickplot} function is used.
 
-We emphasize that some of the routines might be outdated (for
-instance, variable names stored within the individual *.h5 files might
-have changed). It should be straight forward though to adapt the
-corresponding reading routines (in \textit{idl\_lib/proLEV/getall}).
-%
-\paragraph{PYTHON}
-The following python packages are required: \\
-h5py, imageio, matplotlib, numpy, os, scipy, sys
-%
-%
-%
+% All plotting routines are stored in the directory
+% \textit{line3D/plotFILES} or \textit{cont3Dslab/plotFILES}, with
+% corresponding libraries named \textit{levpy}, \textit{lib\_gdl} and
+% \textit{lib\_idl} for \textsc{PYTHON}, \textsc{GDL}, and \textsc{IDL},
+% respectively.
+% %
+% \paragraph{GDL/IDL}
+% The required libraries can be simply read in by typing in your IDL/GDL terminal:\\
+% @idl\_lib/startup.pro \\
+% @gdl\_lib/startup.pro \\
+
+% We emphasize that some of the routines might be outdated (for
+% instance, variable names stored within the individual *.h5 files might
+% have changed). It should be straight forward though to adapt the
+% corresponding reading routines (in \textit{idl\_lib/proLEV/getall}).
+% %
+% \paragraph{PYTHON}
+% The following python packages are required: \\
+% h5py, imageio, matplotlib, numpy, os, scipy, sys
+% %
+% %
+% %
 \section{Main code modules}
 \subsection{line3D}
 \label{subsec:line3d}

@@ -465,85 +465,28 @@ OBJS2_MODELSPECVBIN = $(OBJS1_MODELSPECVBIN) $(OBJSM_MODELSPECVBIN) $(DIR_OBJ_MO
 
 all: model sc3d spec modelspec spec_vbin modelspec_vbin
 
-
-CPDIR = ../florian3d
-
-copy:
-	mkdir $(CPDIR)
-	mkdir $(CPDIR)/outputFILES
-	mkdir $(CPDIR)/outputFILES_TEST
-	mkdir $(CPDIR)/outputFILES_TEMP
-	mkdir $(CPDIR)/inputFILES
-	mkdir $(CPDIR)/plotFILES
-	mkdir $(CPDIR)/modules
-	mkdir $(CPDIR)/modules/modules
-	mkdir $(CPDIR)/modules/modules_model
-	mkdir $(CPDIR)/modules/modules_modelspec
-	mkdir $(CPDIR)/modules/modules_modelspec_vbin
-	mkdir $(CPDIR)/modules/modules_spec
-	mkdir $(CPDIR)/modules/modules_spec_vbin
-	mkdir $(CPDIR)/modules/modules_opal
-	mkdir $(CPDIR)/modules/modules_lte
-	mkdir $(CPDIR)/modules/modules_photprof
-	mkdir $(CPDIR)/modules/modules_sc3d
-	mkdir $(CPDIR)/objects
-	mkdir $(CPDIR)/objects/objects
-	mkdir $(CPDIR)/objects/objects_model
-	mkdir $(CPDIR)/objects/objects_modelspec
-	mkdir $(CPDIR)/objects/objects_modelspec_vbin
-	mkdir $(CPDIR)/objects/objects_spec
-	mkdir $(CPDIR)/objects/objects_spec_vbin
-	mkdir $(CPDIR)/objects/objects_opal
-	mkdir $(CPDIR)/objects/objects_lte
-	mkdir $(CPDIR)/objects/objects_photprof
-	mkdir $(CPDIR)/objects/objects_sc3d
-
-	cp -r outputFILES_TEST/*.pro $(CPDIR)/outputFILES_TEST/
-	cp -r outputFILES_TEST/*.py $(CPDIR)/outputFILES_TEST/
-	cp -r plotFILES/*.pro $(CPDIR)/plotFILES/
-	cp -r plotFILES/*.py $(CPDIR)/plotFILES/
-#	cp -r phot_flux $(CPDIR)/
-	cp -r opal_tables $(CPDIR)/
-	cp -r lte_tables $(CPDIR)/
-	cp in_sc3d $(CPDIR)/
-	cp in_spec $(CPDIR)/
-	cp in_spec_vbin $(CPDIR)/
-	cp in_modelspec $(CPDIR)/
-	cp in_modelspec_vbin $(CPDIR)/
-	cp indat_sc3d.nml $(CPDIR)/
-	cp indat_spec.nml $(CPDIR)/
-	cp indat_spec_vbin.nml $(CPDIR)/
-	cp indat_modelspec.nml $(CPDIR)/
-	cp indat_modelspec_vbin.nml $(CPDIR)/
-	cp Makefile $(CPDIR)/
-	cp -r src* $(CPDIR)/
-	cp *.txt $(CPDIR)/
-#
 ########################################################################
 #
-model: $(OBJS2_MODEL) | $(DIR_LIST_MOD_OBJ)
+model: $(OBJS2_MODEL) 
 #	@echo $(OBJS2_MODEL)
 	 $(LD) $(OBJS2_MODEL) $(OMP_FLAG) -L $(DIR_LIB_HDF5) -o model.eo
 
-sc3d: $(OBJS2_SC3D) | $(DIR_LIST_MOD_OBJ)
+sc3d: $(OBJS2_SC3D)
 	 $(LD) $(OBJS2_SC3D) $(OMP_FLAG) -L $(DIR_LIB_HDF5) -o sc3d.eo
 
-spec: $(OBJS2_SPEC) | $(DIR_LIST_MOD_OBJ)
+spec: $(OBJS2_SPEC)
 	 $(LD) $(OBJS2_SPEC) $(OMP_FLAG) -L $(DIR_LIB_HDF5) -o spec.eo
 
-modelspec: $(OBJS2_MODELSPEC | $(DIR_LIST_MOD_OBJ))
+modelspec: $(OBJS2_MODELSPEC)
 	 $(LD) $(OBJS2_MODELSPEC) $(OMP_FLAG) -L $(DIR_LIB_HDF5) -o modelspec.eo
 
-spec_vbin: $(OBJS2_SPECVBIN | $(DIR_LIST_MOD_OBJ))
+spec_vbin: $(OBJS2_SPECVBIN)
 	 $(LD) $(OBJS2_SPECVBIN) $(OMP_FLAG) -L $(DIR_LIB_HDF5) -o spec_vbin.eo
 
-modelspec_vbin: $(OBJS2_MODELSPECVBIN | $(DIR_LIST_MOD_OBJ))
+modelspec_vbin: $(OBJS2_MODELSPECVBIN)
 	 $(LD) $(OBJS2_MODELSPECVBIN) $(OMP_FLAG) -L $(DIR_LIB_HDF5) -o modelspec_vbin.eo
 #
 ########################################################################
-#
-$(DIR_LIST_MOD_OBJ): 
-      mkdir -p $@
 #
 
 $(DIR_OBJ)/mod_interp1d.o: $(DIR_SRC)/mod_interp1d.f90 \
@@ -662,9 +605,13 @@ $(DIR_OBJ)/sparse.o: $(DIR_SRC)/sparse.f90 \
                      $(OBJSM_TYPE)
 		$(F90) $(CFLAGS) -I $(DIR_MOD) $< -o $(DIR_OBJ)/sparse.o
 
-$(DIR_OBJ)/mod_type.o: $(DIR_SRC)/mod_type.f90
+$(DIR_OBJ)/mod_type.o: $(DIR_SRC)/mod_type.f90 | $(DIR_LIST_MOD_OBJ)
 		$(F90) $(CFLAGS) -I $(DIR_MOD) $(MFLAGS) $(DIR_MOD) $< -o $(DIR_OBJ)/mod_type.o
-
+######
+$(DIR_LIST_MOD_OBJ): 
+	echo "Creating Tree for DIR_OBJ and DIR_MOD"
+	mkdir -p $@
+#####
 ########################################################################
 
 $(DIR_OBJ_OPAL)/mod_opal.o: $(DIR_SRC_OPAL)/mod_opal.f90 \
@@ -1070,7 +1017,6 @@ clean:
 		rm -f $(DIR_MOD_OPAL)/*.o $(DIR_MOD_OPAL)/*~ $(DIR_MOD_OPAL)/*.mod
 		rm -f $(DIR_MOD_LTE)/*.o $(DIR_MOD_LTE)/*~ $(DIR_MOD_LTE)/*.mod
 
-
 		rm -f $(DIR_SRC)/*~ $(DIR_SRC)/#*
 		rm -f $(DIR_SRC_MODEL)/*~ $(DIR_SRC_MODEL)/#*
 		rm -f $(DIR_SRC_SC3D)/*~ $(DIR_SRC_SC3D)/#*
@@ -1085,5 +1031,5 @@ clean:
 
 cleanall: 
 		rm -f *.eo *.o *~ *.mod \#*
-      rm -rf $(DIR_LIST_MOD_OBJ)
+		rm -rf $(DIR_LIST_MOD_OBJ)
 
