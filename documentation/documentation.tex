@@ -294,10 +294,10 @@ You can get the code from github:
 \paragraph{Compililing the source}
 \label{compilation}
 For the optimal use of the code, we recommend the separation of the source code and the model location. 
-To this end, the main code must be compiled at the location of the source (i.e. inside directory \verb|line3d_dev|) 
+To this end, the main code must be compiled at the location of the source (i.e., inside directory \verb|line3d_dev|) 
 it can then be called and executed from any other desired location. 
-To do so one first needs to export several environmental variables, 
-including those of HDF5 library (if HDF5 library is not present on your machine consult \ref{subsec:hdf5}). \\
+To do so, one first needs to export several environmental variables, 
+including those of HDF5 library (if HDF5 library is not present on your machine, consult \ref{subsec:hdf5}). \\
 
   \begin{verbatim}
     export LIB_HDF5=<.../hdf5_lib>
@@ -323,7 +323,7 @@ including those of HDF5 library (if HDF5 library is not present on your machine 
 % 
 
 After setting up the environment, one can simply compile the code calling \texttt{make}.
-Upon successful compilation executables:
+Upon successful compilation, executables:
 \begin{itemize}
   \item \texttt{model.eo}
   \item \texttt{sc3d.eo}
@@ -336,9 +336,9 @@ Upon successful compilation executables:
 These programs can then be executed as described below.
 
 \paragraph{Executing programs}
-The recommended way of utilising the code is to create separate directory for execution of the programs. 
-In the example here, we create directory \texttt{line3d-runs}. 
-In this directory we then copy files:
+The recommended way of utilising the code is to create a separate directory for the execution of the programs. 
+In the example here, we create a directory \texttt{line3d-runs}. 
+In this directory, we then copy files:
 \begin{itemize}
   \item \texttt{.env}
   \item \texttt{indat\_sc3d.nml}
@@ -349,16 +349,16 @@ In this directory we then copy files:
   \item \texttt{in\_line.dat}
 \end{itemize}. 
 
-At this point input and output directoriesmust by created followind the designation in the \texttt{indat} files 
+At this point, input and output directories must be created following the designation in the \texttt{indat} files 
 (i.e. \verb|model_dir = ''|, \verb|output_dir = ''|, \verb|output_file = ''|, \verb|input_file = ''|, \verb|input_file2 = ''| )
 
-Having exporred environmental variables as above we can then call e.g.:\\ 
+Having exported environmental variables as above, we can then call, e.g.,:\\ 
 \verb|model.eo indat_sc3d.nml|. 
 
 \subsection{Installing HDF5}
 \label{subsec:hdf5}
 
-I recommend to create a local build for your HDF5 libraries. 
+We recommend creating a local build for your HDF5 libraries. 
 To this end, please follow the following steps (here for version 1.14.1)
 \paragraph{UNIX systems}
 \begin{enumerate}
